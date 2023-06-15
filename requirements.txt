@@ -1,0 +1,10 @@
+cryptography
+Django
+django-filter
+djangorestframework
+drf-spectacular
+markdown
+psycopg2-binary
+pyjwt
+requests
+uwsgi
