@@ -1,13 +1,13 @@
 ### Customization
 
 # django static and media files
-#/static/
-#/media/
+/static/
+/media/
 !/static/.gitkeep
 !/media/.gitkeep
 
 # vouch
-#/vouch
+/vouch
 !/vouch/config.template
 
 # local database volume
