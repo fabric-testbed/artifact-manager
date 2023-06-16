@@ -47,12 +47,15 @@ class ArtifactViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         api_user = get_api_user(request=self.request)
         if self.kwargs.get('author_uuid', None):
-            return Artifact.objects.filter(
-                Q(authors__uuid=self.kwargs.get('author_uuid')) &
-                (Q(visibility=Artifact.PUBLIC) |
-                 Q(project_uuid__in=api_user.projects) |
-                 Q(authors__uuid__contains=api_user.uuid))
+            qs1 = Artifact.objects.filter(
+                authors__uuid__contains=self.kwargs.get('author_uuid')
             ).distinct().order_by('-created')
+            qs2 = Artifact.objects.filter(
+                Q(visibility=Artifact.PUBLIC) |
+                Q(project_uuid__in=api_user.projects) |
+                Q(authors__uuid__contains=api_user.uuid)
+            ).distinct().order_by('-created')
+            return qs1.intersection(qs2).order_by('-created')
         else:
             return Artifact.objects.filter(
                 Q(visibility=Artifact.PUBLIC) |
