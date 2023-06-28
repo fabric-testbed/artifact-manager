@@ -96,14 +96,18 @@ def download_fabric_artifact_contents(urn: str) -> HttpResponse:
     """
     try:
         storage = storages['fabric_artifact_storage']
-        fabric_artifact_contents = ArtifactVersion.objects.filter(uuid=urn.split(':')[-1]).first()
-        if storage.exists(fabric_artifact_contents.filename):
-            mime_type, _ = mimetypes.guess_type(storage.path(fabric_artifact_contents.filename))
-            with storage.open(fabric_artifact_contents.filename, mode='rb') as fh:
+        c = ArtifactVersion.objects.filter(uuid=urn.split(':')[-1]).first()
+        fabric_artifact_contents = c.artifact_id + '/' + c.storage_id + '/' + c.filename
+        if storage.exists(fabric_artifact_contents):
+            mime_type, encoding = mimetypes.guess_type(storage.path(fabric_artifact_contents))
+            extension = mimetypes.guess_extension(mime_type)
+            print(mime_type, encoding, extension)
+            suffix = extension + '.gz' if encoding == 'gzip' else extension
+            with storage.open(fabric_artifact_contents, mode='rb') as fh:
                 data = fh.read()
             response = HttpResponse(data, content_type=mime_type)
             response.headers['Content-Disposition'] = "attachment; filename=%s" % storage.get_valid_name(
-                fabric_artifact_contents.filename)
+                c.artifact.title) + suffix
             return response
     except Exception as exc:
         print(exc)

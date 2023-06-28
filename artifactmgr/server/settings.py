@@ -25,7 +25,13 @@ SECRET_KEY = 'django-insecure-=lnekk7th8j+qokv%%05cg%x!&%crul1ka579j04mq&s6(hl3h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ARTIFACTMGR_FQDN = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1')
+
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ARTIFACTMGR_FQDN,
+]
 
 # Application definition
 
@@ -38,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_spectacular',
+    'django_bootstrap5',  # django bootstrap
+    'fontawesomefree',  # fontawesome free version
     'artifactmgr.apps.artifacts',
 ]
 
@@ -53,7 +61,7 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 5,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
@@ -72,7 +80,11 @@ ROOT_URLCONF = 'artifactmgr.server.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'artifactmgr/templates'),
+            os.path.join(BASE_DIR, 'artifactmgr/templates/artifactmgr'),
+            os.path.join(BASE_DIR, 'artifactmgr/templates/artifacts'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

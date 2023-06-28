@@ -41,6 +41,10 @@ class ApiUser(models.Model):
     def can_create_tag(self):
         return os.getenv('CAN_CREATE_TAGS_ROLE') in self.fabric_roles
 
+    @property
+    def is_authenticated(self):
+        return self.uuid is not os.getenv('API_USER_ANON_UUID')
+
     def is_project_member(self, project_uuid: str) -> bool:
         return project_uuid in self.projects
 
@@ -51,6 +55,7 @@ class ApiUser(models.Model):
             'affiliation': self.affiliation,
             'can_create_artifact': self.can_create_artifact,
             'can_create_tag': self.can_create_tag,
+            'cilogon_id': self.cilogon_id,
             'email': self.email,
             'fabric_roles': self.fabric_roles,
             'name': self.name,
@@ -182,3 +187,6 @@ class ArtifactVersion(models.Model):
     @property
     def urn(self) -> str:
         return 'urn:{0}:contents:{1}:{2}'.format(self.storage_type, self.storage_repo, self.uuid)
+
+    class Meta:
+        ordering = ('-created', )

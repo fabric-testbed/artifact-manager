@@ -1,0 +1,21 @@
+/* Site footer styling */
+.footer {
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background-color: #326bb3;
+  color: #fff;
+  height: 3.5rem;
+  width: 100%;
+}
+
+.link {
+  color: white;
+  font-weight: 600;
+}
+
+.footer a:hover {
+    color: lightslategray;
+}

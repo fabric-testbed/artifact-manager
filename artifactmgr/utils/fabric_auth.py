@@ -20,7 +20,10 @@ def get_api_user(request) -> ApiUser:
     - store user details for short-term access (API_USER_REFRESH_CHECK_MINUTES)
     - if not found - return anonymous api_user object
     """
-    api_user = ApiUser(uuid=os.getenv('API_USER_ANON_UUID'), projects=[], fabric_roles=[])
+    api_user = ApiUser(uuid=os.getenv('API_USER_ANON_UUID'),
+                       name=os.getenv('API_USER_ANON_NAME'),
+                       projects=[],
+                       fabric_roles=[])
     cookie = request.COOKIES.get(os.getenv('VOUCH_COOKIE_NAME'), None)
     token = request.headers.get('authorization', 'Bearer ').replace('Bearer ', '')
     now = datetime.now(timezone.utc)

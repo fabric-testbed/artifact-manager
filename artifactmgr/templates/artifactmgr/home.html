@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    FABRIC Artifact Manager
+{% endblock %}
+
+{% block content %}
+    {% if not api_user.access_expires %}
+        <h3 class="text-center mt-4">Please log in to gain full access.</h3>
+    {% else %}
+        <div class="homepage">
+            <table class="table table-striped table-bordered my-4">
+                <tbody>
+                <tr>
+                    <td style="width: 25%">Name</td>
+                    <td style="width: 75%"><strong>{{ api_user.name }}</strong></td>
+                </tr>
+                <tr>
+                    <td>Affiliation</td>
+                    <td><strong>{{ api_user.affiliation }}</strong></td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td><strong>{{ api_user.email }}</strong></td>
+                </tr>
+                <tr>
+                    <td>UUID</td>
+                    <td><strong>{{ api_user.uuid }}</strong></td>
+                </tr>
+                <tr>
+                    <td>CILogon ID</td>
+                    <td><strong>{{ api_user.cilogon_id }}</strong></td>
+                </tr>
+                <tr>
+                    <td>FABRIC Roles</td>
+                    <td><strong>
+                        {% for r in api_user.fabric_roles %}
+                            {{ r }}<br>
+                        {% endfor %}
+                    </strong></td>
+                </tr>
+                <tr>
+                    <td>FABRIC Projects (UUIDs)</td>
+                    <td><strong>
+                        {% for p in api_user.projects %}
+                            {{ p }}<br>
+                        {% endfor %}
+                    </strong></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% endblock %}

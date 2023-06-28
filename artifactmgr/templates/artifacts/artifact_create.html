@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static django_bootstrap5 %}
+
+{% block title %}
+    Artifact Manager
+{% endblock %}
+
+{% block content %}
+    {% if message %}
+        <div class="text-danger" style="font-size: large">{{ message }}</div>
+    {% endif %}
+    {% if api_user.is_authenticated %}
+        {% if api_user.can_create_artifact %}
+            <div class="container w-85">
+                <h2>Import Artifact</h2>
+                <form id="import-artifact" method="POST" class="post-form">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                </form>
+                <button class="btn btn-success mr-2" type="submit" form="import-artifact" value="save">Save</button>
+                <button class="btn btn-secondary mr-2" value="cancel">
+                    <a href="{% url 'artifact_list' %}" class="unlink">Back</a>
+                </button>
+            </div>
+        {% else %}
+            You are not able to import an Artifact
+        {% endif %}
+    {% else %}
+        <p>You are not logged in</p>
+        <a href="/login">
+            <button class="message-btn btn btn-success">Login</button>
+        </a>
+    {% endif %}
+{% endblock %}

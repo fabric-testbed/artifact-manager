@@ -1,14 +1,21 @@
 import os
 from datetime import datetime, timedelta, timezone
 
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, viewsets
 from rest_framework.exceptions import MethodNotAllowed
 
 from artifactmgr.apps.artifacts.api.author_serializers import AuthorSerializer
 from artifactmgr.apps.artifacts.models import ApiUser, ArtifactAuthor
 from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
-from artifactmgr.utils.fabric_auth import get_api_user, is_valid_uuid
+from artifactmgr.utils.fabric_auth import is_valid_uuid
+
+
+class DynamicSearchFilter(filters.SearchFilter):
+    def get_search_fields(self, view, request):
+        if request.parser_context.get('view').action == 'list':
+            return ['name', 'email', 'affiliation']
+        else:
+            return []
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -21,10 +28,8 @@ class AuthorViewSet(viewsets.ModelViewSet):
     - partial update (PATCH id)
     - destroy (DELETE id)
     """
-    # queryset = ArtifactAuthor.objects.all().order_by('name')
     serializer_class = AuthorSerializer
-    search_fields = ['name', 'email', 'affiliation']
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    filter_backends = [DynamicSearchFilter]
     permission_classes = [permissions.AllowAny]
     lookup_field = 'uuid'
 
@@ -48,7 +53,6 @@ class AuthorViewSet(viewsets.ModelViewSet):
         """
         retrieve (GET {int:pk})
         """
-        api_user = get_api_user(request=request)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):

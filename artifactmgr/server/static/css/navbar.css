@@ -1,0 +1,38 @@
+.navbar {
+  background-color: #326bb3;
+  padding: 0 1rem 0 0;
+}
+
+.navbar-brand {
+  margin-right: 0.75rem;
+  font-size: 1.1rem;
+  color: rgba(0, 0, 0, 0.8) !important;
+  font-weight: 500;
+}
+
+.navbar-text {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.dropdown-menu {
+  background-color: #326bb3;
+}
+
+.dropdown-item {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.dropdown-item:focus,
+.dropdown-item:hover {
+  color: #fff;
+  background-color: #326bb3;
+}
+
+.nav-link {
+  color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.navbar-nav li.active {
+  border-bottom: 3px solid #326bb3;
+}

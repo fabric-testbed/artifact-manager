@@ -20,6 +20,14 @@ from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_
 from artifactmgr.utils.fabric_auth import get_api_user
 
 
+class DynamicSearchFilter(filters.SearchFilter):
+    def get_search_fields(self, view, request):
+        if request.parser_context.get('view').action == 'list':
+            return ['title', 'project_name']
+        else:
+            return []
+
+
 class ArtifactViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -40,20 +48,19 @@ class ArtifactViewSet(viewsets.ModelViewSet):
     }
     default_serializer_class = ArtifactSerializer
     permission_classes = [permissions.AllowAny]
-    search_fields = ['title', 'project_name']
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    filter_backends = [DynamicSearchFilter]
     lookup_field = 'uuid'
 
     def get_queryset(self):
         api_user = get_api_user(request=self.request)
         if self.kwargs.get('author_uuid', None):
             qs1 = Artifact.objects.filter(
-                authors__uuid__contains=self.kwargs.get('author_uuid')
+                authors__uuid__in=[self.kwargs.get('author_uuid')]
             ).distinct().order_by('-created')
             qs2 = Artifact.objects.filter(
                 Q(visibility=Artifact.PUBLIC) |
                 Q(project_uuid__in=api_user.projects) |
-                Q(authors__uuid__contains=api_user.uuid)
+                Q(authors__uuid__in=[api_user.uuid])
             ).distinct().order_by('-created')
             return qs1.intersection(qs2).order_by('-created')
         else:
@@ -258,7 +265,8 @@ class ArtifactViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='by-author/(?P<author_uuid>[^/.]+)')
     def by_author(self, request, *args, **kwargs) -> HttpResponse | ValidationError:
         """
-        Download FABRIC Artifact Contents by URN
-        - Must have proper access permissions to download files
+        FABRIC Artifacts - By Author
+        - Retrieve artifacts by author where api_user can view them
+        - get_queryset returns intersection of all artifacts by author x viewable artifacts by api_user
         """
         return super().list(request, *args, **kwargs)
