@@ -19,7 +19,7 @@
                     <section class="artifactBody__description">
                         {{ artifact.description_long|safe }}
                     </section>
-                    <br><br>
+                    <br>
                     {% if artifact.versions %}
                         <section class="artifactBody__versions">
                             <h4>Versions</h4>
@@ -44,18 +44,6 @@
                             </ul>
                         </section>
                     {% endif %}
-                    <div class="inline">
-                        {{ artifact.created|str_to_datetime }}
-                        {% if artifact.tags %}
-                            <div class="float-end">
-                                {% for tag in artifact.tags %}
-                                    <button class="btn btn-secondary mr-2"
-                                            style="padding: 2px; font-size: small">{{ tag }}</button>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        <br><br>
-                    </div>
                     {% if artifact.authors %}
                         <section class="artifactBody__authors">
                             <h4>Authors</h4>
@@ -75,6 +63,18 @@
                             </ul>
                         </section>
                     {% endif %}
+                    <div class="inline">
+                        {{ artifact.created|str_to_datetime }}
+                        {% if artifact.tags %}
+                            <div class="float-end">
+                                {% for tag in artifact.tags %}
+                                    <button class="btn btn-secondary mr-2"
+                                            style="padding: 2px; font-size: small">{{ tag }}</button>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <br><br>
+                    </div>
                 </td>
             </tr>
             </tbody>

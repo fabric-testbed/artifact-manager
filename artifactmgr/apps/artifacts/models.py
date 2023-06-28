@@ -43,7 +43,7 @@ class ApiUser(models.Model):
 
     @property
     def is_authenticated(self):
-        return self.uuid is not os.getenv('API_USER_ANON_UUID')
+        return self.uuid != os.getenv('API_USER_ANON_UUID')
 
     def is_project_member(self, project_uuid: str) -> bool:
         return project_uuid in self.projects
@@ -58,6 +58,7 @@ class ApiUser(models.Model):
             'cilogon_id': self.cilogon_id,
             'email': self.email,
             'fabric_roles': self.fabric_roles,
+            'is_authenticated': self.is_authenticated,
             'name': self.name,
             'projects': self.projects,
             'uuid': self.uuid
