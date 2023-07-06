@@ -8,5 +8,6 @@ fontawesomefree
 markdown
 psycopg2-binary
 pyjwt
+python-dateutil
 requests
 uwsgi

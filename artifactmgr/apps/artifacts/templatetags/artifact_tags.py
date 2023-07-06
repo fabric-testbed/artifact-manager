@@ -1,5 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+from typing import Union
 
+from dateutil import parser
 from django import template
 
 register = template.Library()
@@ -12,3 +14,15 @@ def str_to_datetime(datetime_str):
     except Exception as exc:
         print(exc)
         return datetime_str
+
+
+@register.filter
+def normalize_date_to_utc(date_str: str) -> Union[None, str]:
+    try:
+        date_parsed = parser.parse(date_str) + timedelta(milliseconds=100)
+        date_parsed = date_parsed - timedelta(milliseconds=100)
+        date_parsed = date_parsed.astimezone(timezone.utc)
+    except Exception as exc:
+        print(exc)
+        return date_str
+    return date_parsed.strftime("%Y-%m-%d %H:%M:%S.%f%z")

@@ -17,7 +17,11 @@
                         <h2>{{ artifact.title }}</h2>
                     </div>
                     <section class="artifactBody__description">
-                        {{ artifact.description_long|safe }}
+                        {% if artifact.description_long  %}
+                            {{ artifact.description_long|safe }}
+                        {% else %}
+                            {{ artifact.description_short|safe }}
+                        {% endif %}
                     </section>
                     <br>
                     {% if artifact.versions %}
@@ -64,7 +68,7 @@
                         </section>
                     {% endif %}
                     <div class="inline">
-                        {{ artifact.created|str_to_datetime }}
+                        {{ artifact.created|normalize_date_to_utc }}
                         {% if artifact.tags %}
                             <div class="float-end">
                                 {% for tag in artifact.tags %}

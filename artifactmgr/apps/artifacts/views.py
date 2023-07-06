@@ -1,17 +1,19 @@
 import json
 import os
 from urllib.parse import parse_qs, urlparse
-from rest_framework import status
+
 from django.db import models
 from django.http import QueryDict
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
+from rest_framework import status
 
 from artifactmgr.apps.artifacts.api.artifact_viewsets import ArtifactViewSet
-from artifactmgr.apps.artifacts.api.version_viewsets import ArtifactVersionViewSet
 from artifactmgr.apps.artifacts.api.author_viewsets import AuthorViewSet
+from artifactmgr.apps.artifacts.forms import ArtifactForm
 from artifactmgr.server.settings import REST_FRAMEWORK
 from artifactmgr.utils.fabric_auth import get_api_user
+from artifactmgr.apps.artifacts.models import Artifact
 
 
 class ListObjectType(models.TextChoices):
@@ -105,9 +107,6 @@ def artifact_detail(request, *args, **kwargs):
     api_user = get_api_user(request=request)
     message = None
     try:
-        # print(request.GET.get('urn'))
-        # if request.GET.get('urn'):
-        #     ArtifactVersionViewSet.download(request=request, *args, **kwargs)
         artifact = ArtifactViewSet.as_view({'get': 'retrieve'})(request=request, *args, **kwargs)
         if artifact.data and artifact.status_code == status.HTTP_200_OK:
             artifact = json.loads(json.dumps(artifact.data))
@@ -128,26 +127,65 @@ def artifact_detail(request, *args, **kwargs):
                   })
 
 
-def artifact_create(request, *args, **kwargs):
+def artifact_create(request):
     api_user = get_api_user(request=request)
     message = None
-    try:
-        print(request.GET.get('urn'))
-        artifact = ArtifactViewSet.as_view({'get': 'retrieve'})(request=request, *args, **kwargs)
-        if artifact.data and artifact.status_code == status.HTTP_200_OK:
-            artifact = json.loads(json.dumps(artifact.data))
-        else:
-            message = {'status_code': artifact.status_code, 'detail': artifact.data.get('detail')}
-        if not message:
-            message = artifact.get('message', None)
-    except Exception as exc:
-        message = exc
-        artifact = {}
+    if request.method == "POST":
+        form = ArtifactForm(request.POST)
+        if form.is_valid():
+            try:
+                request.data = QueryDict('', mutable=True)
+                data_dict = form.cleaned_data
+                request.data.update(data_dict)
+                a = ArtifactViewSet(request=request)
+                artifact = a.create(request=request)
+                if artifact.status_code == status.HTTP_201_CREATED:
+                    artifact = json.loads(json.dumps(artifact.data))
+                    return redirect('artifact_detail', uuid=artifact.get('uuid'))
+                else:
+                    message = artifact.data
+            except Exception as exc:
+                message = exc
+    else:
+        form = ArtifactForm()
     return render(request,
-                  'artifact_detail.html',
+                  'artifact_create.html',
                   {
                       'api_user': api_user.as_dict(),
-                      'artifact': artifact,
+                      'form': form,
+                      'message': message,
+                      'debug': os.getenv('API_DEBUG')
+                  })
+
+
+def artifact_update(request, *args, **kwargs):
+    api_user = get_api_user(request=request)
+    artifact_uuid = kwargs.get('uuid')
+    message = None
+    if request.method == "POST":
+        form = ArtifactForm(request.POST)
+        if form.is_valid():
+            try:
+                request.data = QueryDict('', mutable=True)
+                data_dict = form.cleaned_data
+                request.data.update(data_dict)
+                a = ArtifactViewSet(request=request)
+                artifact = a.update(request=request, uuid=artifact_uuid)
+                if artifact.status_code == 204:
+                    return redirect('artifact_detail', uuid=artifact_uuid)
+                else:
+                    message = artifact.data
+            except Exception as exc:
+                message = exc
+    else:
+        artifact = get_object_or_404(Artifact, uuid=artifact_uuid)
+        form = ArtifactForm(instance=artifact, authors=[a.uuid for a in artifact.authors.all()] if artifact else [])
+    return render(request,
+                  'artifact_update.html',
+                  {
+                      'api_user': api_user.as_dict(),
+                      'artifact_uuid': artifact_uuid,
+                      'form': form,
                       'message': message,
                       'debug': os.getenv('API_DEBUG')
                   })

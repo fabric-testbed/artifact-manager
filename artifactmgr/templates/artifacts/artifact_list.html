@@ -23,7 +23,14 @@
                     {% endif %}
                 </div>
                 <div class="col-lg-3">
-                    <button class="btn btn-primary mr-2" id="search_submit" type="submit">Search</button>
+                    <button class="btn btn-primary mr-2" id="search_submit" type="submit">
+                        Search
+                    </button>
+                    {% if api_user.is_authenticated %}
+                        <button class="btn btn-success mr-2" id="create_artifact" type="button">
+                            <a href="{% url 'artifact_create' %}" class="unlink">Create New Artifact</a>
+                        </button>
+                    {% endif %}
                 </div>
             </div>
         </form>

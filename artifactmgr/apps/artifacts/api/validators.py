@@ -117,9 +117,11 @@ def validate_artifact_create(request, api_user: ApiUser) -> tuple:
     - 'title': 'string' - required
     - 'visibility': 'author' - required, one of author, project, public
     """
+    from pprint import pprint
     message = []
     try:
         request_data = request.data
+        pprint(request_data)
         # 'authors': ['string'] - optional
         authors = request_data.get('authors', [])
         for author in authors:
@@ -136,19 +138,19 @@ def validate_artifact_create(request, api_user: ApiUser) -> tuple:
                     message.append({'authors': 'unable to find user: \'{0}\''.format(author)})
             else:
                 message.append({'authors': 'invalid uuid format: \'{0}\''.format(author)})
-        # 'description_long': 'string' - required
-        description_long = request_data.get('description_long', '')
-        if not description_long or len(description_long) < int(os.getenv('MIN_DESCRIPTION_LENGTH')) or len(
-                description_long) > int(os.getenv('MAX_DESCRIPTION_LONG_LENGTH')):
+        # 'description_long': 'string' - optional
+        description_long = request_data.get('description_long', None)
+        if description_long and (
+                len(description_long) < int(os.getenv('MIN_DESCRIPTION_LENGTH')) or len(description_long) > int(
+            os.getenv('MAX_DESCRIPTION_LONG_LENGTH'))):
             message.append(
                 {'description_long': 'invalid length: \'{0}\', must be between {1} and {2} characters'.format(
                     len(description_long), os.getenv('MIN_DESCRIPTION_LENGTH'),
                     os.getenv('MAX_DESCRIPTION_LONG_LENGTH'))})
-        # 'description_short': 'string' - optional
-        description_short = request_data.get('description_short', None)
-        if description_short and (
-                len(description_short) < int(os.getenv('MIN_DESCRIPTION_LENGTH')) or len(description_short) > int(
-            os.getenv('MAX_DESCRIPTION_SHORT_LENGTH'))):
+        # 'description_short': 'string' - required
+        description_short = request_data.get('description_short', '')
+        if not description_short or len(description_short) < int(os.getenv('MIN_DESCRIPTION_LENGTH')) or len(
+                description_short) > int(os.getenv('MAX_DESCRIPTION_SHORT_LENGTH')):
             message.append(
                 {'description_short': 'invalid length: \'{0}\', must be between {1} and {2} characters'.format(
                     len(description_short), os.getenv('MIN_DESCRIPTION_LENGTH'),

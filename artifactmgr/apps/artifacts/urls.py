@@ -16,11 +16,14 @@ Including another URLconf
 """
 from django.urls import path
 
-from artifactmgr.apps.artifacts.views import author_list, author_detail, artifact_list, artifact_detail
+from artifactmgr.apps.artifacts.views import artifact_create, artifact_detail, artifact_list, artifact_update, \
+    author_detail, author_list
 
 urlpatterns = [
     path('', artifact_list, name='artifact_list'),
+    path('create/', artifact_create, name='artifact_create'),
     path('<uuid>', artifact_detail, name='artifact_detail'),
+    path('<uuid>/update', artifact_update, name='artifact_update'),
     path('people/', author_list, name='author_list'),
     path('people/<uuid>', author_detail, name='author_detail'),
 ]

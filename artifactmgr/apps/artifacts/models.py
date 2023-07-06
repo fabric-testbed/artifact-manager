@@ -116,7 +116,7 @@ class Artifact(models.Model):
         (PROJECT, "Project"),
         (PUBLIC, "Public"),
     )
-    authors = models.ManyToManyField(ArtifactAuthor, related_name="artifact_authors")
+    authors = models.ManyToManyField(ArtifactAuthor, related_name='artifact_author')
     created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         ArtifactAuthor,
@@ -190,4 +190,4 @@ class ArtifactVersion(models.Model):
         return 'urn:{0}:contents:{1}:{2}'.format(self.storage_type, self.storage_repo, self.uuid)
 
     class Meta:
-        ordering = ('-created', )
+        ordering = ('-created',)
