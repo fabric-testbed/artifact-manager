@@ -22,7 +22,7 @@
     {% if api_user.is_authenticated %}
         {% if api_user.can_create_artifact %}
             <div class="container w-85">
-                <h3>Create Artifact</h3>
+                <h3>Update Artifact</h3>
                 <form id="form" method="POST">
                     {% csrf_token %}
                     <p>
@@ -64,7 +64,7 @@
                 <br>
                 <button class="btn btn-success mr-2" type="submit" form="form" name="save">Save</button>
                 <button class="btn btn-secondary mr-2" value="cancel">
-                    <a href="{% url 'artifact_list' %}" class="unlink">Back</a>
+                    <a href="{% url 'artifact_detail' uuid=artifact_uuid %}" class="unlink">Back</a>
                 </button>
             </div>
         {% else %}

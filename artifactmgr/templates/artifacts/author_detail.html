@@ -34,7 +34,7 @@
                                 {{ artifact.title }}
                             </a><br>
                             {{ artifact.description_short }}<br>
-                            created: {{ artifact.created|str_to_datetime }}
+                            created: {{ artifact.created|normalize_date_to_utc }}
                         </td>
                     </tr>
                 {% endfor %}

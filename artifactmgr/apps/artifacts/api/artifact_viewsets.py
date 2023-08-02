@@ -23,7 +23,7 @@ from artifactmgr.utils.fabric_auth import get_api_user
 class DynamicSearchFilter(filters.SearchFilter):
     def get_search_fields(self, view, request):
         if request.parser_context.get('view').action == 'list':
-            return ['title', 'project_name']
+            return ['title', 'project_name', 'tags__tag']
         else:
             return []
 
@@ -233,7 +233,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                         artifact.tags.remove(tag)
                 artifact.save()
                 # return updated artifact
-                return Response(data=ArtifactSerializer(instance=artifact).data, status=201)
+                return Response(data=ArtifactSerializer(instance=artifact).data, status=204)
             else:
                 raise ValidationError(detail={'ValidationError': message})
         else:

@@ -4,16 +4,17 @@ from urllib.parse import parse_qs, urlparse
 
 from django.db import models
 from django.http import QueryDict
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 
 from artifactmgr.apps.artifacts.api.artifact_viewsets import ArtifactViewSet
 from artifactmgr.apps.artifacts.api.author_viewsets import AuthorViewSet
+from artifactmgr.apps.artifacts.api.version_viewsets import ArtifactVersionViewSet
 from artifactmgr.apps.artifacts.forms import ArtifactForm
+from artifactmgr.apps.artifacts.models import Artifact
 from artifactmgr.server.settings import REST_FRAMEWORK
 from artifactmgr.utils.fabric_auth import get_api_user
-from artifactmgr.apps.artifacts.models import Artifact
 
 
 class ListObjectType(models.TextChoices):
@@ -106,22 +107,54 @@ def author_detail(request, *args, **kwargs):
 def artifact_detail(request, *args, **kwargs):
     api_user = get_api_user(request=request)
     message = None
+
+    if request.method == 'POST':
+        try:
+            v_api_request = request.POST.copy()
+            v_api_request.COOKIES = request.COOKIES
+            v_api_request.headers = request.headers
+            v_api_request.FILES = request.FILES
+            v_api_request.data = QueryDict('', mutable=True)
+            v_api_request.data.update(
+                {
+                    'file': request.FILES,
+                    'data': {
+                        'artifact': kwargs.get('uuid'),
+                        'storage_type': 'fabric',
+                        'storage_repo': 'renci'
+                    }
+                }
+            )
+            v = ArtifactVersionViewSet(request=v_api_request)
+            version = v.create(request=v_api_request)
+            if version.status_code == status.HTTP_201_CREATED:
+                version = json.loads(json.dumps(version.data))
+                print(version)
+                return redirect('artifact_detail', uuid=kwargs.get('uuid'))
+        except Exception as exc:
+            message = exc
+            print(message)
+        return redirect('artifact_detail', uuid=kwargs.get('uuid'))
     try:
         artifact = ArtifactViewSet.as_view({'get': 'retrieve'})(request=request, *args, **kwargs)
         if artifact.data and artifact.status_code == status.HTTP_200_OK:
             artifact = json.loads(json.dumps(artifact.data))
+            is_author = api_user.uuid in [a.get('uuid') for a in artifact.get('authors', [])]
         else:
             message = {'status_code': artifact.status_code, 'detail': artifact.data.get('detail')}
+            is_author = False
         if not message:
             message = artifact.get('message', None)
     except Exception as exc:
         message = exc
         artifact = {}
+        is_author = False
     return render(request,
                   'artifact_detail.html',
                   {
                       'api_user': api_user.as_dict(),
                       'artifact': artifact,
+                      'is_author': is_author,
                       'message': message,
                       'debug': os.getenv('API_DEBUG')
                   })

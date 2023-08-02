@@ -67,7 +67,9 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         - Once created the Contents cannot be altered
         """
         api_user = get_api_user(request=request)
-        if api_user.can_create_artifact:
+        artifact = Artifact.objects.filter(uuid=request.data['data'].get('artifact', None)).first()
+        # ensure artifact exists and that api_user is an author of the artifact
+        if artifact and api_user.uuid in [a.uuid for a in artifact.authors.all()]:
             is_valid, message = validate_artifact_version_create(request, api_user=api_user)
             if is_valid:
                 artifact_version = create_fabric_artifact_contents(request=request, api_user=api_user)
@@ -77,7 +79,8 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
                 raise ValidationError(detail={'ValidationError': message})
         else:
             raise PermissionDenied(
-                detail="PermissionDenied: user:'{0}' is unable to create /artifacts".format(api_user.uuid))
+                detail="PermissionDenied: user:'{0}' is unable to create /contents or artifact does not exist".format(
+                    api_user.uuid))
 
     def retrieve(self, request, *args, **kwargs):
         """

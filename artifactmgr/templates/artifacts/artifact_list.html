@@ -41,17 +41,23 @@
                     <td>
                         <a href="{% url 'artifact_detail' uuid=artifact.uuid %}">
                             {{ artifact.title }}
-                        </a><br>
+                        </a>
+                        <br>
                         {{ artifact.description_short }}<br>
                         <div class="inline">
                             <div class="float-start">
-                                {{ artifact.created|str_to_datetime }}
+                                <b>created:</b> {{ artifact.created|normalize_date_to_utc }}
                             </div>
                             {% if artifact.tags %}
                                 <div class="float-end">
                                     {% for tag in artifact.tags %}
                                         <button class="btn btn-secondary mr-2"
-                                                style="padding: 2px; font-size: small">{{ tag }}</button>
+                                                style="padding: 2px; font-size: small">
+                                            <a href="{% url 'artifact_list' %}?search={{ tag }}"
+                                               style="color: white; text-decoration: none">
+                                                {{ tag }}
+                                            </a>
+                                        </button>
                                     {% endfor %}
                                 </div>
                             {% endif %}

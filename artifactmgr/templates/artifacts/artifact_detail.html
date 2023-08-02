@@ -14,10 +14,19 @@
             <tr>
                 <td>
                     <div class="inline">
-                        <h2>{{ artifact.title }}</h2>
+                        <h2>
+                            {{ artifact.title }}
+                            <em class="text-success" style="font-size: medium">({{ artifact.visibility }})</em>
+                            {% if is_author %}
+                                <button class="btn btn-success mr-2" style="margin-left: 10px; float: right">
+                                    <a href="{% url 'artifact_update' uuid=artifact.uuid %}"
+                                       class="unlink">Edit</a>
+                                </button>
+                            {% endif %}
+                        </h2>
                     </div>
                     <section class="artifactBody__description">
-                        {% if artifact.description_long  %}
+                        {% if artifact.description_long %}
                             {{ artifact.description_long|safe }}
                         {% else %}
                             {{ artifact.description_short|safe }}
@@ -40,12 +49,23 @@
                                                    href="/api/contents/download/{{ version.urn }}" target="_blank">
                                                     download
                                                 </a>
-                                                {{ version.created|str_to_datetime }}
+                                                {{ version.created|normalize_date_to_utc }}
                                             </div>
                                         </div>
                                     </li>
                                 {% endfor %}
                             </ul>
+                            {% if is_author %}
+                                <!--Simple Form-->
+                                <h4>Add a new Version</h4>
+                                <form method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <input type="file" name="file" accept=".tgz, .tar, .tar.gz">
+                                    <button class="btn btn-dark" type="submit">
+                                        Submit
+                                    </button>
+                                </form>
+                            {% endif %}
                         </section>
                     {% endif %}
                     {% if artifact.authors %}
@@ -68,16 +88,25 @@
                         </section>
                     {% endif %}
                     <div class="inline">
-                        {{ artifact.created|normalize_date_to_utc }}
+                        <b>created:</b> {{ artifact.created|normalize_date_to_utc }}
                         {% if artifact.tags %}
                             <div class="float-end">
                                 {% for tag in artifact.tags %}
                                     <button class="btn btn-secondary mr-2"
-                                            style="padding: 2px; font-size: small">{{ tag }}</button>
+                                            style="padding: 2px; font-size: small">
+                                        <a href="{% url 'artifact_list' %}?search={{ tag }}"
+                                           style="color: white; text-decoration: none">
+                                            {{ tag }}
+                                        </a>
+                                    </button>
                                 {% endfor %}
                             </div>
                         {% endif %}
-                        <br><br>
+                        <br>
+                        <div>
+                            <b>modified:</b> {{ artifact.modified|normalize_date_to_utc }}
+                        </div>
+                        <br>
                     </div>
                 </td>
             </tr>
