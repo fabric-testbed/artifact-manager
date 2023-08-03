@@ -33,8 +33,8 @@
                         {% endif %}
                     </section>
                     <br>
-                    {% if artifact.versions %}
-                        <section class="artifactBody__versions">
+                    <section class="artifactBody__versions">
+                        {% if artifact.versions %}
                             <h4>Versions</h4>
                             <ul>
                                 {% for version in artifact.versions %}
@@ -55,19 +55,20 @@
                                     </li>
                                 {% endfor %}
                             </ul>
-                            {% if is_author %}
-                                <!--Simple Form-->
-                                <h4>Add a new Version</h4>
-                                <form method="post" enctype="multipart/form-data">
-                                    {% csrf_token %}
-                                    <input type="file" name="file" accept=".tgz, .tar, .tar.gz">
-                                    <button class="btn btn-dark" type="submit">
-                                        Submit
-                                    </button>
-                                </form>
-                            {% endif %}
-                        </section>
-                    {% endif %}
+                        {% endif %}
+                        {% if is_author %}
+                            <!--Simple Form-->
+                            <h4>Add a new Version</h4>
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <input type="file" name="file" accept=".tgz, .tar, .tar.gz">
+                                <button class="btn btn-dark" type="submit">
+                                    Submit
+                                </button>
+                            </form>
+
+                        {% endif %}
+                    </section>
                     {% if artifact.authors %}
                         <section class="artifactBody__authors">
                             <h4>Authors</h4>
