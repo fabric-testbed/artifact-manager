@@ -222,7 +222,6 @@ def artifact_update(request, *args, **kwargs):
     fabric_users = []
     if request.method == "POST" and isinstance(request.POST.get('save'), str):
         form = ArtifactForm(request.POST)
-        print(form.errors)
         if form.is_valid():
             try:
                 request.data = QueryDict('', mutable=True)

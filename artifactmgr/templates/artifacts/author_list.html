@@ -57,18 +57,18 @@
             {% if prev_page %}
                 <button type="button" class="btn btn-secondary mr-2">
                     {% if search %}
-                        <a href="{% url 'author_list' %}?page={{ prev_page }}&search={{ search }}" class="unlink">
+                        <a href="{{ people.previous }}&search={{ search }}" class="unlink">
                             <em class="fa fa-fw fa-angles-left"></em> Page {{ prev_page }}
                         </a>
                     {% else %}
-                        <a href="{% url 'author_list' %}?page={{ prev_page }}" class="unlink">
+                        <a href="{{ people.previous }}" class="unlink">
                             <em class="fa fa-fw fa-angles-left"></em> Page {{ prev_page }}
                         </a>
                     {% endif %}
                 </button>
             {% else %}
                 <button class="btn btn-secondary mr-2 disabled">
-                    <a href="{% url 'author_list' %}?page={{ prev_page }}" class="unlink">
+                    <a href="{{ people.previous }}" class="unlink">
                         <em class="fa fa-fw fa-angles-left"></em> n/a
                     </a>
                 </button>
@@ -78,12 +78,12 @@
                 <form type="get" action="." style="margin: 0">
                     <button type="button" class="btn btn-secondary mr-2">
                         {% if search %}
-                            <a href="{% url 'author_list' %}?page={{ next_page }}&search={{ search }}"
+                            <a href="{{ people.next }}&search={{ search }}"
                                class="unlink">
                                 Page {{ next_page }} <em class="fa fa-fw fa-angles-right"></em>
                             </a>
                         {% else %}
-                            <a href="{% url 'author_list' %}?page={{ next_page }}" class="unlink">
+                            <a href="{{ people.next }}" class="unlink">
                                 Page {{ next_page }} <em class="fa fa-fw fa-angles-right"></em>
                             </a>
                         {% endif %}
@@ -91,7 +91,7 @@
                 </form>
             {% else %}
                 <button class="btn btn-secondary mr-2 disabled">
-                    <a href="{% url 'author_list' %}?page={{ next_page }}" class="unlink">
+                    <a href="{{ people.next }}" class="unlink">
                         n/a <em class="fa fa-fw fa-angles-right"></em>
                     </a>
                 </button>

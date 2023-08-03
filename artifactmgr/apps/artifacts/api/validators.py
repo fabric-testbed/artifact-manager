@@ -117,11 +117,9 @@ def validate_artifact_create(request, api_user: ApiUser) -> tuple:
     - 'title': 'string' - required
     - 'visibility': 'author' - required, one of author, project, public
     """
-    from pprint import pprint
     message = []
     try:
         request_data = request.data
-        pprint(request_data)
         # 'authors': ['string'] - optional
         authors = request_data.get('authors', [])
         for author in authors:

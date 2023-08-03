@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import CheckboxSelectMultiple
 
-from artifactmgr.apps.artifacts.models import Artifact, ArtifactTag, ArtifactAuthor
+from artifactmgr.apps.artifacts.models import Artifact, ArtifactAuthor, ArtifactTag
 
 
 class ArtifactForm(forms.ModelForm):
@@ -73,7 +73,7 @@ class ArtifactForm(forms.ModelForm):
         )
 
         for i in range(len(authors)):
-            field_name = 'author_%s' % (i+1,)
+            field_name = 'author_%s' % (i + 1,)
             self.fields[field_name] = forms.CharField(required=False)
             try:
                 a = ArtifactAuthor.objects.filter(uuid=authors[i]).first()
