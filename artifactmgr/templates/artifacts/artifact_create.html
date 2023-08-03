@@ -60,7 +60,37 @@
                         {{ form.author_11 }}
                         {{ form.author_12 }}
                     </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <h4>Search for FABRIC authors</h4>
+                        </div>
+                        <div class="col-lg-5">
+                            {% if search %}
+                                <input id="search" type="text" name="search" value="{{ search }}">
+                            {% else %}
+                                <input id="search" type="text" name="search" placeholder="search...">
+                            {% endif %}
+                        </div>
+                        <div class="col-lg-2">
+                            <button class="btn btn-primary mr-2" id="search_submit"
+                                    type="submit" style="float: right">
+                                Search
+                            </button>
+                        </div>
+                    </div>
                 </form>
+                <br>
+                <div>
+                    {% if fabric_users %}
+                        <br>
+                        <ul>
+                            {% for user in fabric_users %}
+                                <li>{{ user.name }} | {{ user.email }} | <b>{{ user.uuid }}</b></li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
                 <br>
                 <button class="btn btn-success mr-2" type="submit" form="form" name="save">Save</button>
                 <button class="btn btn-secondary mr-2" value="cancel">
@@ -79,6 +109,7 @@
     {% if debug %}
         <hr>
         <pre><strong>form</strong>:<br>{{ form.data|pprint }}</pre>
+        <pre><strong>fabric_users</strong>:<br>{{ fabric_users|pprint }}</pre>
         <pre><strong>api_user</strong>:<br>{{ api_user|pprint }}</pre>
         <br>
     {% endif %}

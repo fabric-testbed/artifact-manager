@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import CheckboxSelectMultiple
 
-from artifactmgr.apps.artifacts.models import Artifact, ArtifactTag
+from artifactmgr.apps.artifacts.models import Artifact, ArtifactTag, ArtifactAuthor
 
 
 class ArtifactForm(forms.ModelForm):
@@ -46,13 +46,6 @@ class ArtifactForm(forms.ModelForm):
         label='Project (by UUID) - required if Visibility = Project',
     )
 
-    # author_count = forms.ChoiceField(
-    #     choices=[(1, 'One'), (2, 'Two'), (3, 'Three'), (4, 'Four'), (5, 'Five'), (6, 'Six'), (7, 'Seven'),
-    #              (8, 'Eight'), (9, 'Nine'), (10, 'Ten'), (11, 'Eleven'), (12, 'Twelve')],
-    #     required=False,
-    #     initial=(4, 'Four')
-    # )
-
     author_1 = forms.CharField(required=False)
     author_2 = forms.CharField(required=False)
     author_3 = forms.CharField(required=False)
@@ -67,7 +60,6 @@ class ArtifactForm(forms.ModelForm):
     author_12 = forms.CharField(required=False)
 
     def __init__(self, *args, **kwargs):
-        print(kwargs)
         authors = kwargs.pop('authors', [])
         super().__init__(*args, **kwargs)
 
@@ -84,7 +76,8 @@ class ArtifactForm(forms.ModelForm):
             field_name = 'author_%s' % (i+1,)
             self.fields[field_name] = forms.CharField(required=False)
             try:
-                self.initial[field_name] = authors[i]
+                a = ArtifactAuthor.objects.filter(uuid=authors[i]).first()
+                self.initial[field_name] = '{0}: {1}'.format(a.uuid, a)
             except IndexError:
                 self.initial[field_name] = ''
 
@@ -92,11 +85,9 @@ class ArtifactForm(forms.ModelForm):
         authors = []
         i = 1
         field_name = 'author_%s' % (i,)
-        while self.cleaned_data.get(field_name):
-            author = self.cleaned_data[field_name]
-            if author in authors:
-                self.add_error(field_name, 'Duplicate')
-            else:
+        while i <= 12:
+            author = str(self.cleaned_data[field_name]).split(':')[0]
+            if author and author not in authors:
                 authors.append(author)
             i += 1
             field_name = 'author_%s' % (i,)

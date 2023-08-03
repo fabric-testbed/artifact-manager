@@ -12,8 +12,9 @@ from artifactmgr.apps.artifacts.api.artifact_viewsets import ArtifactViewSet
 from artifactmgr.apps.artifacts.api.author_viewsets import AuthorViewSet
 from artifactmgr.apps.artifacts.api.version_viewsets import ArtifactVersionViewSet
 from artifactmgr.apps.artifacts.forms import ArtifactForm
-from artifactmgr.apps.artifacts.models import Artifact
+from artifactmgr.apps.artifacts.models import ApiUser, Artifact
 from artifactmgr.server.settings import REST_FRAMEWORK
+from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
 from artifactmgr.utils.fabric_auth import get_api_user
 
 
@@ -163,7 +164,9 @@ def artifact_detail(request, *args, **kwargs):
 def artifact_create(request):
     api_user = get_api_user(request=request)
     message = None
-    if request.method == "POST":
+    search = None
+    fabric_users = []
+    if request.method == "POST" and isinstance(request.POST.get('save'), str):
         form = ArtifactForm(request.POST)
         if form.is_valid():
             try:
@@ -179,15 +182,35 @@ def artifact_create(request):
                     message = artifact.data
             except Exception as exc:
                 message = exc
+        else:
+            message = form.errors
+    elif request.method == "POST" and isinstance(request.POST.get('search'), str):
+        form = ArtifactForm(request.POST)
+        search = request.POST.get('search')
+        if len(search) < 3:
+            message = 'SearchError: Search for FABRIC authors requires 3 or more characters'
+        else:
+            if api_user.access_type == ApiUser.COOKIE:
+                fabric_users = query_core_api_by_cookie(
+                    query='/people?search={0}'.format(search),
+                    cookie=request.COOKIES.get(os.getenv('VOUCH_COOKIE_NAME'), None)).get('results')
+            else:
+                fabric_users = query_core_api_by_token(
+                    query='/people?search={0}'.format(search),
+                    token=request.headers.get('authorization', 'Bearer ').replace('Bearer ', '')).get('results')
+        if not message and len(fabric_users) == 0:
+            fabric_users = [{'name': 'No results found for search = "{0}"'.format(search)}]
     else:
         form = ArtifactForm()
     return render(request,
                   'artifact_create.html',
                   {
                       'api_user': api_user.as_dict(),
+                      'debug': os.getenv('API_DEBUG'),
+                      'fabric_users': fabric_users,
                       'form': form,
                       'message': message,
-                      'debug': os.getenv('API_DEBUG')
+                      'search': search
                   })
 
 
@@ -195,8 +218,11 @@ def artifact_update(request, *args, **kwargs):
     api_user = get_api_user(request=request)
     artifact_uuid = kwargs.get('uuid')
     message = None
-    if request.method == "POST":
+    search = None
+    fabric_users = []
+    if request.method == "POST" and isinstance(request.POST.get('save'), str):
         form = ArtifactForm(request.POST)
+        print(form.errors)
         if form.is_valid():
             try:
                 request.data = QueryDict('', mutable=True)
@@ -210,6 +236,24 @@ def artifact_update(request, *args, **kwargs):
                     message = artifact.data
             except Exception as exc:
                 message = exc
+        else:
+            message = form.errors
+    elif request.method == "POST" and isinstance(request.POST.get('search'), str):
+        form = ArtifactForm(request.POST)
+        search = request.POST.get('search')
+        if len(search) < 3:
+            message = 'SearchError: Search for FABRIC authors requires 3 or more characters'
+        else:
+            if api_user.access_type == ApiUser.COOKIE:
+                fabric_users = query_core_api_by_cookie(
+                    query='/people?search={0}'.format(search),
+                    cookie=request.COOKIES.get(os.getenv('VOUCH_COOKIE_NAME'), None)).get('results')
+            else:
+                fabric_users = query_core_api_by_token(
+                    query='/people?search={0}'.format(search),
+                    token=request.headers.get('authorization', 'Bearer ').replace('Bearer ', '')).get('results')
+        if not message and len(fabric_users) == 0:
+            fabric_users = [{'name': 'No results found for search = "{0}"'.format(search)}]
     else:
         artifact = get_object_or_404(Artifact, uuid=artifact_uuid)
         form = ArtifactForm(instance=artifact, authors=[a.uuid for a in artifact.authors.all()] if artifact else [])
@@ -218,9 +262,11 @@ def artifact_update(request, *args, **kwargs):
                   {
                       'api_user': api_user.as_dict(),
                       'artifact_uuid': artifact_uuid,
+                      'debug': os.getenv('API_DEBUG'),
+                      'fabric_users': fabric_users,
                       'form': form,
                       'message': message,
-                      'debug': os.getenv('API_DEBUG')
+                      'search': search
                   })
 
 
