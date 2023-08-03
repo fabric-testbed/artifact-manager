@@ -19,9 +19,11 @@
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'author_list' %}">Authors</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/api/swagger">API</a>
-            </li>
+            {% if api_user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/api/swagger">API</a>
+                </li>
+            {% endif %}
         </ul>
         <div class="navbar-nav nav-item ms-auto order-5">
             {% if api_user.is_authenticated %}
