@@ -16,6 +16,7 @@ from artifactmgr.apps.artifacts.models import ApiUser, Artifact
 from artifactmgr.server.settings import REST_FRAMEWORK
 from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
 from artifactmgr.utils.fabric_auth import get_api_user
+from artifactmgr.server.settings import API_DEBUG
 
 
 class ListObjectType(models.TextChoices):
@@ -43,7 +44,7 @@ def artifact_list(request):
                       'prev_page': artifacts.get('prev_page', None),
                       'search': artifacts.get('search', None),
                       'count': artifacts.get('count', None),
-                      'debug': os.getenv('API_DEBUG')
+                      'debug': API_DEBUG
                   })
 
 
@@ -66,7 +67,7 @@ def author_list(request):
                       'prev_page': authors.get('prev_page', None),
                       'search': authors.get('search', None),
                       'count': authors.get('count', None),
-                      'debug': os.getenv('API_DEBUG')
+                      'debug': API_DEBUG
                   })
 
 
@@ -101,7 +102,7 @@ def author_detail(request, *args, **kwargs):
                       'prev_page': artifacts.get('prev_page', None),
                       'search': artifacts.get('search', None),
                       'count': artifacts.get('count', None),
-                      'debug': os.getenv('API_DEBUG')
+                      'debug': API_DEBUG
                   })
 
 
@@ -157,7 +158,7 @@ def artifact_detail(request, *args, **kwargs):
                       'artifact': artifact,
                       'is_author': is_author,
                       'message': message,
-                      'debug': os.getenv('API_DEBUG')
+                      'debug': API_DEBUG
                   })
 
 
@@ -206,7 +207,7 @@ def artifact_create(request):
                   'artifact_create.html',
                   {
                       'api_user': api_user.as_dict(),
-                      'debug': os.getenv('API_DEBUG'),
+                      'debug': API_DEBUG,
                       'fabric_users': fabric_users,
                       'form': form,
                       'message': message,
@@ -261,7 +262,7 @@ def artifact_update(request, *args, **kwargs):
                   {
                       'api_user': api_user.as_dict(),
                       'artifact_uuid': artifact_uuid,
-                      'debug': os.getenv('API_DEBUG'),
+                      'debug': API_DEBUG,
                       'fabric_users': fabric_users,
                       'form': form,
                       'message': message,
@@ -339,5 +340,6 @@ def list_object_paginator(request, object_type: str, *args, **kwargs):
         'next_page': next_page,
         'prev_page': prev_page,
         'search': search_term,
-        'count': count
+        'count': count,
+        'debug': API_DEBUG
     }

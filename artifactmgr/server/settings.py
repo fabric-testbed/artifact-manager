@@ -23,7 +23,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = 'django-insecure-=lnekk7th8j+qokv%%05cg%x!&%crul1ka579j04mq&s6(hl3h'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if os.getenv('DJANGO_DEBUG').casefold() == 'true':
+    DEBUG = True
+else:
+    DEBUG = False
+
+# SECURITY WARNING: don't run with API debug turned on in production!
+if os.getenv('API_DEBUG').casefold() == 'true':
+    API_DEBUG = True
+else:
+    API_DEBUG = False
 
 ARTIFACTMGR_FQDN = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1')
 
