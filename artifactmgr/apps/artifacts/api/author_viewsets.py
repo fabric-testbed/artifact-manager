@@ -5,7 +5,7 @@ from rest_framework import filters, permissions, viewsets
 from rest_framework.exceptions import MethodNotAllowed
 
 from artifactmgr.apps.artifacts.api.author_serializers import AuthorSerializer
-from artifactmgr.apps.artifacts.models import ApiUser, ArtifactAuthor
+from artifactmgr.apps.artifacts.models import ApiUser, ArtifactAuthor, TaskTimeoutTracker
 from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
 from artifactmgr.utils.fabric_auth import is_valid_uuid
 
@@ -79,7 +79,8 @@ def create_author_from_uuid(request, api_user: ApiUser, author_uuid: str) -> Art
         now = datetime.now(timezone.utc)
         if is_valid_uuid(author_uuid):
             author = ArtifactAuthor.objects.filter(uuid=author_uuid).first()
-            if author and author.updated + timedelta(days=int(os.getenv('AUTHOR_REFRESH_CHECK_DAYS'))) > now:
+            arc = TaskTimeoutTracker.objects.get(name=os.getenv('ARC_NAME'))
+            if author and author.updated + timedelta(seconds=int(arc.timeout_in_seconds)) > now:
                 return author
             else:
                 if api_user.access_type == ApiUser.COOKIE:
