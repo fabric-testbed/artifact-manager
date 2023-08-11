@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timedelta, timezone
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -191,3 +192,35 @@ class ArtifactVersion(models.Model):
 
     class Meta:
         ordering = ('-created',)
+
+
+class TaskTimeoutTracker(models.Model):
+    """
+    Task Timeout Tracker
+    - description
+    - last_updated
+    - name
+    - timeout_in_seconds
+    - uuid
+    - value
+    """
+    description = models.CharField(max_length=255, blank=True, null=True)
+    last_updated = models.DateTimeField(blank=False, null=False)
+    name = models.CharField(max_length=255, blank=False, null=False)
+    timeout_in_seconds = models.IntegerField(default=0, blank=False, null=False)
+    uuid = models.CharField(primary_key=True, max_length=255, blank=False, null=False)
+    value = models.TextField(blank=True, null=True)
+
+    # Order by name
+    class Meta:
+        db_table = "task_timeout_tracker"
+        ordering = ("name",)
+
+    def __str__(self):
+        return self.name
+
+    def timed_out(self) -> bool:
+        if datetime.now(timezone.utc) > (self.last_updated + timedelta(seconds=int(self.timeout_in_seconds))):
+            return True
+        else:
+            return False

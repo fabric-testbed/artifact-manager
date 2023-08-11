@@ -1,3 +1,5 @@
+import json
+
 from django.db.models import Q
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -67,7 +69,11 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         - Once created the Contents cannot be altered
         """
         api_user = get_api_user(request=request)
-        artifact = Artifact.objects.filter(uuid=request.data['data'].get('artifact', None)).first()
+        try:
+            request_data = json.loads(request.data.getlist('data')[0])
+        except Exception as exc:
+            request_data = request.data.getlist('data')[0]
+        artifact = Artifact.objects.filter(uuid=request_data.get('artifact', None)).first()
         # ensure artifact exists and that api_user is an author of the artifact
         if artifact and api_user.uuid in [a.uuid for a in artifact.authors.all()]:
             is_valid, message = validate_artifact_version_create(request, api_user=api_user)

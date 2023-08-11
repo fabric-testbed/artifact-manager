@@ -1,9 +1,13 @@
 import json
+import mimetypes
 import os
 
 from artifactmgr.apps.artifacts.models import ApiUser, Artifact, ArtifactAuthor, ArtifactTag, ArtifactVersion
 from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
 from artifactmgr.utils.fabric_auth import is_valid_uuid
+
+# valid mimetypes for artifact contents
+valid_mimetypes = [('application/x-tar', 'gzip')]
 
 
 def validate_contents_download(urn: str, api_user: ApiUser) -> tuple:
@@ -61,6 +65,10 @@ def validate_artifact_version_create(request, api_user: ApiUser) -> tuple:
             message.append({'file': 'missing a \'file\' to create an artifact from'})
         if 'data' not in request_keys:
             message.append({'data': 'missing the \'data\' attributes to create an artifact from'})
+        file_mimetype = mimetypes.guess_type(request.FILES.get('file').name)
+        if file_mimetype not in valid_mimetypes:
+            message.append({'mimetypes': 'Invalid file type for \'{0}\', must be .tgz or .tar.gz'.format(
+                request.FILES.get('file').name)})
         request_data = request.data['data']
         if not isinstance(request_data, dict):
             request_data = json.loads(request_data)

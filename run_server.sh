@@ -89,6 +89,9 @@ done
 # static files
 python manage.py collectstatic --noinput
 
+# initialize task timeout tracker
+python manage.py init_task_timeout_tracker
+
 # run mode
 case "${RUN_MODE}" in
     local-dev)

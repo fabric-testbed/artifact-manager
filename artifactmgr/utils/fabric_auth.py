@@ -1,6 +1,7 @@
 import base64
 import gzip
 import hashlib
+import json
 import os
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -8,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 import jwt
 import requests
 
-from artifactmgr.apps.artifacts.models import ApiUser
+from artifactmgr.apps.artifacts.models import ApiUser, TaskTimeoutTracker
 
 
 def get_api_user(request) -> ApiUser:
@@ -81,18 +82,31 @@ def get_oidc_sub_from_cookie(cookie: str) -> str | None:
 
 
 def get_oidc_sub_from_token(token: str) -> str | None:
+    s = requests.Session()
     try:
+        psk = TaskTimeoutTracker.objects.get(name=os.getenv('PSK_NAME'))
+        if not psk.timed_out():
+            public_signing_key = jwt.PyJWK(json.loads(psk.value)).key
+        else:
+            api_call = s.get(url=os.getenv('FABRIC_CREDENTIAL_MANAGER') + '/credmgr/certs')
+            jwks = api_call.json().get('keys')[0]
+            public_signing_key = jwt.PyJWK(jwks).key
+            psk.value = json.dumps(jwks)
+            psk.last_updated = datetime.now(timezone.utc)
+            psk.save()
         token_json = jwt.decode(
             jwt=token,
-            key=os.getenv('PUBLIC_SIGNING_KEY'),
+            key=public_signing_key,
             algorithms=["RS256"],
             options={"verify_aud": False}
         )
         oidc_sub = token_json.get('sub')
-        return oidc_sub
     except Exception as exc:
         print(exc)
-        return None
+        oidc_sub = None
+
+    s.close()
+    return oidc_sub
 
 
 def auth_user_by_cookie(cookie: str) -> ApiUser:
@@ -168,9 +182,8 @@ def auth_user_by_token(token):
 def is_token_revoked(token: str) -> bool:
     """
     Check all incoming tokens against a token revocation list (TRL)
-    - TODO: SHA256 simple hash <-- needs to mirror whatever CM is doing
     """
-    revocation_list = ['ba8a9d292308e55ac9ca1f995625aecb2876fb4ba16935152a69a0efc28e4cbe']
+    revocation_list = get_token_revocation_list()
     try:
         token_hash = hashlib.new('sha256')
         token_hash.update(token.encode())
@@ -180,6 +193,28 @@ def is_token_revoked(token: str) -> bool:
         print(exc)
         return True
     return False
+
+
+def get_token_revocation_list() -> [str]:
+    """
+    Retrieve Token Revocation List (TRL) from CM at some interval
+    """
+    s = requests.Session()
+    try:
+        trl = TaskTimeoutTracker.objects.get(name=os.getenv('TRL_NAME'))
+        if not trl.timed_out():
+            token_revocation_list = json.loads(trl.value)
+        else:
+            api_call = s.get(url=os.getenv('FABRIC_CREDENTIAL_MANAGER') + '/credmgr/tokens/revoke_list')
+            token_revocation_list = api_call.json().get('data')
+            trl.value = json.dumps(token_revocation_list)
+            trl.last_updated = datetime.now(timezone.utc)
+            trl.save()
+    except Exception as exc:
+        print(exc)
+        token_revocation_list = []
+    s.close()
+    return list(token_revocation_list)
 
 
 def is_valid_uuid(val) -> bool:
