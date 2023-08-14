@@ -172,6 +172,13 @@ STORAGES = {
     },
 }
 
+# Login / Logout settings
+LOGIN_URL = '/login'
+LOGIN_REDIRECT_URL = '/'
+
+LOGOUT_URL = '/logout'
+LOGOUT_REDIRECT_URL = '/'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
