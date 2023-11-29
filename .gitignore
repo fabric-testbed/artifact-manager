@@ -15,6 +15,7 @@
 
 # local artifact storage
 /artifact_storage
+/apps/artifacts/fixtures/artifacts.json
 
 # migrations files - only keep init file
 /artifactmgr/apps/artifacts/migrations/

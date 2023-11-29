@@ -9,115 +9,114 @@
         <div class="text-danger" style="font-size: large">{{ message }}</div>
     {% endif %}
     <div class="container w-85">
-        <table class="table table-striped table-bordered my-4">
-            <tbody>
-            <tr>
-                <td>
-                    <div class="inline">
-                        <h2>
-                            {{ artifact.title }}
-                            <em class="text-success" style="font-size: medium">({{ artifact.visibility }})</em>
-                            {% if is_author %}
-                                <button class="btn btn-success mr-2" style="margin-left: 10px; float: right">
-                                    <a href="{% url 'artifact_update' uuid=artifact.uuid %}"
-                                       class="unlink">Edit</a>
-                                </button>
-                            {% endif %}
-                        </h2>
-                    </div>
-                    <section class="artifactBody__description">
-                        {% if artifact.description_long %}
-                            {{ artifact.description_long|safe }}
-                        {% else %}
-                            {{ artifact.description_short|safe }}
-                        {% endif %}
-                    </section>
-                    <br>
-                    <section class="artifactBody__versions">
-                        {% if artifact.versions %}
-                            <h4>Versions</h4>
-                            <ul>
-                                {% for version in artifact.versions %}
-                                    <li>
-                                        <div class="row">
-                                            <div class="col-lg-3">
-                                                Version {{ version.version }}
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <a class="btn btn-success"
-                                                   style="font-size: small;padding: 2px"
-                                                   href="/api/contents/download/{{ version.urn }}" target="_blank">
-                                                    download
-                                                </a>
-                                                {{ version.created|normalize_date_to_utc }}
-                                            </div>
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                        {% if is_author %}
-                            <!--Simple Form-->
-                            <h4>Add a new Version</h4>
-                            <form method="post" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <input type="file" name="file" accept=".tgz, .tar, .tar.gz">
-                                <button class="btn btn-dark" type="submit">
-                                    Submit
-                                </button>
-                            </form>
-
-                        {% endif %}
-                    </section>
-                    {% if artifact.authors %}
-                        <section class="artifactBody__authors">
-                            <h4>Authors</h4>
-                            <ul>
-                                {% for author in artifact.authors %}
-                                    <li>
-                                        <a href="{% url 'author_detail' uuid=author.uuid %}">
-                                            {{ author.name }}
-                                        </a>, {{ author.affiliation }}
-                                        {% if author.email %}
-                                            (<a href="mailto:{{ author.email }}">{{ author.email }}</a>)
-                                        {% else %}
-                                            (<i style="color: gray">email is private</i>)
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </section>
-                    {% endif %}
-                    <div class="inline">
-                        <b>created:</b> {{ artifact.created|normalize_date_to_utc }}
-                        {% if artifact.tags %}
-                            <div class="float-end">
-                                {% for tag in artifact.tags %}
-                                    <button class="btn btn-secondary mr-2"
-                                            style="padding: 2px; font-size: small">
-                                        <a href="{% url 'artifact_list' %}?search={{ tag }}"
-                                           style="color: white; text-decoration: none">
-                                            {{ tag }}
-                                        </a>
-                                    </button>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        <br>
-                        <div>
-                            <b>modified:</b> {{ artifact.modified|normalize_date_to_utc }}
-                        </div>
-                        <br>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
+        <h2>
+            {{ artifact.title }}
+            <em class="text-success" style="font-size: medium">({{ artifact.visibility }})</em>
+            {% if is_author %}
+                <button class="btn btn-success mr-2" style="margin-left: 10px; float: right">
+                    <a href="{% url 'artifact_update' uuid=artifact.uuid %}"
+                        class="unlink">Edit</a>
+                </button>
+            {% endif %}
+        </h2>
+        <table class="table table-striped table-bordered my-2">
+          <tr>
+            <td>Description</td>
+            <td>
+              {% if artifact.description_long %}
+                  {{ artifact.description_long|safe }}
+              {% else %}
+                  {{ artifact.description_short|safe }}
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td>Created</td>
+            <td>{{ artifact.created|normalize_date_to_utc }}</td>
+          </tr>
+          <tr>
+            <td>Modified</td>
+            <td>{{ artifact.modified|normalize_date_to_utc }}</td>
+          </tr>
+          <tr>
+            <td>Tags</td>
+            <td>
+              {% if artifact.tags|length == 0 %}
+                No tags for this artifact
+              {% endif %}
+              {% if artifact.tags|length > 0 %}
+                {% for tag in artifact.tags %}
+                  <a
+                    href="{% url 'artifact_list' %}?search={{ tag }}"
+                    class="badge badge-primary"
+                  >
+                      {{ tag }}
+                  </a>
+                {% endfor %}
+              {% endif %}
+            </td>
+          </tr>
         </table>
+        <section class="artifactBody__versions">
+            {% if artifact.versions %}
+                <h4>Versions</h4>
+                <ul>
+                    {% for version in artifact.versions %}
+                        <li>
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    Version {{ version.version }}
+                                </div>
+                                <div class="col-lg-6">
+                                    <a class="btn btn-success"
+                                        style="font-size: small;padding: 2px"
+                                        href="/api/contents/download/{{ version.urn }}" target="_blank">
+                                        download
+                                    </a>
+                                    {{ version.created|normalize_date_to_utc }}
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if is_author %}
+                <!--Simple Form-->
+                <h4>Add a new Version</h4>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" name="file" accept=".tgz, .tar, .tar.gz">
+                    <button class="btn btn-dark" type="submit">
+                        Submit
+                    </button>
+                </form>
+
+            {% endif %}
+        </section>
+        {% if artifact.authors %}
+            <section class="artifactBody__authors">
+                <h4>Authors</h4>
+                <ul>
+                    {% for author in artifact.authors %}
+                        <li>
+                            <a href="{% url 'author_detail' uuid=author.uuid %}">
+                                {{ author.name }}
+                            </a>, {{ author.affiliation }}
+                            {% if author.email %}
+                                (<a href="mailto:{{ author.email }}">{{ author.email }}</a>)
+                            {% else %}
+                                (<i style="color: gray">email is private</i>)
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
     </div>
-    {% if debug %}
+    <!-- {% if debug %}
         <hr>
         <pre><strong>artifact</strong>:<br>{{ artifact|pprint }}</pre>
         <pre><strong>api_user</strong>:<br>{{ api_user|pprint }}</pre>
         <br>
-    {% endif %}
+    {% endif %} -->
 {% endblock %}
