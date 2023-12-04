@@ -10,7 +10,13 @@
     {% endif %}
     <div class="container w-85">
         <div>
+          <div class="d-flex flex-row justify-content-between">
             <h2 class="mb-2">{{ author.name }}</h2>
+            <button class="btn btn-secondary mr-2" value="cancel">
+                <a href="{% url 'author_list' %}" class="unlink">Back</a>
+            </button>
+          </div>
+            
             <table class="table table-striped table-bordered my-4">
               <tbody>
                 <tr>

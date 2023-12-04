@@ -43,7 +43,7 @@ class ArtifactForm(forms.ModelForm):
     project_uuid = forms.CharField(
         widget=forms.TextInput(attrs={'size': 60}),
         required=False,
-        label='Project (by UUID) - required if Visibility = Project',
+        label='Project (by UUID) - required if Visibility is set as "Project"',
     )
 
     author_1 = forms.CharField(required=False)
@@ -63,7 +63,8 @@ class ArtifactForm(forms.ModelForm):
         authors = kwargs.pop('authors', [])
         super().__init__(*args, **kwargs)
 
-        available_tags = [(t.tag, t.tag) for t in ArtifactTag.objects.all().order_by('tag')]
+        available_tags = [(t.tag, t.tag)
+                          for t in ArtifactTag.objects.all().order_by('tag')]
 
         self.fields['tags'] = forms.MultipleChoiceField(
             widget=CheckboxSelectMultiple,
@@ -96,4 +97,5 @@ class ArtifactForm(forms.ModelForm):
 
     class Meta:
         model = Artifact
-        fields = ['title', 'description_short', 'description_long', 'visibility', 'project_uuid', 'tags']
+        fields = ['title', 'description_short', 'description_long',
+                  'visibility', 'project_uuid', 'tags']

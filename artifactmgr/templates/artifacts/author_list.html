@@ -12,11 +12,11 @@
         <form method="get">
             {% csrf_token %}
               <h2>Authors</h2>
-              <div class="d-flex flex-row">
+              <div class="d-flex flex-row justify-content-between">
                   {% if search %}
-                      <input id="search" type="text" name="search" class="form-control" value="{{ search }}">
+                      <input id="search" type="text" name="search" class="form-control w-75" value="{{ search }}">
                   {% else %}
-                      <input id="search" type="text" name="search" class="form-control" placeholder="Search authors...">
+                      <input id="search" type="text" name="search" class="form-control w-75" placeholder="Search authors...">
                   {% endif %}
                   <button class="btn btn-primary" id="search_submit" type="submit">Search</button>
               </div>

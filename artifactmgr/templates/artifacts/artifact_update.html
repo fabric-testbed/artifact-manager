@@ -46,7 +46,7 @@
                     <p>
                         Authors (by UUID):
                     </p>
-                    <div>
+                    <div class="artifact-authors">
                         {{ form.author_1 }}
                         {{ form.author_2 }}
                         {{ form.author_3 }}
@@ -67,9 +67,9 @@
                         </div>
                         <div class="col-lg-5">
                             {% if search %}
-                                <input id="search" type="text" name="search" value="{{ search }}">
+                                <input id="search" type="text" name="search" class="form-control" value="{{ search }}">
                             {% else %}
-                                <input id="search" type="text" name="search" placeholder="search...">
+                                <input id="search" type="text" name="search" class="form-control" placeholder="search...">
                             {% endif %}
                         </div>
                         <div class="col-lg-2">
@@ -101,7 +101,9 @@
             You are not able to create an Artifact
         {% endif %}
     {% else %}
-        <p>You are not logged in</p>
+      <div class="alert alert-warning" role="alert">
+        You are not logged in. Please login first to update the artifact.
+      </div>
         <a href="/login">
             <button class="message-btn btn btn-success">Login</button>
         </a>
