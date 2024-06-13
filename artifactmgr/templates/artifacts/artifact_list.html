@@ -11,26 +11,22 @@
     <div class="container w-85">
         <form method="get">
             {% csrf_token %}
-            <div class="row">
-                <div class="col-lg-3">
-                    <h2>Artifacts</h2>
-                </div>
-                <div class="col-lg-6">
-                    {% if search %}
-                        <input id="search" type="text" name="search" value="{{ search }}">
-                    {% else %}
-                        <input id="search" type="text" name="search" placeholder="search...">
-                    {% endif %}
-                </div>
-                <div class="col-lg-3">
-                    <button class="btn btn-primary mr-2" id="search_submit" type="submit">
-                        Search
-                    </button>
-                    {% if api_user.is_authenticated %}
-                        <button class="btn btn-success mr-2" id="create_artifact" type="button">
-                            <a href="{% url 'artifact_create' %}" class="unlink">Create New Artifact</a>
-                        </button>
-                    {% endif %}
+            <h2>Artifacts</h2>
+            <div class="d-flex flex-row justify-content-between">
+                {% if search %}
+                    <input id="search" type="text" name="search" class="form-control w-75" value="{{ search }}">
+                {% else %}
+                    <input id="search" type="text" name="search" class="form-control w-75" placeholder="Search artifacts by name or tag...">
+                {% endif %}
+                <div>
+                  <button class="btn btn-primary ml-1" id="search_submit" type="submit">
+                    Search
+                  </button>
+                  {% if api_user.is_authenticated %}
+                      <button class="btn btn-success ml-1" id="create_artifact" type="button">
+                          <a href="{% url 'artifact_create' %}" class="unlink">Create Artifact</a>
+                      </button>
+                  {% endif %}
                 </div>
             </div>
         </form>
@@ -83,7 +79,7 @@
             {% else %}
                 <button class="btn btn-secondary mr-2 disabled">
                     <a href="{{ artifacts.previous }}" class="unlink">
-                        <em class="fa fa-fw fa-angles-left"></em> n/a
+                        <em class="fa fa-fw fa-angles-left"></em>
                     </a>
                 </button>
             {% endif %}
@@ -106,16 +102,16 @@
             {% else %}
                 <button class="btn btn-secondary mr-2 disabled">
                     <a href="{{ artifacts.next }}" class="unlink">
-                        n/a <em class="fa fa-fw fa-angles-right"></em>
+                        <em class="fa fa-fw fa-angles-right"></em>
                     </a>
                 </button>
             {% endif %}
         </div>
     </div>
-    {% if debug %}
+    <!-- {% if debug %}
         <hr>
         <pre><strong>artifacts</strong>:<br>{{ artifacts|pprint }}</pre>
         <pre><strong>api_user</strong>:<br>{{ api_user|pprint }}</pre>
         <br>
-    {% endif %}
+    {% endif %} -->
 {% endblock %}

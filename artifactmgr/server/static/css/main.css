@@ -107,7 +107,7 @@ select {
 }
 
 .list-group-item.active {
-  background-color: #326bb3;
+  background-color: #5798bc;
   border: none;
 }
 
@@ -162,20 +162,18 @@ h4[aria-expanded="false"] .fa-minus {
 }
 
 .message-btn {
-  font-family: FontAwesome;
   padding: 0.35rem 1rem;
   margin-right: 0.5rem;
 }
 
 .unlink {
-  font-family: FontAwesome;
-  color: #fff;
+  color: #fff !important;
   text-decoration: none;
 }
 
 .unlink:hover,
 .unlink:focus {
-  color: #fff;
+  color: #fff !important;
   text-decoration: none;
 }
 
@@ -184,7 +182,20 @@ h4[aria-expanded="false"] .fa-minus {
 }
 
 .card-header a {
-  color: #326bb3;
+  color: #5798bc;
+}
+
+a {
+  color: #5798bc;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #1f6a8c !important;
+}
+
+.btn:hover {
+  color: #fff !important;
 }
 
 .bd-callout {
@@ -197,11 +208,25 @@ h4[aria-expanded="false"] .fa-minus {
 }
 
 .bd-callout-info {
-  border-left-color: #326bb3;
+  border-left-color: #5798bc;
 }
 
 .btn-primary {
-  background-color: #326bb3 !important;
+  background-color: #5798bc !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: #5798bc !important;
+  color: #fff !important;
+}
+
+.btn-outline-primary {
+  border-color:  #5798bc !important;
+  color: #5798bc !important;
+}
+
+.btn-check:checked+.btn, .btn.active, .btn.show, .btn:first-child:active, :not(.btn-check)+.btn:active {
+  background-color: #5798bc !important;
 }
 
 .btn-info {
@@ -214,8 +239,19 @@ h4[aria-expanded="false"] .fa-minus {
 }
 
 .alert {
-  position: fixed;
-  top: 0;
   width: 100%;
-  z-index: 100;
+}
+
+.navbar {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  --bs-navbar-padding-y: 0 !important;
+}
+
+.sm-font {
+  font-size: 0.8rem;
+}
+
+.badge-primary {
+  background-color: #5798bc !important;
 }
