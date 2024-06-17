@@ -16,17 +16,18 @@
                 {% if search %}
                     <input id="search" type="text" name="search" class="form-control w-75" value="{{ search }}">
                 {% else %}
-                    <input id="search" type="text" name="search" class="form-control w-75" placeholder="Search artifacts by name or tag...">
+                    <input id="search" type="text" name="search" class="form-control w-75"
+                           placeholder="Search artifacts by name or tag...">
                 {% endif %}
                 <div>
-                  <button class="btn btn-primary ml-1" id="search_submit" type="submit">
-                    Search
-                  </button>
-                  {% if api_user.is_authenticated %}
-                      <button class="btn btn-success ml-1" id="create_artifact" type="button">
-                          <a href="{% url 'artifact_create' %}" class="unlink">Create Artifact</a>
-                      </button>
-                  {% endif %}
+                    <button class="btn btn-primary ml-1" id="search_submit" type="submit">
+                        Search
+                    </button>
+                    {% if api_user.is_authenticated %}
+                        <button class="btn btn-success ml-1" id="create_artifact" type="button">
+                            <a href="{% url 'artifact_create' %}" class="unlink">Create Artifact</a>
+                        </button>
+                    {% endif %}
                 </div>
             </div>
         </form>
@@ -47,10 +48,10 @@
                             {% if artifact.tags %}
                                 <div class="float-end">
                                     {% for tag in artifact.tags %}
-                                        <button class="btn btn-secondary mr-2"
+                                        <button class="btn btn-primary mr-2"
                                                 style="padding: 2px; font-size: small">
                                             <a href="{% url 'artifact_list' %}?search={{ tag }}"
-                                               style="color: white; text-decoration: none">
+                                               class="badge badge-primary">
                                                 {{ tag }}
                                             </a>
                                         </button>
@@ -108,10 +109,10 @@
             {% endif %}
         </div>
     </div>
-    <!-- {% if debug %}
+    {% if debug %}
         <hr>
         <pre><strong>artifacts</strong>:<br>{{ artifacts|pprint }}</pre>
         <pre><strong>api_user</strong>:<br>{{ api_user|pprint }}</pre>
         <br>
-    {% endif %} -->
+    {% endif %}
 {% endblock %}

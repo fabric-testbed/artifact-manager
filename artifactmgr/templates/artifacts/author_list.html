@@ -11,15 +11,16 @@
     <div class="container w-85">
         <form method="get">
             {% csrf_token %}
-              <h2>Authors</h2>
-              <div class="d-flex flex-row justify-content-between">
-                  {% if search %}
-                      <input id="search" type="text" name="search" class="form-control w-75" value="{{ search }}">
-                  {% else %}
-                      <input id="search" type="text" name="search" class="form-control w-75" placeholder="Search authors...">
-                  {% endif %}
-                  <button class="btn btn-primary" id="search_submit" type="submit">Search</button>
-              </div>
+            <h2>Authors</h2>
+            <div class="d-flex flex-row justify-content-between">
+                {% if search %}
+                    <input id="search" type="text" name="search" class="form-control w-75" value="{{ search }}">
+                {% else %}
+                    <input id="search" type="text" name="search" class="form-control w-75"
+                           placeholder="Search authors...">
+                {% endif %}
+                <button class="btn btn-primary" id="search_submit" type="submit">Search</button>
+            </div>
         </form>
         <table class="table table-striped table-bordered my-4">
             <tbody>
@@ -92,10 +93,10 @@
             {% endif %}
         </div>
     </div>
-    <!-- {% if debug %}
+    {% if debug %}
         <hr>
         <pre><strong>people</strong>:<br>{{ people|pprint }}</pre>
         <pre><strong>api_user</strong>:<br>{{ api_user|pprint }}</pre>
         <br>
-    {% endif %} -->
+    {% endif %}
 {% endblock %}
