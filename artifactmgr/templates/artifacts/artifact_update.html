@@ -69,7 +69,8 @@
                             {% if search %}
                                 <input id="search" type="text" name="search" class="form-control" value="{{ search }}">
                             {% else %}
-                                <input id="search" type="text" name="search" class="form-control" placeholder="search...">
+                                <input id="search" type="text" name="search" class="form-control"
+                                       placeholder="search...">
                             {% endif %}
                         </div>
                         <div class="col-lg-2">
@@ -101,18 +102,18 @@
             You are not able to create an Artifact
         {% endif %}
     {% else %}
-      <div class="alert alert-warning" role="alert">
-        You are not logged in. Please login first to update the artifact.
-      </div>
+        <div class="alert alert-warning" role="alert">
+            You are not logged in. Please login first to update the artifact.
+        </div>
         <a href="/login">
             <button class="message-btn btn btn-success">Login</button>
         </a>
     {% endif %}
-    <!-- {% if debug %}
+    {% if debug %}
         <hr>
         <pre><strong>form</strong>:<br>{{ form.data|pprint }}</pre>
         <pre><strong>fabric_users</strong>:<br>{{ fabric_users|pprint }}</pre>
         <pre><strong>api_user</strong>:<br>{{ api_user|pprint }}</pre>
         <br>
-    {% endif %} -->
+    {% endif %}
 {% endblock %}
