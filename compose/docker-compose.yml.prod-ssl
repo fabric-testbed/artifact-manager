@@ -1,7 +1,6 @@
 # compose/docker-compose.yml.prod-ssl
 # - nginx port 8080, 8443 exposed to host (http, https) - self signed certs by default
 
-version: '3.9'
 services:
 
   django:

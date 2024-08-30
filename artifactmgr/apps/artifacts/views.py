@@ -112,60 +112,95 @@ def artifact_detail(request, *args, **kwargs):
 
     if request.method == 'POST':
         try:
+            artifact_detail_button = request.POST.get('artifact_detail_button', None)
             v_api_request = request.POST.copy()
-            v_api_request.method = 'POST'
             v_api_request.COOKIES = request.COOKIES
             v_api_request.headers = request.headers
-            v_api_request.FILES = request.FILES
             v_api_request.data = QueryDict('', mutable=True)
-            v_api_request.data.update(
-                {
-                    'file': request.FILES,
-                    'data': {
-                        'artifact': kwargs.get('uuid'),
-                        'storage_type': 'fabric',
-                        'storage_repo': 'renci'
+            if artifact_detail_button == 'add_version':
+                v_api_request.method = 'POST'
+                v_api_request.FILES = request.FILES
+                v_api_request.data.update(
+                    {
+                        'file': request.FILES,
+                        'data': {
+                            'artifact': kwargs.get('uuid'),
+                            'storage_type': 'fabric',
+                            'storage_repo': 'renci'
+                        }
                     }
-                }
-            )
-            is_valid, message = validate_artifact_version_create(request=v_api_request, api_user=api_user)
-            print(is_valid, message)
-            if is_valid:
-                v = ArtifactVersionViewSet(request=v_api_request)
-                version = v.create(request=v_api_request)
-                if version.status_code == status.HTTP_201_CREATED:
-                    version = json.loads(json.dumps(version.data))
-                    print(version)
-                    return redirect('artifact_detail', uuid=kwargs.get('uuid'))
-            else:
-                try:
-                    request.method = 'GET'
-                    artifact = ArtifactViewSet.as_view({'get': 'retrieve'})(request=request, *args, **kwargs)
-                    if artifact.data and artifact.status_code == status.HTTP_200_OK:
-                        artifact = json.loads(json.dumps(artifact.data))
-                        is_author = api_user.uuid in [a.get('uuid') for a in artifact.get('authors', [])]
-                    else:
-                        message = {'status_code': artifact.status_code, 'detail': artifact.data.get('detail')}
+                )
+                is_valid, message = validate_artifact_version_create(request=v_api_request, api_user=api_user)
+                if is_valid:
+                    v = ArtifactVersionViewSet(request=v_api_request)
+                    version = v.create(request=v_api_request)
+                    if version.status_code == status.HTTP_201_CREATED:
+                        version = json.loads(json.dumps(version.data))
+                        return redirect('artifact_detail', uuid=kwargs.get('uuid'))
+                else:
+                    try:
+                        request.method = 'GET'
+                        artifact = ArtifactViewSet.as_view({'get': 'retrieve'})(request=request, *args, **kwargs)
+                        if artifact.data and artifact.status_code == status.HTTP_200_OK:
+                            artifact = json.loads(json.dumps(artifact.data))
+                            is_author = api_user.uuid in [a.get('uuid') for a in artifact.get('authors', [])]
+                        else:
+                            message = {'status_code': artifact.status_code, 'detail': artifact.data.get('detail')}
+                            is_author = False
+                        if not message:
+                            message = artifact.get('message', None)
+                    except Exception as exc:
+                        message = exc
+                        artifact = {}
                         is_author = False
-                    if not message:
-                        message = artifact.get('message', None)
-                except Exception as exc:
-                    message = exc
-                    artifact = {}
-                    is_author = False
-                return render(request,
-                              'artifact_detail.html',
-                              {
-                                  'api_user': api_user.as_dict(),
-                                  'artifact': artifact,
-                                  'is_author': is_author,
-                                  'message': message,
-                                  'debug': API_DEBUG
-                              })
+                    return render(request,
+                                  'artifact_detail.html',
+                                  {
+                                      'api_user': api_user.as_dict(),
+                                      'artifact': artifact,
+                                      'is_author': is_author,
+                                      'message': message,
+                                      'debug': API_DEBUG
+                                  })
+            elif artifact_detail_button == "hide_version":
+                v_api_request.method = 'PATCH'
+                v_api_request.data.update(
+                    {
+                        'active': 'false'
+                    }
+                )
+                v = ArtifactVersionViewSet(request=v_api_request)
+                version = v.partial_update(request=v_api_request, uuid=request.POST.get('version_uuid', None))
+                return redirect('artifact_detail', uuid=kwargs.get('uuid'))
+            elif artifact_detail_button == "show_version":
+                v_api_request.method = 'PATCH'
+                v_api_request.data.update(
+                    {
+                        'active': 'true'
+                    }
+                )
+                v = ArtifactVersionViewSet(request=v_api_request)
+                version = v.partial_update(request=v_api_request, uuid=request.POST.get('version_uuid', None))
+                return redirect('artifact_detail', uuid=kwargs.get('uuid'))
+            elif artifact_detail_button == "delete_artifact":
+                artifact_uuid = request.POST.get('artifact_uuid', None)
+                v_api_request.method = 'DELETE'
+                v_api_request.data.update(
+                    {
+                        'uuid': artifact_uuid
+                    }
+                )
+                a = ArtifactViewSet(request=v_api_request)
+                artifact = a.destroy(request=v_api_request)
+                return redirect('artifact_list')
+            else:
+                return redirect('artifact_detail', uuid=kwargs.get('uuid'))
+
         except Exception as exc:
             message = exc
             print(message)
-        return redirect('artifact_detail', uuid=kwargs.get('uuid'))
+            return redirect('artifact_detail', uuid=kwargs.get('uuid'))
+    # get artifact detail page when not method: POST
     try:
         artifact = ArtifactViewSet.as_view({'get': 'retrieve'})(request=request, *args, **kwargs)
         if artifact.data and artifact.status_code == status.HTTP_200_OK:
@@ -259,7 +294,7 @@ def artifact_update(request, *args, **kwargs):
                 request.data.update(data_dict)
                 a = ArtifactViewSet(request=request)
                 artifact = a.update(request=request, uuid=artifact_uuid)
-                if artifact.status_code == 204:
+                if artifact.status_code == 200:
                     return redirect('artifact_detail', uuid=artifact_uuid)
                 else:
                     message = artifact.data

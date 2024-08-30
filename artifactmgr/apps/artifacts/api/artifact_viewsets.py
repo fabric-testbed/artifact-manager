@@ -42,7 +42,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         'create': ArtifactCreateSerializer,
         'retrieve': ArtifactSerializer,
         'update': ArtifactUpdateSerializer,
-        'partial-update': ArtifactUpdateSerializer,
+        'partial_update': ArtifactUpdateSerializer,
         'destroy': ArtifactSerializer,
     }
     default_serializer_class = ArtifactSerializer
@@ -232,7 +232,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                         artifact.tags.remove(tag)
                 artifact.save()
                 # return updated artifact
-                return Response(data=ArtifactSerializer(instance=artifact).data, status=204)
+                return Response(data=ArtifactSerializer(instance=artifact).data, status=200)
             else:
                 raise ValidationError(detail={'ValidationError': message})
         else:
@@ -251,17 +251,22 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         """
         FABRIC Artifacts - Remove
         - Must be the Artifact creator to remove it
+        TODO: remove stored object files - fail gracefully if files do not exist
         """
-        artifact = get_object_or_404(Artifact, uuid=kwargs.get('uuid'))
+        artifact_uuid = request.data.get('uuid', None)
+        if not artifact_uuid:
+            artifact_uuid = kwargs.get('uuid')
+        artifact = get_object_or_404(Artifact, uuid=artifact_uuid)
         api_user = get_api_user(request=request)
         if api_user.uuid == artifact.created_by.uuid:
-            return super().destroy(request, *args, **kwargs)
+            artifact.delete()
+            return Response(status=204)
         else:
             raise PermissionDenied(
                 detail="PermissionDenied: user:'{0}' is unable to delete /artifacts/{1}".format(api_user.uuid,
                                                                                                 kwargs.get('uuid')))
 
-    @action(detail=False, methods=['get'], url_path='by-author/(?P<author_uuid>[^/.]+)')
+    @action(detail=False, methods=['get'], url_path='by-author/(?P<uuid>[^/.]+)')
     def by_author(self, request, *args, **kwargs) -> HttpResponse | ValidationError:
         """
         FABRIC Artifacts - By Author

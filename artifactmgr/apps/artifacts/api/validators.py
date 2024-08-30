@@ -28,8 +28,12 @@ def validate_contents_download(urn: str, api_user: ApiUser) -> tuple:
         if not artifact_version:
             message.append({'NotFound': 'artifact with urn = \'{0}\' not found'.format(urn)})
         else:
+            # check that urn matches requested urn
             if artifact_version.urn != urn:
                 message.append({'DoesNotMatch': 'artifact urn does not match urn = \'{0}\' not found'.format(urn)})
+            # check that version requested is active
+            if str(artifact_version.active).casefold() != 'true':
+                message.append({'DownloadNotAvailable': 'urn {0} is marked as not active'.format(artifact_version.urn)})
             artifact = artifact_version.artifact
             # artifact permissions check
             author = ArtifactAuthor.objects.filter(uuid=api_user.uuid).first()
@@ -289,6 +293,26 @@ def validate_artifact_update(request, api_user: ApiUser) -> tuple:
             if visibility == 'project' and not project_uuid:
                 message.append({'visibility': 'corresponding project_uuid required: \'{0}\''.format(visibility)})
 
+    except Exception as exc:
+        message.append({'APIException': exc})
+    if len(message) > 0:
+        return False, message
+    else:
+        return True, None
+
+
+def validate_artifact_version_update(request) -> tuple:
+    """
+    PUT/PATCH /api/contents/{uuid}
+    - 'active': boolean - optional
+    """
+    message = []
+    try:
+        request_data = request.data
+        # 'active': boolean - optional
+        active = request_data.get('active', None)
+        if active and str(active).casefold() not in ['true', 'false']:
+            message.append({'active': 'must be boolean or None, not: \'{0}\''.format(active)})
     except Exception as exc:
         message.append({'APIException': exc})
     if len(message) > 0:

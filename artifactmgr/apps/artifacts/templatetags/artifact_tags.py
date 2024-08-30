@@ -1,6 +1,6 @@
+import os
 from datetime import timedelta, timezone
 from typing import Union
-import os
 
 from dateutil import parser
 from django import template

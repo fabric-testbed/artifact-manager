@@ -74,6 +74,7 @@ def create_fabric_artifact_contents(request, api_user: ApiUser) -> ArtifactVersi
             ver += 1
         artifact_file_path = storage.save(storage_path + artifact_file.name, artifact_file)
         fabric_artifact = ArtifactVersion()
+        fabric_artifact.active = True
         fabric_artifact.artifact = artifact
         fabric_artifact.created = now
         fabric_artifact.created_by = ArtifactAuthor.objects.filter(uuid=api_user.uuid).first()

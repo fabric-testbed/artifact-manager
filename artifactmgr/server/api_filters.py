@@ -16,6 +16,8 @@ def preprocessing_filter_spec(endpoints):
         # Version endpoints
         if path.endswith("/api/contents"):
             filtered.append((path, path_regex, method, callback))
+        if path.startswith("/api/contents") and method in ['PATCH', 'PUT']:
+            filtered.append((path, path_regex, method, callback))
         if path.startswith("/api/contents/download") and method == 'GET':
             filtered.append((path, path_regex, method, callback))
     return filtered

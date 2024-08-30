@@ -12,15 +12,27 @@
         <div class="mb-2 d-flex flex-row justify-content-between">
             <h2>{{ artifact.title }}</h2>
             <div>
-                {% if is_author %}
-                    <button class="btn btn-success mr-2" style="margin-left: 10px; float: right">
-                        <a href="{% url 'artifact_update' uuid=artifact.uuid %}"
-                           class="unlink">Edit</a>
+                <form action="{% url 'artifact_detail' uuid=artifact.uuid %}"
+                      method="POST">
+                    {% csrf_token %}
+                    {% if is_author %}
+                        <button class="btn btn-danger" type="submit"
+                                style="margin-left: 10px; float: right"
+                                name="artifact_detail_button" value="delete_artifact">
+                            <a onclick="return confirm('Delete Artifact: {{ artifact.title }}?')">
+                                Delete
+                            </a>
+                        </button>
+                        <input type="hidden" name="artifact_uuid" value="{{ artifact.uuid }}">
+                        <button class="btn btn-success mr-2" style="margin-left: 10px; float: right">
+                            <a href="{% url 'artifact_update' uuid=artifact.uuid %}"
+                               class="unlink">Edit</a>
+                        </button>
+                    {% endif %}
+                    <button class="btn btn-secondary mr-2" value="cancel">
+                        <a href="{% url 'artifact_list' %}" class="unlink">Back</a>
                     </button>
-                {% endif %}
-                <button class="btn btn-secondary mr-2" value="cancel">
-                    <a href="{% url 'artifact_list' %}" class="unlink">Back</a>
-                </button>
+                </form>
             </div>
         </div>
         <table class="table table-striped table-bordered my-2">
@@ -89,21 +101,101 @@
                     <tr>
                         <th>Version Number</th>
                         <th>Created</th>
+                        <th>URN</th>
                         <th>Download</th>
                     </tr>
                     {% for version in artifact.versions %}
-                        <tr>
-                            <td>Version {{ version.version }}</td>
-                            <td>{{ version.created|normalize_date_to_utc }}</td>
-                            <td>
-                                <a
-                                        class="btn btn-success"
-                                        style="font-size: small;padding: 2px"
-                                        href="/api/contents/download/{{ version.urn }}" target="_blank">
-                                    download
-                                </a>
-                            </td>
-                        </tr>
+                        {% if is_author %}
+                            <tr>
+                                <td>
+                                    {% if version.active %}
+                                        {{ version.version }}
+                                    {% else %}
+                                        <s class="text-secondary" style="font-size: medium">{{ version.version }}</s>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if version.active %}
+                                        {{ version.created|normalize_date_to_utc }}
+                                    {% else %}
+                                        <s class="text-secondary"
+                                           style="font-size: medium">{{ version.created|normalize_date_to_utc }}</s>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if version.active %}
+                                        {{ version.urn }}
+                                    {% else %}
+                                        <s class="text-secondary" style="font-size: medium">{{ version.urn }}</s>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if version.active %}
+                                        <form action="{% url 'artifact_detail' uuid=artifact.uuid %}"
+                                              method="POST">
+                                            {% csrf_token %}
+                                            {% if version.uuid %}
+                                                <a
+                                                        class="btn btn-success"
+                                                        style="font-size: small;padding: 2px"
+                                                        href="/api/contents/download/{{ version.urn }}" target="_blank">
+                                                    download
+                                                </a>
+                                                <button class="btn btn-danger" type="submit"
+                                                        style="font-size: small;padding: 2px"
+                                                        name="artifact_detail_button" value="hide_version">
+                                                    <a onclick="return confirm('Disable/Hide version: {{ version.version }}?')">
+                                                        disable
+                                                    </a>
+                                                </button>
+                                                <input type="hidden" name="version_uuid" value="{{ version.uuid }}">
+                                            {% endif %}
+                                        </form>
+                                    {% else %}
+                                        <form action="{% url 'artifact_detail' uuid=artifact.uuid %}"
+                                              method="POST">
+                                            {% csrf_token %}
+                                            {% if version.uuid %}
+                                                <a
+                                                        class="btn btn-secondary disabled"
+                                                        style="font-size: small;padding: 2px"
+                                                        href="/api/contents/download/{{ version.urn }}" target="_blank">
+                                                    download
+                                                </a>
+                                                <button class="btn btn-primary" type="submit"
+                                                        style="font-size: small;padding: 2px"
+                                                        name="artifact_detail_button" value="show_version">
+                                                    <a onclick="return confirm('Enable/Show version: {{ version.version }}?')">
+                                                        enable
+                                                    </a>
+                                                </button>
+                                                <input type="hidden" name="version_uuid" value="{{ version.uuid }}">
+                                            {% endif %}
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% elif version.active %}
+                            <tr>
+                                <td>
+                                    {{ version.version }}
+                                </td>
+                                <td>
+                                    {{ version.created|normalize_date_to_utc }}
+                                </td>
+                                <td>
+                                    {{ version.urn }}
+                                </td>
+                                <td>
+                                    <a
+                                            class="btn btn-success"
+                                            style="font-size: small;padding: 2px"
+                                            href="/api/contents/download/{{ version.urn }}" target="_blank">
+                                        download
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                 </table>
             {% endif %}
@@ -113,7 +205,8 @@
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input type="file" name="file" accept=".tgz, .tar, .tar.gz">
-                    <button class="btn btn-sm btn-primary mt-2" type="submit">
+                    <button class="btn btn-sm btn-primary mt-2" type="submit" name="artifact_detail_button"
+                            value="add_version">
                         Submit
                     </button>
                 </form>

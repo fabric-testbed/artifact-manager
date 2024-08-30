@@ -165,6 +165,7 @@ class ArtifactVersion(models.Model):
         (GIT, "Git"),
         (ZENODO, "Zenodo"),
     )
+    active = models.BooleanField(default=True)
     artifact = models.ForeignKey(
         Artifact, on_delete=models.CASCADE, related_name="artifact_version"
     )
