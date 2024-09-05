@@ -39,8 +39,8 @@ class ApiUser(models.Model):
         return os.getenv('CAN_CREATE_ARTIFACT_ROLE') in self.fabric_roles
 
     @property
-    def can_create_tag(self):
-        return os.getenv('CAN_CREATE_TAGS_ROLE') in self.fabric_roles
+    def is_artifact_manager_admin(self):
+        return os.getenv('ARTIFACT_MANAGER_ADMINS_ROLE') in self.fabric_roles
 
     @property
     def is_authenticated(self):
@@ -55,10 +55,10 @@ class ApiUser(models.Model):
             'access_type': self.access_type,
             'affiliation': self.affiliation,
             'can_create_artifact': self.can_create_artifact,
-            'can_create_tag': self.can_create_tag,
             'cilogon_id': self.cilogon_id,
             'email': self.email,
             'fabric_roles': self.fabric_roles,
+            'is_artifact_manager_admin': self.is_artifact_manager_admin,
             'is_authenticated': self.is_authenticated,
             'name': self.name,
             'projects': self.projects,
@@ -94,8 +94,11 @@ class ArtifactAuthor(models.Model):
 class ArtifactTag(models.Model):
     """
     Represents artifact tags
+    - tag - arbitrary string
+    - restricted - tag can only be applied by amgr-admins
     """
     tag = LowerCaseField(primary_key=True, max_length=255, blank=False, null=False)
+    restricted = models.BooleanField(default=False)
 
     class Meta:
         ordering = ("tag",)

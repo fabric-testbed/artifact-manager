@@ -1,7 +1,8 @@
 from django import forms
 from django.forms import CheckboxSelectMultiple
 
-from artifactmgr.apps.artifacts.models import Artifact, ArtifactAuthor, ArtifactTag
+from artifactmgr.apps.artifacts.models import Artifact, ArtifactAuthor, ArtifactTag, ApiUser
+from artifactmgr.utils.fabric_auth import get_api_user
 
 
 class ArtifactForm(forms.ModelForm):
@@ -61,10 +62,18 @@ class ArtifactForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         authors = kwargs.pop('authors', [])
+        api_user_uuid = kwargs.pop('api_user', None)
         super().__init__(*args, **kwargs)
+        api_user = ApiUser.objects.filter(uuid=api_user_uuid).first()
 
-        available_tags = [(t.tag, t.tag)
-                          for t in ArtifactTag.objects.all().order_by('tag')]
+        if api_user and api_user.is_artifact_manager_admin:
+            available_tags = [(t.tag, t.tag)
+                              for t in ArtifactTag.objects.all().order_by('tag')]
+        else:
+            available_tags = [(t.tag, t.tag)
+                              for t in ArtifactTag.objects.filter(
+                    restricted=False
+                ).order_by('tag')]
 
         self.fields['tags'] = forms.MultipleChoiceField(
             widget=CheckboxSelectMultiple,

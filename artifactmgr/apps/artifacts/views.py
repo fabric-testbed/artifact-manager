@@ -232,7 +232,7 @@ def artifact_create(request):
     search = None
     fabric_users = []
     if request.method == "POST" and isinstance(request.POST.get('save'), str):
-        form = ArtifactForm(request.POST)
+        form = ArtifactForm(request.POST, api_user=api_user)
         if form.is_valid():
             try:
                 request.data = QueryDict('', mutable=True)
@@ -250,7 +250,7 @@ def artifact_create(request):
         else:
             message = form.errors
     elif request.method == "POST" and isinstance(request.POST.get('search'), str):
-        form = ArtifactForm(request.POST)
+        form = ArtifactForm(request.POST, api_user=api_user)
         search = request.POST.get('search')
         if len(search) < 3:
             message = 'SearchError: Search for FABRIC authors requires 3 or more characters'
@@ -266,7 +266,7 @@ def artifact_create(request):
         if not message and len(fabric_users) == 0:
             fabric_users = [{'name': 'No results found for search = "{0}"'.format(search)}]
     else:
-        form = ArtifactForm()
+        form = ArtifactForm(api_user=api_user)
     return render(request,
                   'artifact_create.html',
                   {
@@ -286,7 +286,7 @@ def artifact_update(request, *args, **kwargs):
     search = None
     fabric_users = []
     if request.method == "POST" and isinstance(request.POST.get('save'), str):
-        form = ArtifactForm(request.POST)
+        form = ArtifactForm(request.POST, api_user=api_user)
         if form.is_valid():
             try:
                 request.data = QueryDict('', mutable=True)
@@ -303,7 +303,7 @@ def artifact_update(request, *args, **kwargs):
         else:
             message = form.errors
     elif request.method == "POST" and isinstance(request.POST.get('search'), str):
-        form = ArtifactForm(request.POST)
+        form = ArtifactForm(request.POST, api_user=api_user)
         search = request.POST.get('search')
         if len(search) < 3:
             message = 'SearchError: Search for FABRIC authors requires 3 or more characters'
@@ -320,7 +320,7 @@ def artifact_update(request, *args, **kwargs):
             fabric_users = [{'name': 'No results found for search = "{0}"'.format(search)}]
     else:
         artifact = get_object_or_404(Artifact, uuid=artifact_uuid)
-        form = ArtifactForm(instance=artifact, authors=[a.uuid for a in artifact.authors.all()] if artifact else [])
+        form = ArtifactForm(instance=artifact, authors=[a.uuid for a in artifact.authors.all()] if artifact else [], api_user=api_user)
     return render(request,
                   'artifact_update.html',
                   {

@@ -221,15 +221,19 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                         if author:
                             artifact.authors.remove(author)
                 # tags
-                if request_data.get('tags', None):
-                    tags = request_data.get('tags', None)
-                    tags_orig = [t.tag for t in artifact.tags.all()]
-                    tags_added = list(set(tags).difference(set(tags_orig)))
-                    tags_removed = list(set(tags_orig).difference(set(tags)))
-                    for tag in tags_added:
-                        artifact.tags.add(tag)
-                    for tag in tags_removed:
-                        artifact.tags.remove(tag)
+                tags = request_data.get('tags', [])
+                tags_orig = [t.tag for t in artifact.tags.all()]
+                # check for restricted tags and add if needed
+                for t in artifact.tags.all():
+                    if t.restricted and not api_user.is_artifact_manager_admin and t.tag not in tags:
+                        tags.append(t.tag)
+                tags_added = list(set(tags).difference(set(tags_orig)))
+                tags_removed = list(set(tags_orig).difference(set(tags)))
+                for tag in tags_added:
+                    artifact.tags.add(tag)
+                for tag in tags_removed:
+                    artifact.tags.remove(tag)
+                # save artifact
                 artifact.save()
                 # return updated artifact
                 return Response(data=ArtifactSerializer(instance=artifact).data, status=200)
@@ -238,7 +242,8 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         else:
             raise PermissionDenied(
                 detail="PermissionDenied: user:'{0}' is unable to update /artifacts/{1}".format(api_user.uuid,
-                                                                                                kwargs.get('uuid')))
+                                                                                        kwargs.get('uuid')))
+
 
     def partial_update(self, request, *args, **kwargs):
         """
@@ -246,6 +251,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         - Must be an author of the Artifact to update it
         """
         return self.update(request, *args, **kwargs)
+
 
     def destroy(self, request, *args, **kwargs):
         """
@@ -265,6 +271,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
             raise PermissionDenied(
                 detail="PermissionDenied: user:'{0}' is unable to delete /artifacts/{1}".format(api_user.uuid,
                                                                                                 kwargs.get('uuid')))
+
 
     @action(detail=False, methods=['get'], url_path='by-author/(?P<uuid>[^/.]+)')
     def by_author(self, request, *args, **kwargs) -> HttpResponse | ValidationError:
