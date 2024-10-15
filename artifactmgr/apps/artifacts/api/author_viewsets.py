@@ -4,8 +4,9 @@ from datetime import datetime, timedelta, timezone
 from rest_framework import filters, permissions, viewsets
 from rest_framework.exceptions import MethodNotAllowed
 
+from artifactmgr.apps.apiuser.models import ApiUser, TaskTimeoutTracker
 from artifactmgr.apps.artifacts.api.author_serializers import AuthorSerializer
-from artifactmgr.apps.artifacts.models import ApiUser, ArtifactAuthor, TaskTimeoutTracker
+from artifactmgr.apps.artifacts.models import ArtifactAuthor
 from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
 from artifactmgr.utils.fabric_auth import is_valid_uuid
 

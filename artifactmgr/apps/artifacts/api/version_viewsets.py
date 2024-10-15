@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import filters, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed, PermissionDenied, ValidationError
@@ -14,7 +15,7 @@ from artifactmgr.apps.artifacts.api.validators import validate_artifact_version_
     validate_artifact_version_update, validate_contents_download
 from artifactmgr.apps.artifacts.api.version_serializers import ArtifactContentsUploadSerializer, \
     ArtifactVersionSerializer, ArtifactVersionUpdateSerializer
-from artifactmgr.apps.artifacts.models import Artifact, ArtifactVersion
+from artifactmgr.apps.artifacts.models import Artifact, ArtifactVersion, VersionDownloads
 from artifactmgr.utils.artifact_version_storage import create_fabric_artifact_contents, download_contents_by_urn
 from artifactmgr.utils.fabric_auth import get_api_user
 
@@ -60,7 +61,10 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         FABRIC Artifact Contents - list view
         - Search by 'storage_repo', 'storage_type'
         """
-        return super().list(request, *args, **kwargs)
+        try:
+            return super().list(request, *args, **kwargs)
+        except Exception as e:
+            print(e)
 
     def create(self, request, *args, **kwargs):
         """
@@ -136,6 +140,9 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         """
         raise MethodNotAllowed(method='DELETE', detail='MethodNotAllowed: DELETE /api/contents/{uuid}')
 
+    @extend_schema(
+        parameters=[OpenApiParameter(name="urn", type=str, location=OpenApiParameter.PATH)]
+    )
     @action(detail=False, methods=['get'], url_path='download/(?P<urn>[^/.]+)')
     def download(self, request, *args, **kwargs) -> HttpResponse | ValidationError:
         """
@@ -143,8 +150,19 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         - Must have proper access permissions to download files
         """
         api_user = get_api_user(request=request)
-        is_valid, message = validate_contents_download(urn=kwargs.get('urn', None), api_user=api_user)
+        version_urn = str(kwargs.get('urn', None))
+        is_valid, message = validate_contents_download(urn=version_urn, api_user=api_user)
         if is_valid:
+            # increment version_downloads
+            try:
+                version_uuid = version_urn.split(':')[-1]
+                artifact_version = get_object_or_404(ArtifactVersion, uuid=version_uuid)
+                version_download = VersionDownloads(downloaded_by=str(api_user.uuid))
+                version_download.save()
+                artifact_version.version_downloads.add(version_download)
+                artifact_version.save()
+            except Exception as exc:
+                print(exc)
             return download_contents_by_urn(urn=kwargs.get('urn'))
         else:
             raise ValidationError(detail={'ValidationError': message})

@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'django_bootstrap5',  # django bootstrap
     'fontawesomefree',  # fontawesome free version
+    'artifactmgr.apps.apiuser',
     'artifactmgr.apps.artifacts',
 ]
 

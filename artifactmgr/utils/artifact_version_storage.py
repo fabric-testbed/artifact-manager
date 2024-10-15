@@ -8,7 +8,8 @@ from django.core.files.storage import storages
 from django.http import HttpResponse
 from rest_framework.exceptions import NotFound
 
-from artifactmgr.apps.artifacts.models import ApiUser, Artifact, ArtifactAuthor, ArtifactVersion
+from artifactmgr.apps.apiuser.models import ApiUser
+from artifactmgr.apps.artifacts.models import Artifact, ArtifactAuthor, ArtifactVersion
 
 """
 Artifact Version object

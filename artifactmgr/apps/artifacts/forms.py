@@ -1,8 +1,7 @@
 from django import forms
 from django.forms import CheckboxSelectMultiple
 
-from artifactmgr.apps.artifacts.models import Artifact, ArtifactAuthor, ArtifactTag, ApiUser
-from artifactmgr.utils.fabric_auth import get_api_user
+from artifactmgr.apps.artifacts.models import ApiUser, Artifact, ArtifactAuthor, ArtifactTag
 
 
 class ArtifactForm(forms.ModelForm):
@@ -41,10 +40,24 @@ class ArtifactForm(forms.ModelForm):
         label='Long Description',
     )
 
+    show_project = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={'class': 'checkbox'}),
+        required=False,
+        initial=True,
+        label='Show Project - checked=True (uncheck for Double-Blind reference)',
+    )
+
     project_uuid = forms.CharField(
         widget=forms.TextInput(attrs={'size': 60}),
         required=False,
         label='Project (by UUID) - required if Visibility is set as "Project"',
+    )
+
+    show_authors = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={'class': 'checkbox'}),
+        required=False,
+        initial=True,
+        label='Show Authors - checked=True (uncheck for Double-Blind reference)',
     )
 
     author_1 = forms.CharField(required=False)
@@ -107,4 +120,4 @@ class ArtifactForm(forms.ModelForm):
     class Meta:
         model = Artifact
         fields = ['title', 'description_short', 'description_long',
-                  'visibility', 'project_uuid', 'tags']
+                  'visibility', 'show_project', 'project_uuid', 'show_authors', 'tags']

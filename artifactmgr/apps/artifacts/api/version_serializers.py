@@ -23,13 +23,18 @@ class ArtifactVersionSerializer(serializers.ModelSerializer):
     - storage_type = models.CharField(max_length=24, choices=STORAGE_TYPE_CHOICES, default=FABRIC)
     - uuid = models.CharField(primary_key=True, max_length=255, blank=False, null=False)
     """
+    version_downloads = serializers.SerializerMethodField(method_name='get_version_downloads')
     created = serializers.SerializerMethodField(method_name='get_created')
     version = serializers.CharField(source='storage_id')
     lookup_field = 'urn'
 
     class Meta:
         model = ArtifactVersion
-        fields = ['active', 'created', 'urn', 'uuid', 'version']
+        fields = ['active', 'created', 'urn', 'uuid', 'version', 'version_downloads']
+
+    @staticmethod
+    def get_version_downloads(self) -> int:
+        return ArtifactVersion.objects.get(uuid=self.uuid).version_downloads.count()
 
     @staticmethod
     def get_created(self) -> str:

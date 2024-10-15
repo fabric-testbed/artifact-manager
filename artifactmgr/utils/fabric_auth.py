@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 import jwt
 import requests
 
-from artifactmgr.apps.artifacts.models import ApiUser, TaskTimeoutTracker
+from artifactmgr.apps.apiuser.models import ApiUser, TaskTimeoutTracker
 
 
 def get_api_user(request) -> ApiUser:
@@ -44,12 +44,9 @@ def get_api_user(request) -> ApiUser:
         oidc_sub = get_oidc_sub_from_cookie(cookie=cookie)
         if oidc_sub:
             api_user = ApiUser.objects.filter(cilogon_id=oidc_sub).first()
-            if api_user:
-                if api_user.access_expires > now:
-                    return api_user
-                else:
-                    api_user.delete()
-            api_user = auth_user_by_cookie(cookie=cookie)
+            if api_user and api_user.access_expires > now:
+                return api_user
+            auth_user_by_cookie(api_user=api_user, cookie=cookie)
             api_user.access_expires = now + timedelta(minutes=int(os.getenv('API_USER_REFRESH_CHECK_MINUTES')))
             api_user.save()
     # return api user
@@ -109,13 +106,13 @@ def get_oidc_sub_from_token(token: str) -> str | None:
     return oidc_sub
 
 
-def auth_user_by_cookie(cookie: str) -> ApiUser:
+def auth_user_by_cookie(api_user: ApiUser, cookie: str):
     """
     Use cookie to authorize user
     - get user uuid from core-api using cookie
     - with user uuid populate user information from core-api /people/{uuid}?as_self=true
     """
-    api_user = ApiUser(uuid=os.getenv('API_USER_ANON_UUID'), projects=[], fabric_roles=[])
+    # api_user = ApiUser(uuid=os.getenv('API_USER_ANON_UUID'), projects=[], fabric_roles=[])
     s = requests.Session()
     try:
         s.cookies.set(os.getenv('VOUCH_COOKIE_NAME'), cookie)
@@ -141,7 +138,6 @@ def auth_user_by_cookie(cookie: str) -> ApiUser:
     except Exception as exc:
         print(exc)
     s.close()
-    return api_user
 
 
 def auth_user_by_token(token):

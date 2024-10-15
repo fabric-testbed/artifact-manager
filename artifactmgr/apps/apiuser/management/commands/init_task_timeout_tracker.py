@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from django.core.management.base import BaseCommand, CommandError
 
-from artifactmgr.apps.artifacts.models import TaskTimeoutTracker
+from artifactmgr.apps.apiuser.models import TaskTimeoutTracker
 
 
 def init_task_timeout_tracker():

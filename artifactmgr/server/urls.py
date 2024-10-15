@@ -16,7 +16,6 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from django.views.generic.base import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework import routers
 
@@ -35,9 +34,9 @@ router.register(r'meta/tags', TagViewSet, basename='tags')
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
-    # path('', landing_page, name='home'),
+    path('', landing_page, name='home'),
     # path('', TemplateView.as_view(template_name='home.html'), name='home'),
-    path('', include('artifactmgr.apps.artifacts.urls')),
+    path('artifacts/', include('artifactmgr.apps.artifacts.urls')),
     path('admin/', admin.site.urls),
     path('api/', include((router.urls, 'artifactmgr.apps.artifacts'))),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),

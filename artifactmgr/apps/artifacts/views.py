@@ -8,12 +8,13 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 
+from artifactmgr.apps.apiuser.models import ApiUser
 from artifactmgr.apps.artifacts.api.artifact_viewsets import ArtifactViewSet
 from artifactmgr.apps.artifacts.api.author_viewsets import AuthorViewSet
 from artifactmgr.apps.artifacts.api.validators import validate_artifact_version_create
 from artifactmgr.apps.artifacts.api.version_viewsets import ArtifactVersionViewSet
 from artifactmgr.apps.artifacts.forms import ArtifactForm
-from artifactmgr.apps.artifacts.models import ApiUser, Artifact
+from artifactmgr.apps.artifacts.models import Artifact
 from artifactmgr.server.settings import API_DEBUG, REST_FRAMEWORK
 from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
 from artifactmgr.utils.fabric_auth import get_api_user
@@ -60,7 +61,7 @@ def author_list(request):
                   'author_list.html',
                   {
                       'api_user': api_user.as_dict(),
-                      'people': authors.get('list_objects', {}),
+                      'authors': authors.get('list_objects', {}),
                       'item_range': authors.get('item_range', None),
                       'message': message,
                       'next_page': authors.get('next_page', None),
@@ -205,7 +206,9 @@ def artifact_detail(request, *args, **kwargs):
         artifact = ArtifactViewSet.as_view({'get': 'retrieve'})(request=request, *args, **kwargs)
         if artifact.data and artifact.status_code == status.HTTP_200_OK:
             artifact = json.loads(json.dumps(artifact.data))
-            is_author = api_user.uuid in [a.get('uuid') for a in artifact.get('authors', [])]
+            artifact_obj = Artifact.objects.get(uuid=kwargs.get('uuid'))
+            is_author = artifact_obj.is_author(api_user_uuid=api_user.uuid)
+            # is_author = api_user.uuid in [a.get('uuid') for a in artifact.get('authors', [])]
         else:
             message = {'status_code': artifact.status_code, 'detail': artifact.data.get('detail')}
             is_author = False
@@ -281,6 +284,7 @@ def artifact_create(request):
 
 def artifact_update(request, *args, **kwargs):
     api_user = get_api_user(request=request)
+    artifact_title = None
     artifact_uuid = kwargs.get('uuid')
     message = None
     search = None
@@ -320,17 +324,20 @@ def artifact_update(request, *args, **kwargs):
             fabric_users = [{'name': 'No results found for search = "{0}"'.format(search)}]
     else:
         artifact = get_object_or_404(Artifact, uuid=artifact_uuid)
-        form = ArtifactForm(instance=artifact, authors=[a.uuid for a in artifact.authors.all()] if artifact else [], api_user=api_user)
+        artifact_title = artifact.title
+        form = ArtifactForm(instance=artifact, authors=[a.uuid for a in artifact.authors.all()] if artifact else [],
+                            api_user=api_user)
     return render(request,
                   'artifact_update.html',
                   {
                       'api_user': api_user.as_dict(),
+                      'artifact_title': artifact_title,
                       'artifact_uuid': artifact_uuid,
                       'debug': API_DEBUG,
                       'fabric_users': fabric_users,
                       'form': form,
                       'message': message,
-                      'search': search
+                      'search': search,
                   })
 
 

@@ -2,12 +2,13 @@ import json
 import mimetypes
 import os
 
-from artifactmgr.apps.artifacts.models import ApiUser, Artifact, ArtifactAuthor, ArtifactTag, ArtifactVersion
+from artifactmgr.apps.apiuser.models import ApiUser
+from artifactmgr.apps.artifacts.models import Artifact, ArtifactAuthor, ArtifactTag, ArtifactVersion
 from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
 from artifactmgr.utils.fabric_auth import is_valid_uuid
 
-# valid mimetypes for artifact contents
-valid_mimetypes = [('application/x-tar', 'gzip')]
+# valid mimetypes for artifact contents (.tgz, .tar, .tar.gz)
+valid_mimetypes = [('application/x-gzip', 'gzip'), ('application/x-tar', None), ('application/x-tar', 'gzip')]
 
 
 def validate_contents_download(urn: str, api_user: ApiUser) -> tuple:

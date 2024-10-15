@@ -1,2122 +1,2122 @@
 [
-{
-  "model": "artifacts.apiuser",
-  "pk": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-  "fields": {
-    "access_expires": "2024-08-23T22:40:59.771Z",
-    "access_type": "cookie",
-    "affiliation": "University of North Carolina at Chapel Hill",
-    "cilogon_id": "http://cilogon.org/serverA/users/11904101",
-    "email": "kthare10@email.unc.edu",
-    "fabric_roles": "[\"Jupyterhub\", \"facility-operators\", \"fabric-active-users\", \"project-leads\", \"long-lived-tokens\"]",
-    "name": "Komal Thareja",
-    "projects": "[\"74a5b28b-c1a2-4fad-882b-03362dddfa71\", \"f7c41035-18c3-455a-a7ae-c0636713fe31\", \"b8d66fb3-e7ad-4df9-a652-2d8e323236e5\", \"10c0094a-abaf-4ef9-a532-2be53e2a896b\", \"6bad9572-dea3-48e0-9e12-2b2c28046eca\", \"ced386b6-01e6-4c8a-bca5-febfc7fe7936\", \"88c74e11-9324-42e1-83fa-97dc742919b6\", \"8b3a2eae-a0c0-475a-807b-e9af581ce4c0\"]"
+  {
+    "model": "apiuser.apiuser",
+    "fields": {
+      "uuid": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "access_expires": "2024-08-23T22:40:59.771Z",
+      "access_type": "cookie",
+      "affiliation": "University of North Carolina at Chapel Hill",
+      "cilogon_id": "http://cilogon.org/serverA/users/11904101",
+      "email": "kthare10@email.unc.edu",
+      "fabric_roles": "[\"Jupyterhub\", \"facility-operators\", \"fabric-active-users\", \"project-leads\", \"long-lived-tokens\"]",
+      "name": "Komal Thareja",
+      "projects": "[\"74a5b28b-c1a2-4fad-882b-03362dddfa71\", \"f7c41035-18c3-455a-a7ae-c0636713fe31\", \"b8d66fb3-e7ad-4df9-a652-2d8e323236e5\", \"10c0094a-abaf-4ef9-a532-2be53e2a896b\", \"6bad9572-dea3-48e0-9e12-2b2c28046eca\", \"ced386b6-01e6-4c8a-bca5-febfc7fe7936\", \"88c74e11-9324-42e1-83fa-97dc742919b6\", \"8b3a2eae-a0c0-475a-807b-e9af581ce4c0\"]"
+    }
+  },
+  {
+    "model": "apiuser.apiuser",
+    "fields": {
+      "uuid": "3cfff215-1cd5-4d18-aa4f-e0a166c7957b",
+      "access_expires": "2024-07-15T17:07:47.583Z",
+      "access_type": "cookie",
+      "affiliation": "Google",
+      "cilogon_id": "http://cilogon.org/serverT/users/39648438",
+      "email": "fabric.tb.3@gmail.com",
+      "fabric_roles": "[\"fabric-active-users\", \"Jupyterhub\"]",
+      "name": "Fabric User-Three",
+      "projects": "[\"74a5b28b-c1a2-4fad-882b-03362dddfa71\", \"88c74e11-9324-42e1-83fa-97dc742919b6\"]"
+    }
+  },
+  {
+    "model": "apiuser.apiuser",
+    "fields": {
+      "uuid": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "access_expires": "2024-08-29T19:52:51.310Z",
+      "access_type": "cookie",
+      "affiliation": "University of North Carolina at Chapel Hill",
+      "cilogon_id": "http://cilogon.org/serverA/users/242181",
+      "email": "stealey@unc.edu",
+      "fabric_roles": "[\"Jupyterhub\", \"facility-operators\", \"fabric-active-users\", \"portal-admins\", \"project-leads\", \"approval-committee \", \"long-lived-tokens\"]",
+      "name": "Michael J. Stealey, Sr",
+      "projects": "[\"74a5b28b-c1a2-4fad-882b-03362dddfa71\", \"fc101be1-6784-43c7-a6fa-2ea27f0e0dba\", \"ec8389c8-6129-40aa-a6ee-3a1d80d74f33\", \"6608c042-fbac-4695-bad8-807a7b627183\", \"a5488d93-7c6b-48ea-9de1-19e216c0519b\", \"10582cb1-ee10-4b8c-8d61-ffc4688be0d6\", \"1af8e23d-5fa8-46fc-be94-21609abbadd0\", \"d74993c8-e3b5-451c-977f-c7cc544f176f\", \"ced386b6-01e6-4c8a-bca5-febfc7fe7936\", \"88c74e11-9324-42e1-83fa-97dc742919b6\", \"8b3a2eae-a0c0-475a-807b-e9af581ce4c0\"]"
+    }
+  },
+  {
+    "model": "apiuser.apiuser",
+    "fields": {
+      "uuid": "69f9b1a6-c3c3-4c53-8693-21c63e771c78",
+      "access_expires": "2024-07-17T18:23:16.184Z",
+      "access_type": "cookie",
+      "affiliation": "University of North Carolina at Chapel Hill",
+      "cilogon_id": "http://cilogon.org/serverT/users/26542073",
+      "email": "yaxue.guo23@gmail.com",
+      "fabric_roles": "[\"Jupyterhub\", \"facility-operators\", \"fabric-active-users\", \"portal-admins\", \"project-leads\", \"long-lived-tokens\"]",
+      "name": "Yaxue Guo",
+      "projects": "[\"74a5b28b-c1a2-4fad-882b-03362dddfa71\", \"ced386b6-01e6-4c8a-bca5-febfc7fe7936\", \"88c74e11-9324-42e1-83fa-97dc742919b6\", \"8b3a2eae-a0c0-475a-807b-e9af581ce4c0\"]"
+    }
+  },
+  {
+    "model": "apiuser.apiuser",
+    "fields": {
+      "uuid": "7414d35f-ee8c-47c6-9984-3aab7cf8c9a9",
+      "access_expires": "2024-08-23T15:16:02.457Z",
+      "access_type": "cookie",
+      "affiliation": "University of North Carolina at Chapel Hill",
+      "cilogon_id": "http://cilogon.org/serverA/users/31379841",
+      "email": "pruth@email.unc.edu",
+      "fabric_roles": "[\"Jupyterhub\", \"fabric-active-users\", \"portal-admins\", \"project-leads\", \"facility-operators\"]",
+      "name": "Paul Ruth",
+      "projects": "[\"74a5b28b-c1a2-4fad-882b-03362dddfa71\", \"fc101be1-6784-43c7-a6fa-2ea27f0e0dba\", \"ced386b6-01e6-4c8a-bca5-febfc7fe7936\", \"88c74e11-9324-42e1-83fa-97dc742919b6\", \"8b3a2eae-a0c0-475a-807b-e9af581ce4c0\"]"
+    }
+  },
+  {
+    "model": "apiuser.apiuser",
+    "fields": {
+      "uuid": "8ea240b4-b72c-4dee-9b77-c0dd6a816ba1",
+      "access_expires": "2023-11-09T21:21:31.809Z",
+      "access_type": "cookie",
+      "affiliation": "University of North Carolina at Chapel Hill",
+      "cilogon_id": "http://cilogon.org/serverT/users/241998",
+      "email": "ibaldin@renci.org",
+      "fabric_roles": "[\"long-lived-tokens\", \"approval-committee \", \"fabric-active-users\", \"project-leads\", \"Jupyterhub\"]",
+      "name": "Ilya Baldin",
+      "projects": "[\"8b3a2eae-a0c0-475a-807b-e9af581ce4c0\", \"88c74e11-9324-42e1-83fa-97dc742919b6\", \"afa75253-a9a6-45ec-b397-e8d29ff7c8bd\"]"
+    }
+  },
+  {
+    "model": "artifacts.artifactauthor",
+    "pk": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+    "fields": {
+      "affiliation": "University of North Carolina at Chapel Hill",
+      "email": "kthare10@email.unc.edu",
+      "name": "Komal Thareja",
+      "updated": "2024-08-22T23:13:53.610Z"
+    }
+  },
+  {
+    "model": "artifacts.artifactauthor",
+    "pk": "409b7534-4bb2-4649-ad18-9e57ac868ffc",
+    "fields": {
+      "affiliation": "University of North Carolina at Chapel Hill",
+      "email": null,
+      "name": "Mert Cevik",
+      "updated": "2023-07-06T14:27:33.650Z"
+    }
+  },
+  {
+    "model": "artifacts.artifactauthor",
+    "pk": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+    "fields": {
+      "affiliation": "University of North Carolina at Chapel Hill",
+      "email": "stealey@unc.edu",
+      "name": "Michael J. Stealey, Sr",
+      "updated": "2023-08-11T20:18:24.201Z"
+    }
+  },
+  {
+    "model": "artifacts.artifactauthor",
+    "pk": "69f9b1a6-c3c3-4c53-8693-21c63e771c78",
+    "fields": {
+      "affiliation": "University of North Carolina at Chapel Hill",
+      "email": "yaxueguo@renci.org",
+      "name": "Yaxue Guo",
+      "updated": "2023-07-06T14:27:33.361Z"
+    }
+  },
+  {
+    "model": "artifacts.artifactauthor",
+    "pk": "7414d35f-ee8c-47c6-9984-3aab7cf8c9a9",
+    "fields": {
+      "affiliation": "University of North Carolina at Chapel Hill",
+      "email": "pruth@email.unc.edu",
+      "name": "Paul Ruth",
+      "updated": "2023-07-06T14:27:33.740Z"
+    }
+  },
+  {
+    "model": "artifacts.artifactauthor",
+    "pk": "8ea240b4-b72c-4dee-9b77-c0dd6a816ba1",
+    "fields": {
+      "affiliation": "University of North Carolina at Chapel Hill",
+      "email": null,
+      "name": "Ilya Baldin",
+      "updated": "2023-07-06T14:27:33.439Z"
+    }
+  },
+  {
+    "model": "artifacts.artifacttag",
+    "pk": "fabric",
+    "fields": {}
+  },
+  {
+    "model": "artifacts.artifacttag",
+    "pk": "knit workshop",
+    "fields": {}
+  },
+  {
+    "model": "artifacts.artifacttag",
+    "pk": "tutorial",
+    "fields": {}
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "0096e143-2ad2-48d7-b88c-cf72770c846f",
+    "fields": {
+      "created": "2023-07-06T14:29:51.328Z",
+      "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "Publicly available artifacts - some kind of description goes here",
+      "description_short": "Publicly available artifacts",
+      "modified": "2023-07-06T14:29:51.336Z",
+      "modified_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "project_name": null,
+      "project_uuid": null,
+      "title": "Public Artifacts",
+      "visibility": "public",
+      "authors": [
+        "593dd0d3-cedb-4bc6-9522-a945da0a8a8e"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "05397748-453b-46fe-9a62-fa39a55e4017",
+    "fields": {
+      "created": "2024-08-23T20:43:43.835Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Save an experimental topology and load it at a later time.",
+      "modified": "2024-08-23T20:43:43.853Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Save/Load Slices",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "078346c8-506f-4e2d-9bd3-e636229f3adf",
+    "fields": {
+      "created": "2024-08-23T20:44:34.974Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Configure you Environment including creating the `fabric_rc` and `ssh_config` files.",
+      "modified": "2024-08-23T20:44:34.990Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Configure Environment",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "095fe375-a9c2-4699-9c1b-cb49f42b8cd3",
+    "fields": {
+      "created": "2024-08-23T20:44:12.509Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Modify an existing slice by adding/removing resources.",
+      "modified": "2024-08-23T20:44:12.524Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Modifying Slices",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "0ea2441b-2f74-4039-a637-2195e8fb1fb7",
+    "fields": {
+      "created": "2024-08-23T20:43:56.961Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Define post boot tasks with or without templates to upload files and execute commands.",
+      "modified": "2024-08-23T20:43:56.977Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Post Boot Tasks",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "0fa723e3-fcf8-4cec-bbb5-01c366958222",
+    "fields": {
+      "created": "2024-08-23T20:44:16.952Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "List resource capacity and availability. Output options: Text, Pandas, JSON, and Python List[Dict]. Find sites containing available components and capacities.",
+      "modified": "2024-08-23T20:44:16.968Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Listing Available Resources",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "156d58f7-5a50-469c-ba7d-26fb93f18dc9",
+    "fields": {
+      "created": "2024-08-23T20:44:22.893Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Create a node with any GPU type.",
+      "modified": "2024-08-23T20:44:22.913Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: All FABRIC GPUs: Tesla T4, RTX6000, A30, A40",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "157527fb-bedb-4690-b3a1-aa50f914d80f",
+    "fields": {
+      "created": "2024-08-23T20:44:36.774Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Add new keys on submit or add later via POA (Perform Operational Action).",
+      "modified": "2024-08-23T20:44:36.790Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Adding other user's keys into slice",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "1ccedc8e-149a-4df7-89ec-bc85f4ab1164",
+    "fields": {
+      "created": "2024-08-23T20:44:34.030Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "Create a private local Ethernet network on a FABRIC site with three configuration options - auto, manual or user defined",
+      "description_short": "Create a private local Ethernet network on a FABRIC site",
+      "modified": "2024-08-23T20:44:34.051Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Local Ethernet (Layer 2)",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "1e2a3023-ce56-4844-a6fc-77c35aa70c4c",
+    "fields": {
+      "created": "2024-08-23T20:44:37.840Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Example of deploying OSPF across a wide-area using FRRouting (similar to Quagga).",
+      "modified": "2024-08-23T20:44:37.851Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: FRRouting OSPF",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "1e6f8713-7621-4c4b-81a2-a2f60e180eeb",
+    "fields": {
+      "created": "2024-08-23T20:44:17.881Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Create a private Kubernetes cluster on FABRIC resources.",
+      "modified": "2024-08-23T20:44:17.897Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Kubernetes Cluster",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "1f665591-3e98-47b2-baac-cbdae482056e",
+    "fields": {
+      "created": "2023-07-06T15:15:49.886Z",
+      "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "short description",
+      "modified": "2023-07-06T15:15:49.901Z",
+      "modified_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "project_name": null,
+      "project_uuid": null,
+      "title": "Demo artifact",
+      "visibility": "public",
+      "authors": [
+        "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+        "7414d35f-ee8c-47c6-9984-3aab7cf8c9a9"
+      ],
+      "tags": [
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "22061b7a-1e1b-495f-b256-f1916b3b92f1",
+    "fields": {
+      "created": "2023-07-06T14:24:27.205Z",
+      "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "alpha FABRIC Project artifacts along with a bunch of other words",
+      "description_short": "alpha FABRIC Project artifacts",
+      "modified": "2023-07-06T14:30:53.481Z",
+      "modified_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "project_name": "FABRIC Project",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Project",
+      "visibility": "project",
+      "authors": [
+        "593dd0d3-cedb-4bc6-9522-a945da0a8a8e"
+      ],
+      "tags": [
+        "fabric"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "251a912c-1ac4-4b89-af66-402e234c0a88",
+    "fields": {
+      "created": "2024-08-23T20:44:31.208Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "Connect to FABRIC's IPv4 internet with three configuration options - auto, manual or user defined.",
+      "description_short": "Connect to FABRIC's IPv4 internet",
+      "modified": "2024-08-23T20:44:32.158Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: FABNet IPv4 (Layer 3)",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "257067c5-b493-47a4-99ee-d0559b690abb",
+    "fields": {
+      "created": "2024-08-23T20:43:41.089Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Show how to remotely log into a running FABRIC node.",
+      "modified": "2024-08-23T20:43:41.105Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Execute Commands on Nodes",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "2f8e206c-7fc8-4e45-9dd4-088b7c6f21e3",
+    "fields": {
+      "created": "2024-08-23T20:44:25.956Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Options for deleting a slice or slices.",
+      "modified": "2024-08-23T20:44:25.973Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Delete Slice(s)",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "3b45aa23-5f7c-431d-b3a5-c97d7abaa317",
+    "fields": {
+      "created": "2024-08-23T20:43:40.208Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Create SSH tunnels from your local machine (i.e., your laptop) to FABRIC Nodes.",
+      "modified": "2024-08-23T20:43:40.223Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: SSH Tunnels",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "43ecc0b9-787a-4894-b796-9e594cac1b28",
+    "fields": {
+      "created": "2024-08-23T20:44:25.091Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Docker",
+      "modified": "2024-08-23T20:44:25.107Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Deploy Docker Containers",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "4475fbcb-064e-440b-b8e6-eefae5b95ad6",
+    "fields": {
+      "created": "2023-08-03T16:16:32.712Z",
+      "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "private test artifact",
+      "description_short": "private test artifact",
+      "modified": "2023-08-03T16:17:35.012Z",
+      "modified_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "project_name": null,
+      "project_uuid": null,
+      "title": "private test artifact",
+      "visibility": "author",
+      "authors": [
+        "593dd0d3-cedb-4bc6-9522-a945da0a8a8e"
+      ],
+      "tags": []
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "54928b24-b982-4b58-91e3-82a7e691500b",
+    "fields": {
+      "created": "2024-08-23T20:44:28.539Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "Listen in on traffic in FABRIC dataplane using PortMirror service - Infrastructure Port Mirroring or InSlice Port Mirroring",
+      "description_short": "Listen in on traffic in FABRIC dataplane using PortMirror service",
+      "modified": "2024-08-23T20:44:28.551Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Port Mirroring",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "5566c196-4ca7-4cff-8a8a-7c2d054612d6",
+    "fields": {
+      "created": "2024-08-23T20:44:26.831Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Set node properties (site, image, cores, ram, disk, etc.).",
+      "modified": "2024-08-23T20:44:26.847Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Customizing Nodes",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "55bb9847-2b65-47bb-bb35-6b4dc18a46f8",
+    "fields": {
+      "created": "2024-08-23T20:43:59.767Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Use threads to configure experiments in parallel.",
+      "modified": "2024-08-23T20:43:59.782Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Parallel Experiment Configuration",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "5999bce4-5c08-48ca-b384-290ecbb11efb",
+    "fields": {
+      "created": "2024-08-23T20:44:01.981Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Lab series on P4 programmable switches using the Behavioral Model (BMv2).",
+      "modified": "2024-08-23T20:44:01.992Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: P4 Labs (BMv2)",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "66290f94-c056-4fc0-8611-5ea90b6411b1",
+    "fields": {
+      "created": "2024-08-23T20:44:13.624Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Examples for setting up automated monitoring in your slice.",
+      "modified": "2024-08-23T20:44:13.639Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Monitoring with MFLib Examples",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "7273ae75-3464-417e-ad5c-ffe321c79253",
+    "fields": {
+      "created": "2024-08-23T20:44:21.782Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Provision a single FPGA and/or configure it using ESnet workflow.",
+      "modified": "2024-08-23T20:44:21.799Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Provision a single FPGA and/or configure it using ESnet workflow",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "73c5b67a-4bba-400f-a3a2-e0850e2ed147",
+    "fields": {
+      "created": "2024-08-23T20:44:23.869Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Program your smart nics with DPDK.",
+      "modified": "2024-08-23T20:44:23.884Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: DPDK and Pktgen with Smart NICs",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "74e32191-ed22-44b0-b42c-02d44a3894be",
+    "fields": {
+      "created": "2024-08-23T20:43:37.160Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Upload a script and execute it.",
+      "modified": "2024-08-23T20:43:37.179Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Upload and Execute Scripts",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "7928049d-58a4-47f0-8451-fa8b3bc0e94f",
+    "fields": {
+      "created": "2024-08-23T20:44:29.535Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "Connect to FABRIC's IPv6 internet with three configuration options - auto, manual or user defined",
+      "description_short": "Connect to FABRIC's IPv6 internet",
+      "modified": "2024-08-23T20:44:30.408Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: FABNet IPv6 (Layer 3)",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "7d82a7d1-f9c4-4c31-9b2b-928119885b7c",
+    "fields": {
+      "created": "2024-08-23T20:44:40.081Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Create slices spanning Chameleon and FABRIC via Layer 2 or Layer 3",
+      "modified": "2024-08-23T20:44:40.096Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Chameleon Facility Ports",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "7e8e7ca9-df59-4f19-8c77-ecb2eae08338",
+    "fields": {
+      "created": "2024-08-23T20:44:19.755Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Simple First Slice Example.",
+      "modified": "2024-08-23T20:44:19.773Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Hello, FABRIC",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "80ae4118-0b65-4068-a6e6-198b7fbeeb2e",
+    "fields": {
+      "created": "2023-07-06T14:27:33.280Z",
+      "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "alpha Development Project long description - this will be set with \"Project\" level visibility but have authors not part of the project itself",
+      "description_short": "alpha Development Project",
+      "modified": "2023-07-06T14:31:34.623Z",
+      "modified_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "project_name": "Development project",
+      "project_uuid": "a5488d93-7c6b-48ea-9de1-19e216c0519b",
+      "title": "Development Project",
+      "visibility": "project",
+      "authors": [
+        "8ea240b4-b72c-4dee-9b77-c0dd6a816ba1",
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+        "409b7534-4bb2-4649-ad18-9e57ac868ffc",
+        "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+        "7414d35f-ee8c-47c6-9984-3aab7cf8c9a9",
+        "69f9b1a6-c3c3-4c53-8693-21c63e771c78"
+      ],
+      "tags": [
+        "fabric",
+        "knit workshop"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "83740c4c-ff44-46a9-8c6f-746e41991102",
+    "fields": {
+      "created": "2024-08-23T20:44:20.743Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Deploy a Grafana/Prometheus services on a FABIRC node using Docker. Create a slice that can be monitored by a Grafana/Prometheus server.",
+      "modified": "2024-08-23T20:44:20.759Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Measuring and Visualizing with Grafana and Prometheus",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "91c7cec4-68ff-4cb2-b483-a7d22b8e8ac5",
+    "fields": {
+      "created": "2024-08-23T20:43:39.282Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Create VLAN-tagged sub-interfaces for Smart NICs, enabling multiple Network Services connections.",
+      "modified": "2024-08-23T20:43:39.298Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Sub Interfaces",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "93ad9456-f9cc-440c-bef4-dc1fc50f20b4",
+    "fields": {
+      "created": "2024-08-23T20:43:57.863Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Connect to your project's persistent storage volume.",
+      "modified": "2024-08-23T20:43:57.881Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Persistent Storage",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "9aba09be-c558-4d68-91ee-8be9ae915b2c",
+    "fields": {
+      "created": "2024-08-23T20:44:39.003Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Create slices spanning Cloud Lab and FABRIC via Layer 2",
+      "modified": "2024-08-23T20:44:39.019Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: CloudLab Facility Ports",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "ac586f9c-c5e8-425c-b57c-303d8356f196",
+    "fields": {
+      "created": "2024-08-23T20:43:42.968Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Collaborative Slice Access between project members.",
+      "modified": "2024-08-23T20:43:42.981Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Share Slices",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "acda96a1-38eb-4ee7-8b62-69813093f061",
+    "fields": {
+      "created": "2024-08-23T20:43:58.748Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Setting up a PEERING client on FABRIC",
+      "modified": "2024-08-23T20:43:58.763Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Peering Client",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "bc70076b-89ec-44ab-9c97-0ae20358a2f0",
+    "fields": {
+      "created": "2024-08-23T20:44:27.707Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Options that can be used when creating, validating, and submitting current or future slices.",
+      "modified": "2024-08-23T20:44:27.723Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Validate and Submit a Slice",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "cb13f805-7e73-44aa-8fc9-d4faa863062e",
+    "fields": {
+      "created": "2023-08-03T16:34:01.788Z",
+      "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "Example",
+      "description_short": "Example",
+      "modified": "2023-08-11T20:18:24.565Z",
+      "modified_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "project_name": null,
+      "project_uuid": null,
+      "title": "Example",
+      "visibility": "public",
+      "authors": [
+        "8ea240b4-b72c-4dee-9b77-c0dd6a816ba1",
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+        "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+        "69f9b1a6-c3c3-4c53-8693-21c63e771c78"
+      ],
+      "tags": []
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "d49b0f6b-d1cd-4381-8409-71239b7b7769",
+    "fields": {
+      "created": "2024-08-23T20:44:15.072Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Create a node with a custom local disk size.",
+      "modified": "2024-08-23T20:44:15.090Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Local Disk",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "d9f5f3b4-dc10-4286-ab4a-25c9463e0905",
+    "fields": {
+      "created": "2024-08-23T20:43:38.163Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Create a private mesh VPN with [Tailscale](http://tailscale.com) to accesss and manage your slice.",
+      "modified": "2024-08-23T20:43:38.176Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Tailscale Mesh VPN",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "dbc9e7a9-e26f-41cf-a62a-fd9f3cee1b33",
+    "fields": {
+      "created": "2024-08-23T20:44:11.541Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Example of deploying OpenVSwitch in a node.",
+      "modified": "2024-08-23T20:44:11.557Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: OpenVSwitch",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "dca289bc-926c-4abe-a4e8-3f94b5c38ac5",
+    "fields": {
+      "created": "2024-08-23T20:44:16.011Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "Find and list parts of slice(s).",
+      "description_short": "Options for listing slice(s).",
+      "modified": "2024-08-23T20:44:16.028Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: List All Slice(s), Slice's Nodes, Networks, Components, and Interfaces",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "e10445cd-7174-4db7-8464-d209834bd106",
+    "fields": {
+      "created": "2024-08-23T20:43:47.253Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Files for live demos and tutorials.",
+      "modified": "2024-08-23T20:43:47.268Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Demos and Tutorials",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "e51831c9-bbac-4489-8d01-4ecf0a083dd3",
+    "fields": {
+      "created": "2024-08-23T20:43:42.020Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Add/Remove SSH Keys to VMs in your slice.",
+      "modified": "2024-08-23T20:43:42.031Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Add/Remove SSH Keys",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "e96fa5d4-74c7-4b64-b94e-862e049b37e5",
+    "fields": {
+      "created": "2024-08-23T20:43:44.737Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Extend a slice reservation for a longer period of time.",
+      "modified": "2024-08-23T20:43:44.750Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Extending a Slice Reservation",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "eb825119-25ed-491c-b46f-aeddf6558e9d",
+    "fields": {
+      "created": "2024-08-23T20:44:33.122Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "Create a private WAN Ethernet link between FABRIC sites with three configuration options - auto, manual or user defined",
+      "description_short": "Create a private WAN Ethernet link between FABRIC sites",
+      "modified": "2024-08-23T20:44:33.136Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: Wide Area Link (Layer 2)",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "f78e26d5-b382-4804-9def-93c9e0b20ab0",
+    "fields": {
+      "created": "2024-08-23T20:44:35.919Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "",
+      "description_short": "Create a node with an NVMe device.",
+      "modified": "2024-08-23T20:44:35.934Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: NVMe Devices",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifact",
+    "pk": "fe890fc5-c554-48ca-b36b-4e6ac7a3cb40",
+    "fields": {
+      "created": "2024-08-23T20:44:18.813Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "deleted": false,
+      "deleted_at": null,
+      "description_long": "Test bandwidth across your FABRIC slice. Apply CPU Pinning and Numa tuning with NIC_Basic or Smart NICs and test bandwidth across your FABRIC slice.",
+      "description_short": "Test bandwidth across your FABRIC slice.",
+      "modified": "2024-08-23T20:44:18.830Z",
+      "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "project_name": "FABRIC Staff Alpha",
+      "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
+      "title": "FABRIC Example: iPerf3",
+      "visibility": "public",
+      "authors": [
+        "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
+      ],
+      "tags": [
+        "fabric",
+        "tutorial"
+      ]
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "054f3f2f-d66b-4d5b-9c5f-6d351e4e27d3",
+    "fields": {
+      "artifact": "ac586f9c-c5e8-425c-b57c-303d8356f196",
+      "created": "2024-08-23T20:43:43.118Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "slice_sharing.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "0ae4ba6a-53aa-4e8a-b937-116f0c547b3c",
+    "fields": {
+      "artifact": "1e6f8713-7621-4c4b-81a2-a2f60e180eeb",
+      "created": "2024-08-23T20:44:18.045Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "kubernetes.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "1279063c-5a28-44e3-a48c-4e4d69903062",
+    "fields": {
+      "artifact": "cb13f805-7e73-44aa-8fc9-d4faa863062e",
+      "created": "2023-08-11T20:17:50.924Z",
+      "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "filename": "test.tgz",
+      "storage_id": "2023-08-11",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "16d0b41a-20a4-43d5-b605-7e3489eae0ed",
+    "fields": {
+      "artifact": "55bb9847-2b65-47bb-bb35-6b4dc18a46f8",
+      "created": "2024-08-23T20:43:59.920Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "parallel_config.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "1824f7aa-127f-4d7a-b1b2-515cc5a5d297",
+    "fields": {
+      "artifact": "078346c8-506f-4e2d-9bd3-e636229f3adf",
+      "created": "2024-08-23T20:44:35.172Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "configure_and_validate.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "1accc3db-f26c-499f-b564-76babab7c9c2",
+    "fields": {
+      "artifact": "1f665591-3e98-47b2-baac-cbdae482056e",
+      "created": "2023-07-06T15:19:26.160Z",
+      "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "filename": "test_dir.tgz",
+      "storage_id": "2023-07-06.1",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "1d532418-30f1-4982-9e54-f1ca6769e5c1",
+    "fields": {
+      "artifact": "93ad9456-f9cc-440c-bef4-dc1fc50f20b4",
+      "created": "2024-08-23T20:43:58.041Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "persistent_storage.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "1e02119c-d520-4c23-a95d-9fed50411897",
+    "fields": {
+      "artifact": "095fe375-a9c2-4699-9c1b-cb49f42b8cd3",
+      "created": "2024-08-23T20:44:12.724Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "modify_slice.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "260fbe1d-aab4-48d2-898f-ee48472cf78f",
+    "fields": {
+      "artifact": "43ecc0b9-787a-4894-b796-9e594cac1b28",
+      "created": "2024-08-23T20:44:25.248Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "docker_containers.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "2d9eeb0e-2269-45d1-8179-20dbbd776abc",
+    "fields": {
+      "artifact": "66290f94-c056-4fc0-8611-5ea90b6411b1",
+      "created": "2024-08-23T20:44:14.318Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "mflib.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "2ef30c26-44b1-4322-a859-d0a321410b81",
+    "fields": {
+      "artifact": "9aba09be-c558-4d68-91ee-8be9ae915b2c",
+      "created": "2024-08-23T20:44:39.286Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "Cloudlab_Facility_Port.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "304e10d5-9c4b-4e8c-bb7d-5c6c8a59cab6",
+    "fields": {
+      "artifact": "7273ae75-3464-417e-ad5c-ffe321c79253",
+      "created": "2024-08-23T20:44:22.161Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "fabric_fpgas.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "31cd7284-54fc-474f-bb48-f443ca48d8a9",
+    "fields": {
+      "artifact": "7e8e7ca9-df59-4f19-8c77-ecb2eae08338",
+      "created": "2024-08-23T20:44:19.983Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "hello_fabric.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "3b7c28bc-93da-43a3-b6d9-b68acdda3013",
+    "fields": {
+      "artifact": "d9f5f3b4-dc10-4286-ab4a-25c9463e0905",
+      "created": "2024-08-23T20:43:38.529Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "tailscale.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "47d570c9-4917-4607-8ea6-216c5a90e19f",
+    "fields": {
+      "artifact": "5999bce4-5c08-48ca-b384-290ecbb11efb",
+      "created": "2024-08-23T20:44:10.803Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "p4_labs_bmv2.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "4a5f92b3-8f02-403a-8921-95a0421dbb59",
+    "fields": {
+      "artifact": "7928049d-58a4-47f0-8451-fa8b3bc0e94f",
+      "created": "2024-08-23T20:44:29.710Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "create_l3network_fabnet_ipv6_ext.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "4d40ead4-8f8e-4e0a-8ed6-e31feceaec5f",
+    "fields": {
+      "artifact": "4475fbcb-064e-440b-b8e6-eefae5b95ad6",
+      "created": "2023-08-03T16:28:56.509Z",
+      "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "filename": "stealey.tgz",
+      "storage_id": "2023-08-03",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "53c47b4f-acc5-4f6d-8238-8e4dcb2f3199",
+    "fields": {
+      "artifact": "5566c196-4ca7-4cff-8a8a-7c2d054612d6",
+      "created": "2024-08-23T20:44:27.015Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "customizing_nodes.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "58e5e442-266e-49b8-b4f1-d4f29956ae20",
+    "fields": {
+      "artifact": "eb825119-25ed-491c-b46f-aeddf6558e9d",
+      "created": "2024-08-23T20:44:33.303Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "create_l2network_wide_area.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "60cf7fb4-69f4-4b26-95aa-7672b7f3af9a",
+    "fields": {
+      "artifact": "157527fb-bedb-4690-b3a1-aa50f914d80f",
+      "created": "2024-08-23T20:44:37.002Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "add_keys_into_slice.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "6f229505-fb92-4fb5-ae86-48ee8369ab3e",
+    "fields": {
+      "artifact": "0096e143-2ad2-48d7-b88c-cf72770c846f",
+      "created": "2023-07-06T14:33:43.042Z",
+      "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "filename": "test_dir.tgz",
+      "storage_id": "2023-07-06.1",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "6f653982-935b-4f05-ae4d-f61e89c38264",
+    "fields": {
+      "artifact": "4475fbcb-064e-440b-b8e6-eefae5b95ad6",
+      "created": "2024-06-12T20:52:53.891Z",
+      "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "filename": "mjstealey-test.tgz",
+      "storage_id": "2024-06-12",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "74e32e28-3329-48fd-8c5c-0c7fc471fcfb",
+    "fields": {
+      "artifact": "e51831c9-bbac-4489-8d01-4ecf0a083dd3",
+      "created": "2024-08-23T20:43:42.233Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "ssh_keys.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "7607ace5-d787-43f8-ba2d-2aabbd11bcdd",
+    "fields": {
+      "artifact": "7d82a7d1-f9c4-4c31-9b2b-928119885b7c",
+      "created": "2024-08-23T20:44:40.334Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "Chameleon_Facility_Port.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "7680587e-1b10-4056-a917-ec736b784c5f",
+    "fields": {
+      "artifact": "2f8e206c-7fc8-4e45-9dd4-088b7c6f21e3",
+      "created": "2024-08-23T20:44:26.128Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "delete_slice.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "7b7ae6d0-5643-4cc2-b2d1-1db7b3d2c899",
+    "fields": {
+      "artifact": "1ccedc8e-149a-4df7-89ec-bc85f4ab1164",
+      "created": "2024-08-23T20:44:34.226Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "create_l2network_basic.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "8b5d2160-e836-401d-aed6-9d97e56d08aa",
+    "fields": {
+      "artifact": "74e32191-ed22-44b0-b42c-02d44a3894be",
+      "created": "2024-08-23T20:43:37.407Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "upload_and_execute.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "8d126b10-7bc8-4117-8a48-6a02643fc07d",
+    "fields": {
+      "artifact": "dbc9e7a9-e26f-41cf-a62a-fd9f3cee1b33",
+      "created": "2024-08-23T20:44:11.730Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "openvswitch.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "9061cd87-6d89-4aae-a7ee-574f9a2a294e",
+    "fields": {
+      "artifact": "7928049d-58a4-47f0-8451-fa8b3bc0e94f",
+      "created": "2024-08-23T20:44:30.527Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "create_l3network_fabnet_ipv6.tgz",
+      "storage_id": "2024-08-23.1",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "91157330-ac1a-4c19-b704-a9c9f5e1a5e5",
+    "fields": {
+      "artifact": "e10445cd-7174-4db7-8464-d209834bd106",
+      "created": "2024-08-23T20:43:56.203Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "public_demos.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "9164ac0b-d81f-438e-a736-4fcf38b51543",
+    "fields": {
+      "artifact": "251a912c-1ac4-4b89-af66-402e234c0a88",
+      "created": "2024-08-23T20:44:31.380Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "create_l3network_fabnet_ipv4_ext.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "9530e554-1016-4642-bde6-3539f04739f6",
+    "fields": {
+      "artifact": "251a912c-1ac4-4b89-af66-402e234c0a88",
+      "created": "2024-08-23T20:44:32.302Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "create_l3network_fabnet_ipv4.tgz",
+      "storage_id": "2024-08-23.1",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "9a2ebd70-a101-4a73-8a80-ba53ad47f2ba",
+    "fields": {
+      "artifact": "0ea2441b-2f74-4039-a637-2195e8fb1fb7",
+      "created": "2024-08-23T20:43:57.158Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "post_boot_tasks.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "9c102025-5b63-44d1-b403-9eeaa2b127a3",
+    "fields": {
+      "artifact": "bc70076b-89ec-44ab-9c97-0ae20358a2f0",
+      "created": "2024-08-23T20:44:27.864Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "create_slice.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "9f7dde18-98b3-4f88-8258-c43d1195f82e",
+    "fields": {
+      "artifact": "1e2a3023-ce56-4844-a6fc-77c35aa70c4c",
+      "created": "2024-08-23T20:44:38.247Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "FRRouting.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "a4c3034f-1da6-48ed-a21b-4cc8231e1d3b",
+    "fields": {
+      "artifact": "0fa723e3-fcf8-4cec-bbb5-01c366958222",
+      "created": "2024-08-23T20:44:17.141Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "list_all_resources.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "a4deffff-9f11-4465-8502-730d2adf1312",
+    "fields": {
+      "artifact": "fe890fc5-c554-48ca-b36b-4e6ac7a3cb40",
+      "created": "2024-08-23T20:44:18.971Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "iperf3.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "a9e215b7-3a47-4cc2-926e-dfbfa0d61437",
+    "fields": {
+      "artifact": "e96fa5d4-74c7-4b64-b94e-862e049b37e5",
+      "created": "2024-08-23T20:43:44.896Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "renew_slice.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "afdce4aa-7302-47a0-8367-07a5d0c3c920",
+    "fields": {
+      "artifact": "acda96a1-38eb-4ee7-8b62-69813093f061",
+      "created": "2024-08-23T20:43:59.040Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "peering_client.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "b20e0794-0293-4186-bbce-d648ece766a4",
+    "fields": {
+      "artifact": "91c7cec4-68ff-4cb2-b483-a7d22b8e8ac5",
+      "created": "2024-08-23T20:43:39.452Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "sub_interfaces.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "b39cd429-40c2-47a5-8004-758afb18bcaf",
+    "fields": {
+      "artifact": "1f665591-3e98-47b2-baac-cbdae482056e",
+      "created": "2023-07-06T15:17:08.152Z",
+      "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "filename": "test_dir.tgz",
+      "storage_id": "2023-07-06",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "b992872a-95d8-48d3-a0cb-a1f14519f0e4",
+    "fields": {
+      "artifact": "83740c4c-ff44-46a9-8c6f-746e41991102",
+      "created": "2024-08-23T20:44:21.025Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "grafana_prometheus_servers.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "ba7d52b1-d878-42f9-a08e-022ad5b1ffb4",
+    "fields": {
+      "artifact": "dca289bc-926c-4abe-a4e8-3f94b5c38ac5",
+      "created": "2024-08-23T20:44:16.167Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "list_slices.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "bd241e54-d07f-4e3d-a7d2-60f8863b4cbf",
+    "fields": {
+      "artifact": "0096e143-2ad2-48d7-b88c-cf72770c846f",
+      "created": "2023-07-06T14:33:37.123Z",
+      "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "filename": "test_dir.tgz",
+      "storage_id": "2023-07-06",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "c36ea282-e888-4d7e-add2-40175aaf958a",
+    "fields": {
+      "artifact": "156d58f7-5a50-469c-ba7d-26fb93f18dc9",
+      "created": "2024-08-23T20:44:23.126Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "fabric_all_gpus.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "c9276968-06bd-4466-b48a-404f806e90ba",
+    "fields": {
+      "artifact": "d49b0f6b-d1cd-4381-8409-71239b7b7769",
+      "created": "2024-08-23T20:44:15.308Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "local_disk.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "cc0ac732-242b-43b7-9583-2a9c34b90ff9",
+    "fields": {
+      "artifact": "0096e143-2ad2-48d7-b88c-cf72770c846f",
+      "created": "2023-07-06T14:33:50.542Z",
+      "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "filename": "test_dir.tgz",
+      "storage_id": "2023-07-06.2",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "cff1b34e-dbee-4b0d-b154-37dee4139e37",
+    "fields": {
+      "artifact": "3b45aa23-5f7c-431d-b3a5-c97d7abaa317",
+      "created": "2024-08-23T20:43:40.360Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "ssh_tunnels.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "e46e4609-e12a-47c9-910c-1b4b5f6de812",
+    "fields": {
+      "artifact": "54928b24-b982-4b58-91e3-82a7e691500b",
+      "created": "2024-08-23T20:44:28.805Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "create_port_mirror.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "e9999478-c90f-4b0c-83e8-92b3c8b3b033",
+    "fields": {
+      "artifact": "257067c5-b493-47a4-99ee-d0559b690abb",
+      "created": "2024-08-23T20:43:41.256Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "ssh_to_nodes.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "eac86bf8-1453-47c1-81d5-23bd5aaed54d",
+    "fields": {
+      "artifact": "80ae4118-0b65-4068-a6e6-198b7fbeeb2e",
+      "created": "2023-07-06T14:32:13.097Z",
+      "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
+      "filename": "test_dir.tgz",
+      "storage_id": "2023-07-06",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "f03931b0-ac7a-446e-88bf-fb5a9d0fa982",
+    "fields": {
+      "artifact": "05397748-453b-46fe-9a62-fa39a55e4017",
+      "created": "2024-08-23T20:43:44.032Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "save_and_load.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "f0c7492e-8416-4a1a-b7e5-aa341b110c43",
+    "fields": {
+      "artifact": "f78e26d5-b382-4804-9def-93c9e0b20ab0",
+      "created": "2024-08-23T20:44:36.080Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "basic_nvme_devices.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "artifacts.artifactversion",
+    "pk": "fd50a99e-aa2f-4bd5-9276-e434c93eff6c",
+    "fields": {
+      "artifact": "73c5b67a-4bba-400f-a3a2-e0850e2ed147",
+      "created": "2024-08-23T20:44:24.351Z",
+      "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
+      "filename": "dpdk_smart_nic.tgz",
+      "storage_id": "2024-08-23",
+      "storage_repo": "renci",
+      "storage_type": "fabric"
+    }
+  },
+  {
+    "model": "apiuser.tasktimeouttracker",
+    "pk": "047441d7-15d1-4ec1-bce0-e545a2de10c1",
+    "fields": {
+      "description": "Author Refresh Check",
+      "last_updated": "2023-08-10T20:14:00.689Z",
+      "name": "author_refresh_check",
+      "timeout_in_seconds": 86400,
+      "value": null
+    }
+  },
+  {
+    "model": "apiuser.tasktimeouttracker",
+    "pk": "0dd60351-ed97-4240-aa51-244665016503",
+    "fields": {
+      "description": "Token Revocation List",
+      "last_updated": "2024-08-23T21:17:38.813Z",
+      "name": "token_revocation_list",
+      "timeout_in_seconds": 300,
+      "value": "[]"
+    }
+  },
+  {
+    "model": "apiuser.tasktimeouttracker",
+    "pk": "ee2a84f5-d618-4915-9ff3-c5ba11c93d3e",
+    "fields": {
+      "description": "Public Signing Key",
+      "last_updated": "2024-08-22T23:13:52.060Z",
+      "name": "public_signing_key",
+      "timeout_in_seconds": 86400,
+      "value": "{\"alg\": \"RS256\", \"e\": \"AQAB\", \"kid\": \"b415167211191e2e05b22b54b1d3b7667e764a747722185e722e52e146fe43aa\", \"kty\": \"RSA\", \"n\": \"5zK1Pu8kWUPLHZbKGhOPxId-KtB6nBD90TkE3oPufUDEDC00_IwMeevJfPI-UsUD9Q6o9U-WMs8y1qxyjnu8CAH8jcZScg8p6iI63_ruEwwL60I0Zw-2f0km8GusAeumDWOU2-M57bWEI_KDDfglkAgXAesKyuxdyJ19Gxj3q9KxJu0vhojkQm6ZOCIdtAZBPMVUmR1Ww1Ro-3MZg_H5zKWntvbniNggVC1PAQ2GgJOD2CM0Wbt9kKXOKV32jLsOe6Z_-EMDpLcvZuokIX4bK-VDdQsLlm4JGwLHTBD0lFkiVkRu1lPhaI4o9DP88LRjEzL-tqFJl8KUMW0iIZXnMShWF8VGZKQvJPJfZx4z3u3FGUYM3PoVZXVe3Tw5OYAolexaNjrV-stowQWYRyUkPSGJOdc6nYO5bIclSLrq2O6vlJ3Nd-63JOD43xCfx6SNVFQOiTerP8C3TEWKr2ru1J8u_FGlAM9xbm4lBk7N0eKusqsOY6MrvulODrYjHWShdzsV6DhHjRuM1f9SrizOePw54g35nNO-9dQCbYYh6QZ1BjZSoc3QyaueQ4wcfu1qQjxT-1_jq4-Oilfjpn15mZeQ5LxOP63H_3XN6cS7h_8aXZLRuF5mKjJ-vqJxQQzVAIxfWsm1QJCOPB4F99Zzj8MlrlTKYQuiTI8YZNAoUPs\", \"use\": \"sig\"}"
+    }
   }
-},
-{
-  "model": "artifacts.apiuser",
-  "pk": "3cfff215-1cd5-4d18-aa4f-e0a166c7957b",
-  "fields": {
-    "access_expires": "2024-07-15T17:07:47.583Z",
-    "access_type": "cookie",
-    "affiliation": "Google",
-    "cilogon_id": "http://cilogon.org/serverT/users/39648438",
-    "email": "fabric.tb.3@gmail.com",
-    "fabric_roles": "[\"fabric-active-users\", \"Jupyterhub\"]",
-    "name": "Fabric User-Three",
-    "projects": "[\"74a5b28b-c1a2-4fad-882b-03362dddfa71\", \"88c74e11-9324-42e1-83fa-97dc742919b6\"]"
-  }
-},
-{
-  "model": "artifacts.apiuser",
-  "pk": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-  "fields": {
-    "access_expires": "2024-08-29T19:52:51.310Z",
-    "access_type": "cookie",
-    "affiliation": "University of North Carolina at Chapel Hill",
-    "cilogon_id": "http://cilogon.org/serverA/users/242181",
-    "email": "stealey@unc.edu",
-    "fabric_roles": "[\"Jupyterhub\", \"facility-operators\", \"fabric-active-users\", \"portal-admins\", \"project-leads\", \"approval-committee \", \"long-lived-tokens\"]",
-    "name": "Michael J. Stealey, Sr",
-    "projects": "[\"74a5b28b-c1a2-4fad-882b-03362dddfa71\", \"fc101be1-6784-43c7-a6fa-2ea27f0e0dba\", \"ec8389c8-6129-40aa-a6ee-3a1d80d74f33\", \"6608c042-fbac-4695-bad8-807a7b627183\", \"a5488d93-7c6b-48ea-9de1-19e216c0519b\", \"10582cb1-ee10-4b8c-8d61-ffc4688be0d6\", \"1af8e23d-5fa8-46fc-be94-21609abbadd0\", \"d74993c8-e3b5-451c-977f-c7cc544f176f\", \"ced386b6-01e6-4c8a-bca5-febfc7fe7936\", \"88c74e11-9324-42e1-83fa-97dc742919b6\", \"8b3a2eae-a0c0-475a-807b-e9af581ce4c0\"]"
-  }
-},
-{
-  "model": "artifacts.apiuser",
-  "pk": "69f9b1a6-c3c3-4c53-8693-21c63e771c78",
-  "fields": {
-    "access_expires": "2024-07-17T18:23:16.184Z",
-    "access_type": "cookie",
-    "affiliation": "University of North Carolina at Chapel Hill",
-    "cilogon_id": "http://cilogon.org/serverT/users/26542073",
-    "email": "yaxue.guo23@gmail.com",
-    "fabric_roles": "[\"Jupyterhub\", \"facility-operators\", \"fabric-active-users\", \"portal-admins\", \"project-leads\", \"long-lived-tokens\"]",
-    "name": "Yaxue Guo",
-    "projects": "[\"74a5b28b-c1a2-4fad-882b-03362dddfa71\", \"ced386b6-01e6-4c8a-bca5-febfc7fe7936\", \"88c74e11-9324-42e1-83fa-97dc742919b6\", \"8b3a2eae-a0c0-475a-807b-e9af581ce4c0\"]"
-  }
-},
-{
-  "model": "artifacts.apiuser",
-  "pk": "7414d35f-ee8c-47c6-9984-3aab7cf8c9a9",
-  "fields": {
-    "access_expires": "2024-08-23T15:16:02.457Z",
-    "access_type": "cookie",
-    "affiliation": "University of North Carolina at Chapel Hill",
-    "cilogon_id": "http://cilogon.org/serverA/users/31379841",
-    "email": "pruth@email.unc.edu",
-    "fabric_roles": "[\"Jupyterhub\", \"fabric-active-users\", \"portal-admins\", \"project-leads\", \"facility-operators\"]",
-    "name": "Paul Ruth",
-    "projects": "[\"74a5b28b-c1a2-4fad-882b-03362dddfa71\", \"fc101be1-6784-43c7-a6fa-2ea27f0e0dba\", \"ced386b6-01e6-4c8a-bca5-febfc7fe7936\", \"88c74e11-9324-42e1-83fa-97dc742919b6\", \"8b3a2eae-a0c0-475a-807b-e9af581ce4c0\"]"
-  }
-},
-{
-  "model": "artifacts.apiuser",
-  "pk": "8ea240b4-b72c-4dee-9b77-c0dd6a816ba1",
-  "fields": {
-    "access_expires": "2023-11-09T21:21:31.809Z",
-    "access_type": "cookie",
-    "affiliation": "University of North Carolina at Chapel Hill",
-    "cilogon_id": "http://cilogon.org/serverT/users/241998",
-    "email": "ibaldin@renci.org",
-    "fabric_roles": "[\"long-lived-tokens\", \"approval-committee \", \"fabric-active-users\", \"project-leads\", \"Jupyterhub\"]",
-    "name": "Ilya Baldin",
-    "projects": "[\"8b3a2eae-a0c0-475a-807b-e9af581ce4c0\", \"88c74e11-9324-42e1-83fa-97dc742919b6\", \"afa75253-a9a6-45ec-b397-e8d29ff7c8bd\"]"
-  }
-},
-{
-  "model": "artifacts.artifactauthor",
-  "pk": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-  "fields": {
-    "affiliation": "University of North Carolina at Chapel Hill",
-    "email": "kthare10@email.unc.edu",
-    "name": "Komal Thareja",
-    "updated": "2024-08-22T23:13:53.610Z"
-  }
-},
-{
-  "model": "artifacts.artifactauthor",
-  "pk": "409b7534-4bb2-4649-ad18-9e57ac868ffc",
-  "fields": {
-    "affiliation": "University of North Carolina at Chapel Hill",
-    "email": null,
-    "name": "Mert Cevik",
-    "updated": "2023-07-06T14:27:33.650Z"
-  }
-},
-{
-  "model": "artifacts.artifactauthor",
-  "pk": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-  "fields": {
-    "affiliation": "University of North Carolina at Chapel Hill",
-    "email": "stealey@unc.edu",
-    "name": "Michael J. Stealey, Sr",
-    "updated": "2023-08-11T20:18:24.201Z"
-  }
-},
-{
-  "model": "artifacts.artifactauthor",
-  "pk": "69f9b1a6-c3c3-4c53-8693-21c63e771c78",
-  "fields": {
-    "affiliation": "University of North Carolina at Chapel Hill",
-    "email": "yaxueguo@renci.org",
-    "name": "Yaxue Guo",
-    "updated": "2023-07-06T14:27:33.361Z"
-  }
-},
-{
-  "model": "artifacts.artifactauthor",
-  "pk": "7414d35f-ee8c-47c6-9984-3aab7cf8c9a9",
-  "fields": {
-    "affiliation": "University of North Carolina at Chapel Hill",
-    "email": "pruth@email.unc.edu",
-    "name": "Paul Ruth",
-    "updated": "2023-07-06T14:27:33.740Z"
-  }
-},
-{
-  "model": "artifacts.artifactauthor",
-  "pk": "8ea240b4-b72c-4dee-9b77-c0dd6a816ba1",
-  "fields": {
-    "affiliation": "University of North Carolina at Chapel Hill",
-    "email": null,
-    "name": "Ilya Baldin",
-    "updated": "2023-07-06T14:27:33.439Z"
-  }
-},
-{
-  "model": "artifacts.artifacttag",
-  "pk": "fabric",
-  "fields": {}
-},
-{
-  "model": "artifacts.artifacttag",
-  "pk": "knit workshop",
-  "fields": {}
-},
-{
-  "model": "artifacts.artifacttag",
-  "pk": "tutorial",
-  "fields": {}
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "0096e143-2ad2-48d7-b88c-cf72770c846f",
-  "fields": {
-    "created": "2023-07-06T14:29:51.328Z",
-    "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "Publicly available artifacts - some kind of description goes here",
-    "description_short": "Publicly available artifacts",
-    "modified": "2023-07-06T14:29:51.336Z",
-    "modified_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "project_name": null,
-    "project_uuid": null,
-    "title": "Public Artifacts",
-    "visibility": "public",
-    "authors": [
-      "593dd0d3-cedb-4bc6-9522-a945da0a8a8e"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "05397748-453b-46fe-9a62-fa39a55e4017",
-  "fields": {
-    "created": "2024-08-23T20:43:43.835Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Save an experimental topology and load it at a later time.",
-    "modified": "2024-08-23T20:43:43.853Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Save/Load Slices",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "078346c8-506f-4e2d-9bd3-e636229f3adf",
-  "fields": {
-    "created": "2024-08-23T20:44:34.974Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Configure you Environment including creating the `fabric_rc` and `ssh_config` files.",
-    "modified": "2024-08-23T20:44:34.990Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Configure Environment",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "095fe375-a9c2-4699-9c1b-cb49f42b8cd3",
-  "fields": {
-    "created": "2024-08-23T20:44:12.509Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Modify an existing slice by adding/removing resources.",
-    "modified": "2024-08-23T20:44:12.524Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Modifying Slices",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "0ea2441b-2f74-4039-a637-2195e8fb1fb7",
-  "fields": {
-    "created": "2024-08-23T20:43:56.961Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Define post boot tasks with or without templates to upload files and execute commands.",
-    "modified": "2024-08-23T20:43:56.977Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Post Boot Tasks",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "0fa723e3-fcf8-4cec-bbb5-01c366958222",
-  "fields": {
-    "created": "2024-08-23T20:44:16.952Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "List resource capacity and availability. Output options: Text, Pandas, JSON, and Python List[Dict]. Find sites containing available components and capacities.",
-    "modified": "2024-08-23T20:44:16.968Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Listing Available Resources",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "156d58f7-5a50-469c-ba7d-26fb93f18dc9",
-  "fields": {
-    "created": "2024-08-23T20:44:22.893Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Create a node with any GPU type.",
-    "modified": "2024-08-23T20:44:22.913Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: All FABRIC GPUs: Tesla T4, RTX6000, A30, A40",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "157527fb-bedb-4690-b3a1-aa50f914d80f",
-  "fields": {
-    "created": "2024-08-23T20:44:36.774Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Add new keys on submit or add later via POA (Perform Operational Action).",
-    "modified": "2024-08-23T20:44:36.790Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Adding other user's keys into slice",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "1ccedc8e-149a-4df7-89ec-bc85f4ab1164",
-  "fields": {
-    "created": "2024-08-23T20:44:34.030Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "Create a private local Ethernet network on a FABRIC site with three configuration options - auto, manual or user defined",
-    "description_short": "Create a private local Ethernet network on a FABRIC site",
-    "modified": "2024-08-23T20:44:34.051Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Local Ethernet (Layer 2)",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "1e2a3023-ce56-4844-a6fc-77c35aa70c4c",
-  "fields": {
-    "created": "2024-08-23T20:44:37.840Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Example of deploying OSPF across a wide-area using FRRouting (similar to Quagga).",
-    "modified": "2024-08-23T20:44:37.851Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: FRRouting OSPF",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "1e6f8713-7621-4c4b-81a2-a2f60e180eeb",
-  "fields": {
-    "created": "2024-08-23T20:44:17.881Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Create a private Kubernetes cluster on FABRIC resources.",
-    "modified": "2024-08-23T20:44:17.897Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Kubernetes Cluster",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "1f665591-3e98-47b2-baac-cbdae482056e",
-  "fields": {
-    "created": "2023-07-06T15:15:49.886Z",
-    "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "short description",
-    "modified": "2023-07-06T15:15:49.901Z",
-    "modified_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "project_name": null,
-    "project_uuid": null,
-    "title": "Demo artifact",
-    "visibility": "public",
-    "authors": [
-      "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-      "7414d35f-ee8c-47c6-9984-3aab7cf8c9a9"
-    ],
-    "tags": [
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "22061b7a-1e1b-495f-b256-f1916b3b92f1",
-  "fields": {
-    "created": "2023-07-06T14:24:27.205Z",
-    "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "alpha FABRIC Project artifacts along with a bunch of other words",
-    "description_short": "alpha FABRIC Project artifacts",
-    "modified": "2023-07-06T14:30:53.481Z",
-    "modified_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "project_name": "FABRIC Project",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Project",
-    "visibility": "project",
-    "authors": [
-      "593dd0d3-cedb-4bc6-9522-a945da0a8a8e"
-    ],
-    "tags": [
-      "fabric"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "251a912c-1ac4-4b89-af66-402e234c0a88",
-  "fields": {
-    "created": "2024-08-23T20:44:31.208Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "Connect to FABRIC's IPv4 internet with three configuration options - auto, manual or user defined.",
-    "description_short": "Connect to FABRIC's IPv4 internet",
-    "modified": "2024-08-23T20:44:32.158Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: FABNet IPv4 (Layer 3)",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "257067c5-b493-47a4-99ee-d0559b690abb",
-  "fields": {
-    "created": "2024-08-23T20:43:41.089Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Show how to remotely log into a running FABRIC node.",
-    "modified": "2024-08-23T20:43:41.105Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Execute Commands on Nodes",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "2f8e206c-7fc8-4e45-9dd4-088b7c6f21e3",
-  "fields": {
-    "created": "2024-08-23T20:44:25.956Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Options for deleting a slice or slices.",
-    "modified": "2024-08-23T20:44:25.973Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Delete Slice(s)",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "3b45aa23-5f7c-431d-b3a5-c97d7abaa317",
-  "fields": {
-    "created": "2024-08-23T20:43:40.208Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Create SSH tunnels from your local machine (i.e., your laptop) to FABRIC Nodes.",
-    "modified": "2024-08-23T20:43:40.223Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: SSH Tunnels",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "43ecc0b9-787a-4894-b796-9e594cac1b28",
-  "fields": {
-    "created": "2024-08-23T20:44:25.091Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Docker",
-    "modified": "2024-08-23T20:44:25.107Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Deploy Docker Containers",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "4475fbcb-064e-440b-b8e6-eefae5b95ad6",
-  "fields": {
-    "created": "2023-08-03T16:16:32.712Z",
-    "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "private test artifact",
-    "description_short": "private test artifact",
-    "modified": "2023-08-03T16:17:35.012Z",
-    "modified_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "project_name": null,
-    "project_uuid": null,
-    "title": "private test artifact",
-    "visibility": "author",
-    "authors": [
-      "593dd0d3-cedb-4bc6-9522-a945da0a8a8e"
-    ],
-    "tags": []
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "54928b24-b982-4b58-91e3-82a7e691500b",
-  "fields": {
-    "created": "2024-08-23T20:44:28.539Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "Listen in on traffic in FABRIC dataplane using PortMirror service - Infrastructure Port Mirroring or InSlice Port Mirroring",
-    "description_short": "Listen in on traffic in FABRIC dataplane using PortMirror service",
-    "modified": "2024-08-23T20:44:28.551Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Port Mirroring",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "5566c196-4ca7-4cff-8a8a-7c2d054612d6",
-  "fields": {
-    "created": "2024-08-23T20:44:26.831Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Set node properties (site, image, cores, ram, disk, etc.).",
-    "modified": "2024-08-23T20:44:26.847Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Customizing Nodes",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "55bb9847-2b65-47bb-bb35-6b4dc18a46f8",
-  "fields": {
-    "created": "2024-08-23T20:43:59.767Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Use threads to configure experiments in parallel.",
-    "modified": "2024-08-23T20:43:59.782Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Parallel Experiment Configuration",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "5999bce4-5c08-48ca-b384-290ecbb11efb",
-  "fields": {
-    "created": "2024-08-23T20:44:01.981Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Lab series on P4 programmable switches using the Behavioral Model (BMv2).",
-    "modified": "2024-08-23T20:44:01.992Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: P4 Labs (BMv2)",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "66290f94-c056-4fc0-8611-5ea90b6411b1",
-  "fields": {
-    "created": "2024-08-23T20:44:13.624Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Examples for setting up automated monitoring in your slice.",
-    "modified": "2024-08-23T20:44:13.639Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Monitoring with MFLib Examples",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "7273ae75-3464-417e-ad5c-ffe321c79253",
-  "fields": {
-    "created": "2024-08-23T20:44:21.782Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Provision a single FPGA and/or configure it using ESnet workflow.",
-    "modified": "2024-08-23T20:44:21.799Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Provision a single FPGA and/or configure it using ESnet workflow",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "73c5b67a-4bba-400f-a3a2-e0850e2ed147",
-  "fields": {
-    "created": "2024-08-23T20:44:23.869Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Program your smart nics with DPDK.",
-    "modified": "2024-08-23T20:44:23.884Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: DPDK and Pktgen with Smart NICs",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "74e32191-ed22-44b0-b42c-02d44a3894be",
-  "fields": {
-    "created": "2024-08-23T20:43:37.160Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Upload a script and execute it.",
-    "modified": "2024-08-23T20:43:37.179Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Upload and Execute Scripts",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "7928049d-58a4-47f0-8451-fa8b3bc0e94f",
-  "fields": {
-    "created": "2024-08-23T20:44:29.535Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "Connect to FABRIC's IPv6 internet with three configuration options - auto, manual or user defined",
-    "description_short": "Connect to FABRIC's IPv6 internet",
-    "modified": "2024-08-23T20:44:30.408Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: FABNet IPv6 (Layer 3)",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "7d82a7d1-f9c4-4c31-9b2b-928119885b7c",
-  "fields": {
-    "created": "2024-08-23T20:44:40.081Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Create slices spanning Chameleon and FABRIC via Layer 2 or Layer 3",
-    "modified": "2024-08-23T20:44:40.096Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Chameleon Facility Ports",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "7e8e7ca9-df59-4f19-8c77-ecb2eae08338",
-  "fields": {
-    "created": "2024-08-23T20:44:19.755Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Simple First Slice Example.",
-    "modified": "2024-08-23T20:44:19.773Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Hello, FABRIC",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "80ae4118-0b65-4068-a6e6-198b7fbeeb2e",
-  "fields": {
-    "created": "2023-07-06T14:27:33.280Z",
-    "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "alpha Development Project long description - this will be set with \"Project\" level visibility but have authors not part of the project itself",
-    "description_short": "alpha Development Project",
-    "modified": "2023-07-06T14:31:34.623Z",
-    "modified_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "project_name": "Development project",
-    "project_uuid": "a5488d93-7c6b-48ea-9de1-19e216c0519b",
-    "title": "Development Project",
-    "visibility": "project",
-    "authors": [
-      "8ea240b4-b72c-4dee-9b77-c0dd6a816ba1",
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-      "409b7534-4bb2-4649-ad18-9e57ac868ffc",
-      "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-      "7414d35f-ee8c-47c6-9984-3aab7cf8c9a9",
-      "69f9b1a6-c3c3-4c53-8693-21c63e771c78"
-    ],
-    "tags": [
-      "fabric",
-      "knit workshop"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "83740c4c-ff44-46a9-8c6f-746e41991102",
-  "fields": {
-    "created": "2024-08-23T20:44:20.743Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Deploy a Grafana/Prometheus services on a FABIRC node using Docker. Create a slice that can be monitored by a Grafana/Prometheus server.",
-    "modified": "2024-08-23T20:44:20.759Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Measuring and Visualizing with Grafana and Prometheus",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "91c7cec4-68ff-4cb2-b483-a7d22b8e8ac5",
-  "fields": {
-    "created": "2024-08-23T20:43:39.282Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Create VLAN-tagged sub-interfaces for Smart NICs, enabling multiple Network Services connections.",
-    "modified": "2024-08-23T20:43:39.298Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Sub Interfaces",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "93ad9456-f9cc-440c-bef4-dc1fc50f20b4",
-  "fields": {
-    "created": "2024-08-23T20:43:57.863Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Connect to your project's persistent storage volume.",
-    "modified": "2024-08-23T20:43:57.881Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Persistent Storage",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "9aba09be-c558-4d68-91ee-8be9ae915b2c",
-  "fields": {
-    "created": "2024-08-23T20:44:39.003Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Create slices spanning Cloud Lab and FABRIC via Layer 2",
-    "modified": "2024-08-23T20:44:39.019Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: CloudLab Facility Ports",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "ac586f9c-c5e8-425c-b57c-303d8356f196",
-  "fields": {
-    "created": "2024-08-23T20:43:42.968Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Collaborative Slice Access between project members.",
-    "modified": "2024-08-23T20:43:42.981Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Share Slices",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "acda96a1-38eb-4ee7-8b62-69813093f061",
-  "fields": {
-    "created": "2024-08-23T20:43:58.748Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Setting up a PEERING client on FABRIC",
-    "modified": "2024-08-23T20:43:58.763Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Peering Client",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "bc70076b-89ec-44ab-9c97-0ae20358a2f0",
-  "fields": {
-    "created": "2024-08-23T20:44:27.707Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Options that can be used when creating, validating, and submitting current or future slices.",
-    "modified": "2024-08-23T20:44:27.723Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Validate and Submit a Slice",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "cb13f805-7e73-44aa-8fc9-d4faa863062e",
-  "fields": {
-    "created": "2023-08-03T16:34:01.788Z",
-    "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "Example",
-    "description_short": "Example",
-    "modified": "2023-08-11T20:18:24.565Z",
-    "modified_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "project_name": null,
-    "project_uuid": null,
-    "title": "Example",
-    "visibility": "public",
-    "authors": [
-      "8ea240b4-b72c-4dee-9b77-c0dd6a816ba1",
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-      "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-      "69f9b1a6-c3c3-4c53-8693-21c63e771c78"
-    ],
-    "tags": []
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "d49b0f6b-d1cd-4381-8409-71239b7b7769",
-  "fields": {
-    "created": "2024-08-23T20:44:15.072Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Create a node with a custom local disk size.",
-    "modified": "2024-08-23T20:44:15.090Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Local Disk",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "d9f5f3b4-dc10-4286-ab4a-25c9463e0905",
-  "fields": {
-    "created": "2024-08-23T20:43:38.163Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Create a private mesh VPN with [Tailscale](http://tailscale.com) to accesss and manage your slice.",
-    "modified": "2024-08-23T20:43:38.176Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Tailscale Mesh VPN",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "dbc9e7a9-e26f-41cf-a62a-fd9f3cee1b33",
-  "fields": {
-    "created": "2024-08-23T20:44:11.541Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Example of deploying OpenVSwitch in a node.",
-    "modified": "2024-08-23T20:44:11.557Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: OpenVSwitch",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "dca289bc-926c-4abe-a4e8-3f94b5c38ac5",
-  "fields": {
-    "created": "2024-08-23T20:44:16.011Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "Find and list parts of slice(s).",
-    "description_short": "Options for listing slice(s).",
-    "modified": "2024-08-23T20:44:16.028Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: List All Slice(s), Slice's Nodes, Networks, Components, and Interfaces",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "e10445cd-7174-4db7-8464-d209834bd106",
-  "fields": {
-    "created": "2024-08-23T20:43:47.253Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Files for live demos and tutorials.",
-    "modified": "2024-08-23T20:43:47.268Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Demos and Tutorials",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "e51831c9-bbac-4489-8d01-4ecf0a083dd3",
-  "fields": {
-    "created": "2024-08-23T20:43:42.020Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Add/Remove SSH Keys to VMs in your slice.",
-    "modified": "2024-08-23T20:43:42.031Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Add/Remove SSH Keys",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "e96fa5d4-74c7-4b64-b94e-862e049b37e5",
-  "fields": {
-    "created": "2024-08-23T20:43:44.737Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Extend a slice reservation for a longer period of time.",
-    "modified": "2024-08-23T20:43:44.750Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Extending a Slice Reservation",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "eb825119-25ed-491c-b46f-aeddf6558e9d",
-  "fields": {
-    "created": "2024-08-23T20:44:33.122Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "Create a private WAN Ethernet link between FABRIC sites with three configuration options - auto, manual or user defined",
-    "description_short": "Create a private WAN Ethernet link between FABRIC sites",
-    "modified": "2024-08-23T20:44:33.136Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: Wide Area Link (Layer 2)",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "f78e26d5-b382-4804-9def-93c9e0b20ab0",
-  "fields": {
-    "created": "2024-08-23T20:44:35.919Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "",
-    "description_short": "Create a node with an NVMe device.",
-    "modified": "2024-08-23T20:44:35.934Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: NVMe Devices",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifact",
-  "pk": "fe890fc5-c554-48ca-b36b-4e6ac7a3cb40",
-  "fields": {
-    "created": "2024-08-23T20:44:18.813Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "deleted": false,
-    "deleted_at": null,
-    "description_long": "Test bandwidth across your FABRIC slice. Apply CPU Pinning and Numa tuning with NIC_Basic or Smart NICs and test bandwidth across your FABRIC slice.",
-    "description_short": "Test bandwidth across your FABRIC slice.",
-    "modified": "2024-08-23T20:44:18.830Z",
-    "modified_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "project_name": "FABRIC Staff Alpha",
-    "project_uuid": "8b3a2eae-a0c0-475a-807b-e9af581ce4c0",
-    "title": "FABRIC Example: iPerf3",
-    "visibility": "public",
-    "authors": [
-      "2265a4da-e1fc-4ffc-bbb7-d86d56575bff"
-    ],
-    "tags": [
-      "fabric",
-      "tutorial"
-    ]
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "054f3f2f-d66b-4d5b-9c5f-6d351e4e27d3",
-  "fields": {
-    "artifact": "ac586f9c-c5e8-425c-b57c-303d8356f196",
-    "created": "2024-08-23T20:43:43.118Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "slice_sharing.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "0ae4ba6a-53aa-4e8a-b937-116f0c547b3c",
-  "fields": {
-    "artifact": "1e6f8713-7621-4c4b-81a2-a2f60e180eeb",
-    "created": "2024-08-23T20:44:18.045Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "kubernetes.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "1279063c-5a28-44e3-a48c-4e4d69903062",
-  "fields": {
-    "artifact": "cb13f805-7e73-44aa-8fc9-d4faa863062e",
-    "created": "2023-08-11T20:17:50.924Z",
-    "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "filename": "test.tgz",
-    "storage_id": "2023-08-11",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "16d0b41a-20a4-43d5-b605-7e3489eae0ed",
-  "fields": {
-    "artifact": "55bb9847-2b65-47bb-bb35-6b4dc18a46f8",
-    "created": "2024-08-23T20:43:59.920Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "parallel_config.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "1824f7aa-127f-4d7a-b1b2-515cc5a5d297",
-  "fields": {
-    "artifact": "078346c8-506f-4e2d-9bd3-e636229f3adf",
-    "created": "2024-08-23T20:44:35.172Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "configure_and_validate.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "1accc3db-f26c-499f-b564-76babab7c9c2",
-  "fields": {
-    "artifact": "1f665591-3e98-47b2-baac-cbdae482056e",
-    "created": "2023-07-06T15:19:26.160Z",
-    "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "filename": "test_dir.tgz",
-    "storage_id": "2023-07-06.1",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "1d532418-30f1-4982-9e54-f1ca6769e5c1",
-  "fields": {
-    "artifact": "93ad9456-f9cc-440c-bef4-dc1fc50f20b4",
-    "created": "2024-08-23T20:43:58.041Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "persistent_storage.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "1e02119c-d520-4c23-a95d-9fed50411897",
-  "fields": {
-    "artifact": "095fe375-a9c2-4699-9c1b-cb49f42b8cd3",
-    "created": "2024-08-23T20:44:12.724Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "modify_slice.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "260fbe1d-aab4-48d2-898f-ee48472cf78f",
-  "fields": {
-    "artifact": "43ecc0b9-787a-4894-b796-9e594cac1b28",
-    "created": "2024-08-23T20:44:25.248Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "docker_containers.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "2d9eeb0e-2269-45d1-8179-20dbbd776abc",
-  "fields": {
-    "artifact": "66290f94-c056-4fc0-8611-5ea90b6411b1",
-    "created": "2024-08-23T20:44:14.318Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "mflib.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "2ef30c26-44b1-4322-a859-d0a321410b81",
-  "fields": {
-    "artifact": "9aba09be-c558-4d68-91ee-8be9ae915b2c",
-    "created": "2024-08-23T20:44:39.286Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "Cloudlab_Facility_Port.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "304e10d5-9c4b-4e8c-bb7d-5c6c8a59cab6",
-  "fields": {
-    "artifact": "7273ae75-3464-417e-ad5c-ffe321c79253",
-    "created": "2024-08-23T20:44:22.161Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "fabric_fpgas.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "31cd7284-54fc-474f-bb48-f443ca48d8a9",
-  "fields": {
-    "artifact": "7e8e7ca9-df59-4f19-8c77-ecb2eae08338",
-    "created": "2024-08-23T20:44:19.983Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "hello_fabric.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "3b7c28bc-93da-43a3-b6d9-b68acdda3013",
-  "fields": {
-    "artifact": "d9f5f3b4-dc10-4286-ab4a-25c9463e0905",
-    "created": "2024-08-23T20:43:38.529Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "tailscale.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "47d570c9-4917-4607-8ea6-216c5a90e19f",
-  "fields": {
-    "artifact": "5999bce4-5c08-48ca-b384-290ecbb11efb",
-    "created": "2024-08-23T20:44:10.803Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "p4_labs_bmv2.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "4a5f92b3-8f02-403a-8921-95a0421dbb59",
-  "fields": {
-    "artifact": "7928049d-58a4-47f0-8451-fa8b3bc0e94f",
-    "created": "2024-08-23T20:44:29.710Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "create_l3network_fabnet_ipv6_ext.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "4d40ead4-8f8e-4e0a-8ed6-e31feceaec5f",
-  "fields": {
-    "artifact": "4475fbcb-064e-440b-b8e6-eefae5b95ad6",
-    "created": "2023-08-03T16:28:56.509Z",
-    "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "filename": "stealey.tgz",
-    "storage_id": "2023-08-03",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "53c47b4f-acc5-4f6d-8238-8e4dcb2f3199",
-  "fields": {
-    "artifact": "5566c196-4ca7-4cff-8a8a-7c2d054612d6",
-    "created": "2024-08-23T20:44:27.015Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "customizing_nodes.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "58e5e442-266e-49b8-b4f1-d4f29956ae20",
-  "fields": {
-    "artifact": "eb825119-25ed-491c-b46f-aeddf6558e9d",
-    "created": "2024-08-23T20:44:33.303Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "create_l2network_wide_area.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "60cf7fb4-69f4-4b26-95aa-7672b7f3af9a",
-  "fields": {
-    "artifact": "157527fb-bedb-4690-b3a1-aa50f914d80f",
-    "created": "2024-08-23T20:44:37.002Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "add_keys_into_slice.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "6f229505-fb92-4fb5-ae86-48ee8369ab3e",
-  "fields": {
-    "artifact": "0096e143-2ad2-48d7-b88c-cf72770c846f",
-    "created": "2023-07-06T14:33:43.042Z",
-    "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "filename": "test_dir.tgz",
-    "storage_id": "2023-07-06.1",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "6f653982-935b-4f05-ae4d-f61e89c38264",
-  "fields": {
-    "artifact": "4475fbcb-064e-440b-b8e6-eefae5b95ad6",
-    "created": "2024-06-12T20:52:53.891Z",
-    "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "filename": "mjstealey-test.tgz",
-    "storage_id": "2024-06-12",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "74e32e28-3329-48fd-8c5c-0c7fc471fcfb",
-  "fields": {
-    "artifact": "e51831c9-bbac-4489-8d01-4ecf0a083dd3",
-    "created": "2024-08-23T20:43:42.233Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "ssh_keys.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "7607ace5-d787-43f8-ba2d-2aabbd11bcdd",
-  "fields": {
-    "artifact": "7d82a7d1-f9c4-4c31-9b2b-928119885b7c",
-    "created": "2024-08-23T20:44:40.334Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "Chameleon_Facility_Port.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "7680587e-1b10-4056-a917-ec736b784c5f",
-  "fields": {
-    "artifact": "2f8e206c-7fc8-4e45-9dd4-088b7c6f21e3",
-    "created": "2024-08-23T20:44:26.128Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "delete_slice.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "7b7ae6d0-5643-4cc2-b2d1-1db7b3d2c899",
-  "fields": {
-    "artifact": "1ccedc8e-149a-4df7-89ec-bc85f4ab1164",
-    "created": "2024-08-23T20:44:34.226Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "create_l2network_basic.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "8b5d2160-e836-401d-aed6-9d97e56d08aa",
-  "fields": {
-    "artifact": "74e32191-ed22-44b0-b42c-02d44a3894be",
-    "created": "2024-08-23T20:43:37.407Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "upload_and_execute.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "8d126b10-7bc8-4117-8a48-6a02643fc07d",
-  "fields": {
-    "artifact": "dbc9e7a9-e26f-41cf-a62a-fd9f3cee1b33",
-    "created": "2024-08-23T20:44:11.730Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "openvswitch.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "9061cd87-6d89-4aae-a7ee-574f9a2a294e",
-  "fields": {
-    "artifact": "7928049d-58a4-47f0-8451-fa8b3bc0e94f",
-    "created": "2024-08-23T20:44:30.527Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "create_l3network_fabnet_ipv6.tgz",
-    "storage_id": "2024-08-23.1",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "91157330-ac1a-4c19-b704-a9c9f5e1a5e5",
-  "fields": {
-    "artifact": "e10445cd-7174-4db7-8464-d209834bd106",
-    "created": "2024-08-23T20:43:56.203Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "public_demos.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "9164ac0b-d81f-438e-a736-4fcf38b51543",
-  "fields": {
-    "artifact": "251a912c-1ac4-4b89-af66-402e234c0a88",
-    "created": "2024-08-23T20:44:31.380Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "create_l3network_fabnet_ipv4_ext.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "9530e554-1016-4642-bde6-3539f04739f6",
-  "fields": {
-    "artifact": "251a912c-1ac4-4b89-af66-402e234c0a88",
-    "created": "2024-08-23T20:44:32.302Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "create_l3network_fabnet_ipv4.tgz",
-    "storage_id": "2024-08-23.1",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "9a2ebd70-a101-4a73-8a80-ba53ad47f2ba",
-  "fields": {
-    "artifact": "0ea2441b-2f74-4039-a637-2195e8fb1fb7",
-    "created": "2024-08-23T20:43:57.158Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "post_boot_tasks.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "9c102025-5b63-44d1-b403-9eeaa2b127a3",
-  "fields": {
-    "artifact": "bc70076b-89ec-44ab-9c97-0ae20358a2f0",
-    "created": "2024-08-23T20:44:27.864Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "create_slice.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "9f7dde18-98b3-4f88-8258-c43d1195f82e",
-  "fields": {
-    "artifact": "1e2a3023-ce56-4844-a6fc-77c35aa70c4c",
-    "created": "2024-08-23T20:44:38.247Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "FRRouting.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "a4c3034f-1da6-48ed-a21b-4cc8231e1d3b",
-  "fields": {
-    "artifact": "0fa723e3-fcf8-4cec-bbb5-01c366958222",
-    "created": "2024-08-23T20:44:17.141Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "list_all_resources.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "a4deffff-9f11-4465-8502-730d2adf1312",
-  "fields": {
-    "artifact": "fe890fc5-c554-48ca-b36b-4e6ac7a3cb40",
-    "created": "2024-08-23T20:44:18.971Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "iperf3.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "a9e215b7-3a47-4cc2-926e-dfbfa0d61437",
-  "fields": {
-    "artifact": "e96fa5d4-74c7-4b64-b94e-862e049b37e5",
-    "created": "2024-08-23T20:43:44.896Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "renew_slice.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "afdce4aa-7302-47a0-8367-07a5d0c3c920",
-  "fields": {
-    "artifact": "acda96a1-38eb-4ee7-8b62-69813093f061",
-    "created": "2024-08-23T20:43:59.040Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "peering_client.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "b20e0794-0293-4186-bbce-d648ece766a4",
-  "fields": {
-    "artifact": "91c7cec4-68ff-4cb2-b483-a7d22b8e8ac5",
-    "created": "2024-08-23T20:43:39.452Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "sub_interfaces.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "b39cd429-40c2-47a5-8004-758afb18bcaf",
-  "fields": {
-    "artifact": "1f665591-3e98-47b2-baac-cbdae482056e",
-    "created": "2023-07-06T15:17:08.152Z",
-    "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "filename": "test_dir.tgz",
-    "storage_id": "2023-07-06",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "b992872a-95d8-48d3-a0cb-a1f14519f0e4",
-  "fields": {
-    "artifact": "83740c4c-ff44-46a9-8c6f-746e41991102",
-    "created": "2024-08-23T20:44:21.025Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "grafana_prometheus_servers.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "ba7d52b1-d878-42f9-a08e-022ad5b1ffb4",
-  "fields": {
-    "artifact": "dca289bc-926c-4abe-a4e8-3f94b5c38ac5",
-    "created": "2024-08-23T20:44:16.167Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "list_slices.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "bd241e54-d07f-4e3d-a7d2-60f8863b4cbf",
-  "fields": {
-    "artifact": "0096e143-2ad2-48d7-b88c-cf72770c846f",
-    "created": "2023-07-06T14:33:37.123Z",
-    "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "filename": "test_dir.tgz",
-    "storage_id": "2023-07-06",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "c36ea282-e888-4d7e-add2-40175aaf958a",
-  "fields": {
-    "artifact": "156d58f7-5a50-469c-ba7d-26fb93f18dc9",
-    "created": "2024-08-23T20:44:23.126Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "fabric_all_gpus.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "c9276968-06bd-4466-b48a-404f806e90ba",
-  "fields": {
-    "artifact": "d49b0f6b-d1cd-4381-8409-71239b7b7769",
-    "created": "2024-08-23T20:44:15.308Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "local_disk.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "cc0ac732-242b-43b7-9583-2a9c34b90ff9",
-  "fields": {
-    "artifact": "0096e143-2ad2-48d7-b88c-cf72770c846f",
-    "created": "2023-07-06T14:33:50.542Z",
-    "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "filename": "test_dir.tgz",
-    "storage_id": "2023-07-06.2",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "cff1b34e-dbee-4b0d-b154-37dee4139e37",
-  "fields": {
-    "artifact": "3b45aa23-5f7c-431d-b3a5-c97d7abaa317",
-    "created": "2024-08-23T20:43:40.360Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "ssh_tunnels.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "e46e4609-e12a-47c9-910c-1b4b5f6de812",
-  "fields": {
-    "artifact": "54928b24-b982-4b58-91e3-82a7e691500b",
-    "created": "2024-08-23T20:44:28.805Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "create_port_mirror.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "e9999478-c90f-4b0c-83e8-92b3c8b3b033",
-  "fields": {
-    "artifact": "257067c5-b493-47a4-99ee-d0559b690abb",
-    "created": "2024-08-23T20:43:41.256Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "ssh_to_nodes.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "eac86bf8-1453-47c1-81d5-23bd5aaed54d",
-  "fields": {
-    "artifact": "80ae4118-0b65-4068-a6e6-198b7fbeeb2e",
-    "created": "2023-07-06T14:32:13.097Z",
-    "created_by": "593dd0d3-cedb-4bc6-9522-a945da0a8a8e",
-    "filename": "test_dir.tgz",
-    "storage_id": "2023-07-06",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "f03931b0-ac7a-446e-88bf-fb5a9d0fa982",
-  "fields": {
-    "artifact": "05397748-453b-46fe-9a62-fa39a55e4017",
-    "created": "2024-08-23T20:43:44.032Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "save_and_load.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "f0c7492e-8416-4a1a-b7e5-aa341b110c43",
-  "fields": {
-    "artifact": "f78e26d5-b382-4804-9def-93c9e0b20ab0",
-    "created": "2024-08-23T20:44:36.080Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "basic_nvme_devices.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.artifactversion",
-  "pk": "fd50a99e-aa2f-4bd5-9276-e434c93eff6c",
-  "fields": {
-    "artifact": "73c5b67a-4bba-400f-a3a2-e0850e2ed147",
-    "created": "2024-08-23T20:44:24.351Z",
-    "created_by": "2265a4da-e1fc-4ffc-bbb7-d86d56575bff",
-    "filename": "dpdk_smart_nic.tgz",
-    "storage_id": "2024-08-23",
-    "storage_repo": "renci",
-    "storage_type": "fabric"
-  }
-},
-{
-  "model": "artifacts.tasktimeouttracker",
-  "pk": "047441d7-15d1-4ec1-bce0-e545a2de10c1",
-  "fields": {
-    "description": "Author Refresh Check",
-    "last_updated": "2023-08-10T20:14:00.689Z",
-    "name": "author_refresh_check",
-    "timeout_in_seconds": 86400,
-    "value": null
-  }
-},
-{
-  "model": "artifacts.tasktimeouttracker",
-  "pk": "0dd60351-ed97-4240-aa51-244665016503",
-  "fields": {
-    "description": "Token Revocation List",
-    "last_updated": "2024-08-23T21:17:38.813Z",
-    "name": "token_revocation_list",
-    "timeout_in_seconds": 300,
-    "value": "[]"
-  }
-},
-{
-  "model": "artifacts.tasktimeouttracker",
-  "pk": "ee2a84f5-d618-4915-9ff3-c5ba11c93d3e",
-  "fields": {
-    "description": "Public Signing Key",
-    "last_updated": "2024-08-22T23:13:52.060Z",
-    "name": "public_signing_key",
-    "timeout_in_seconds": 86400,
-    "value": "{\"alg\": \"RS256\", \"e\": \"AQAB\", \"kid\": \"b415167211191e2e05b22b54b1d3b7667e764a747722185e722e52e146fe43aa\", \"kty\": \"RSA\", \"n\": \"5zK1Pu8kWUPLHZbKGhOPxId-KtB6nBD90TkE3oPufUDEDC00_IwMeevJfPI-UsUD9Q6o9U-WMs8y1qxyjnu8CAH8jcZScg8p6iI63_ruEwwL60I0Zw-2f0km8GusAeumDWOU2-M57bWEI_KDDfglkAgXAesKyuxdyJ19Gxj3q9KxJu0vhojkQm6ZOCIdtAZBPMVUmR1Ww1Ro-3MZg_H5zKWntvbniNggVC1PAQ2GgJOD2CM0Wbt9kKXOKV32jLsOe6Z_-EMDpLcvZuokIX4bK-VDdQsLlm4JGwLHTBD0lFkiVkRu1lPhaI4o9DP88LRjEzL-tqFJl8KUMW0iIZXnMShWF8VGZKQvJPJfZx4z3u3FGUYM3PoVZXVe3Tw5OYAolexaNjrV-stowQWYRyUkPSGJOdc6nYO5bIclSLrq2O6vlJ3Nd-63JOD43xCfx6SNVFQOiTerP8C3TEWKr2ru1J8u_FGlAM9xbm4lBk7N0eKusqsOY6MrvulODrYjHWShdzsV6DhHjRuM1f9SrizOePw54g35nNO-9dQCbYYh6QZ1BjZSoc3QyaueQ4wcfu1qQjxT-1_jq4-Oilfjpn15mZeQ5LxOP63H_3XN6cS7h_8aXZLRuF5mKjJ-vqJxQQzVAIxfWsm1QJCOPB4F99Zzj8MlrlTKYQuiTI8YZNAoUPs\", \"use\": \"sig\"}"
-  }
-}
 ]
