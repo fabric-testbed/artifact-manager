@@ -192,10 +192,12 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         api_user = get_api_user(request=request)
         try:
             artifact = get_object_or_404(Artifact, uuid=self.kwargs.get('uuid'))
-            artifact_view = ArtifactViews(viewed_by=str(api_user.uuid))
-            artifact_view.save()
-            artifact.artifact_views.add(artifact_view)
-            artifact.save()
+            # view count can only be incremented by non-authors of the artifact
+            if api_user.uuid not in [a.uuid for a in artifact.authors.all()]:
+                artifact_view = ArtifactViews(viewed_by=str(api_user.uuid))
+                artifact_view.save()
+                artifact.artifact_views.add(artifact_view)
+                artifact.save()
         except Exception as exc:
             artifact = None
             print(exc)
