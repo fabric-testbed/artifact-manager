@@ -8,13 +8,14 @@ Is a platform for sharing and reproducing FABRIC research artifacts. It provides
 
 ## Table of Contents
 
-- Configuration
-- Deploy
-- Usage
-- References
+- [Configuration](#config)
+- [Deploy](#deploy)
+- [Usage](#usage)
+- [Backup and Restore](#backup-restore)
+- [References](#references)
 
 
-## Configuration 
+## <a name="config"></a>Configuration
 
 ```
 cp env.template .env
@@ -22,7 +23,6 @@ cp vouch/config.template vouch/config
 cp compose/docker-compose.yml.prod-ssl docker-compose.yml
 vim nginx/default.conf
 ```
-
 
 ### `.env`
 
@@ -397,3 +397,58 @@ server {
     }
 }
 ```
+
+## <a name="deploy"></a>Deploy
+
+```
+UWSGI_UID=$(id -u) UWSGI_GID=$(id -g) ./run_server.sh --run-mode local-ssl --load-fixtures --make-migrations
+```
+
+## <a name="usage"></a>Usage
+
+## <a name="backup-restore"></a>Backup and Restore
+
+At present only the `artifacts` app needs to be backup up or restored. This may change as the project evolves.
+
+### Backup
+
+Run the `dumpdata.sh` script from the top level of the repository to generate JSON files for each Django app.
+
+Local
+
+```console
+source .env
+source venv/bin/activate
+./dumpdata.sh
+```
+
+Docker
+
+```console
+docker exec amgr-django /bin/bash -c "source .env; source .venv/bin/activate; ./dumpdata.sh"
+docker cp amgr-django:/code/dumpdata/artifacts.json dumpdata/artifacts.json
+```
+
+### Restore
+
+Local
+
+```console
+cp dumpdata/artifacts.json artifactmgr/apps/artifacts/fixtures/
+# first run, make migrations, load fixtures
+UWSGI_UID=$(id -u) UWSGI_GID=$(id -g) ./run_server.sh --run-mode local-ssl --load-fixtures --make-migrations
+# subsequent runs, no need to load fixures
+UWSGI_UID=$(id -u) UWSGI_GID=$(id -g) ./run_server.sh --run-mode local-ssl --make-migrations
+```
+
+Docker
+
+```console
+cp dumpdata/artifacts.json artifactmgr/apps/artifacts/fixtures/
+docker compose build
+MAKE_MIGRATIONS=1 LOAD_FIXTURES=1 docker compose up -d
+
+```
+
+
+## <a name="references"></a>References

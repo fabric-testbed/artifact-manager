@@ -2,17 +2,20 @@ import json
 
 from django.db.models import Q
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import filters, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed, PermissionDenied, ValidationError
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 
-from artifactmgr.apps.artifacts.api.validators import validate_artifact_version_create, validate_contents_download
+from artifactmgr.apps.artifacts.api.validators import validate_artifact_version_create, \
+    validate_artifact_version_update, validate_contents_download
 from artifactmgr.apps.artifacts.api.version_serializers import ArtifactContentsUploadSerializer, \
-    ArtifactVersionSerializer
-from artifactmgr.apps.artifacts.models import Artifact, ArtifactVersion
+    ArtifactVersionSerializer, ArtifactVersionUpdateSerializer
+from artifactmgr.apps.artifacts.models import Artifact, ArtifactVersion, VersionDownloads
 from artifactmgr.utils.artifact_version_storage import create_fabric_artifact_contents, download_contents_by_urn
 from artifactmgr.utils.fabric_auth import get_api_user
 
@@ -27,17 +30,16 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
     - partial update (PATCH id)
     - destroy (DELETE id)
     """
-    # queryset = ArtifactVersion.objects.all().order_by('-created')
-    parser_classes = [FormParser, MultiPartParser]
     serializer_classes = {
         'list': ArtifactVersionSerializer,
         'create': ArtifactContentsUploadSerializer,
         'retrieve': ArtifactVersionSerializer,
-        'update': ArtifactVersionSerializer,
-        'partial-update': ArtifactVersionSerializer,
+        'update': ArtifactVersionUpdateSerializer,
+        'partial_update': ArtifactVersionUpdateSerializer,
         'destroy': ArtifactVersionSerializer,
     }
     default_serializer_class = ArtifactVersionSerializer
+    parser_classes = [FormParser, MultiPartParser]
     search_fields = ['storage_repo', 'storage_type']
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     permission_classes = [permissions.AllowAny]
@@ -59,7 +61,10 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         FABRIC Artifact Contents - list view
         - Search by 'storage_repo', 'storage_type'
         """
-        return super().list(request, *args, **kwargs)
+        try:
+            return super().list(request, *args, **kwargs)
+        except Exception as e:
+            print(e)
 
     def create(self, request, *args, **kwargs):
         """
@@ -92,19 +97,42 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         """
         retrieve (GET {int:pk})
         """
-        return super().create(request, *args, **kwargs)
+        return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         """
-        update (PUT {int:pk})
+        update (PATCH {int:pk})
+        - Must be an author of the Artifact to update Artifact contents
         """
-        raise MethodNotAllowed(method='PUT', detail='MethodNotAllowed: PUT /api/contents/{uuid}')
+        api_user = get_api_user(request=request)
+        version = get_object_or_404(ArtifactVersion, uuid=kwargs.get('uuid'))
+        artifact = version.artifact
+        if api_user.uuid in [a.uuid for a in artifact.authors.all()]:
+            is_valid, message = validate_artifact_version_update(request)
+            if is_valid:
+                request_data = request.data
+                # active
+                active = request_data.get('active', None)
+                if str(active).casefold() == 'true':
+                    version.active = True
+                if str(active).casefold() == 'false':
+                    version.active = False
+                version.save()
+                # print(ArtifactVersionSerializer(instance=version).data)
+                # return updated artifact
+                return Response(data=ArtifactVersionSerializer(instance=version).data, status=204)
+            else:
+                raise ValidationError(detail={'ValidationError': message})
+        else:
+            raise PermissionDenied(
+                detail="PermissionDenied: user:'{0}' is unable to update /contents/{1}".format(api_user.uuid,
+                                                                                               kwargs.get('uuid')))
 
     def partial_update(self, request, *args, **kwargs):
         """
         partial_update (PATCH {int:pk})
         """
-        raise MethodNotAllowed(method='PATCH', detail='MethodNotAllowed: PATCH /api/contents/{uuid}')
+        return self.update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         """
@@ -112,6 +140,9 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         """
         raise MethodNotAllowed(method='DELETE', detail='MethodNotAllowed: DELETE /api/contents/{uuid}')
 
+    @extend_schema(
+        parameters=[OpenApiParameter(name="urn", type=str, location=OpenApiParameter.PATH)]
+    )
     @action(detail=False, methods=['get'], url_path='download/(?P<urn>[^/.]+)')
     def download(self, request, *args, **kwargs) -> HttpResponse | ValidationError:
         """
@@ -119,8 +150,19 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         - Must have proper access permissions to download files
         """
         api_user = get_api_user(request=request)
-        is_valid, message = validate_contents_download(urn=kwargs.get('urn', None), api_user=api_user)
+        version_urn = str(kwargs.get('urn', None))
+        is_valid, message = validate_contents_download(urn=version_urn, api_user=api_user)
         if is_valid:
+            # increment version_downloads
+            try:
+                version_uuid = version_urn.split(':')[-1]
+                artifact_version = get_object_or_404(ArtifactVersion, uuid=version_uuid)
+                version_download = VersionDownloads(downloaded_by=str(api_user.uuid))
+                version_download.save()
+                artifact_version.version_downloads.add(version_download)
+                artifact_version.save()
+            except Exception as exc:
+                print(exc)
             return download_contents_by_urn(urn=kwargs.get('urn'))
         else:
             raise ValidationError(detail={'ValidationError': message})

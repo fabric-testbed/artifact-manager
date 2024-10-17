@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'django_bootstrap5',  # django bootstrap
     'fontawesomefree',  # fontawesome free version
+    'artifactmgr.apps.apiuser',
     'artifactmgr.apps.artifacts',
 ]
 
@@ -71,7 +72,7 @@ MIDDLEWARE = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 5,
+    'PAGE_SIZE': int(os.getenv('REST_FRAMEWORK_PAGE_SIZE')),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 

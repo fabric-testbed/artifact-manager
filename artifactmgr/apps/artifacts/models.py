@@ -1,72 +1,12 @@
-import os
-from datetime import datetime, timedelta, timezone
-
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
+
+from artifactmgr.apps.apiuser.models import ApiUser
 
 
 class LowerCaseField(models.CharField):
 
     def get_prep_value(self, value):
         return str(value).lower()
-
-
-class ApiUser(models.Model):
-    """
-    ApiUser
-    - FABRIC user or Anonymous user as set by fabric cookie or token
-    """
-    COOKIE = "cookie"
-    TOKEN = "token"
-    ACCESS_TYPE_CHOICES = (
-        (COOKIE, "Cookie"),
-        (TOKEN, "Token"),
-    )
-    access_expires = models.DateTimeField(blank=True, null=True)
-    access_type = models.CharField(
-        max_length=24, choices=ACCESS_TYPE_CHOICES, default=COOKIE
-    )
-    affiliation = models.CharField(max_length=255, blank=True, null=True)
-    cilogon_id = models.CharField(max_length=255, blank=False, null=False)
-    email = models.CharField(max_length=255, blank=True, null=True)
-    fabric_roles = ArrayField(models.CharField(max_length=255, blank=True))
-    name = models.CharField(max_length=255, blank=True, null=True)
-    projects = ArrayField(models.CharField(max_length=255, blank=True))
-    uuid = models.CharField(primary_key=True, max_length=255, blank=False, null=False)
-
-    @property
-    def can_create_artifact(self):
-        return os.getenv('CAN_CREATE_ARTIFACT_ROLE') in self.fabric_roles
-
-    @property
-    def can_create_tag(self):
-        return os.getenv('CAN_CREATE_TAGS_ROLE') in self.fabric_roles
-
-    @property
-    def is_authenticated(self):
-        return self.uuid != os.getenv('API_USER_ANON_UUID')
-
-    def is_project_member(self, project_uuid: str) -> bool:
-        return project_uuid in self.projects
-
-    def as_dict(self):
-        return {
-            'access_expires': str(self.access_expires),
-            'access_type': self.access_type,
-            'affiliation': self.affiliation,
-            'can_create_artifact': self.can_create_artifact,
-            'can_create_tag': self.can_create_tag,
-            'cilogon_id': self.cilogon_id,
-            'email': self.email,
-            'fabric_roles': self.fabric_roles,
-            'is_authenticated': self.is_authenticated,
-            'name': self.name,
-            'projects': self.projects,
-            'uuid': self.uuid
-        }
-
-    def __str__(self):
-        return self.uuid
 
 
 class ArtifactAuthor(models.Model):
@@ -94,14 +34,30 @@ class ArtifactAuthor(models.Model):
 class ArtifactTag(models.Model):
     """
     Represents artifact tags
+    - tag - arbitrary string
+    - restricted - tag can only be applied by amgr-admins
     """
     tag = LowerCaseField(primary_key=True, max_length=255, blank=False, null=False)
+    restricted = models.BooleanField(default=False)
 
     class Meta:
         ordering = ("tag",)
 
     def __str__(self):
         return self.tag
+
+
+class ArtifactViews(models.Model):
+    """
+    ArtifactViews
+    - viewed_at - datetime in UTC
+    - viewed_by - APIUser UUID reference
+    """
+    viewed_at = models.DateTimeField(auto_now_add=True)
+    viewed_by = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        ordering = ("viewed_at",)
 
 
 class Artifact(models.Model):
@@ -117,6 +73,7 @@ class Artifact(models.Model):
         (PROJECT, "Project"),
         (PUBLIC, "Public"),
     )
+    artifact_views = models.ManyToManyField(ArtifactViews, related_name="artifact_views")
     authors = models.ManyToManyField(ArtifactAuthor, related_name='artifact_author')
     created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
@@ -129,7 +86,7 @@ class Artifact(models.Model):
     deleted_at = models.DateTimeField(blank=True, null=True)
     description_long = models.TextField(max_length=5000, blank=False, null=False)
     description_short = models.CharField(max_length=255, blank=True, null=True)
-    modified = models.DateTimeField(auto_now=True)
+    modified = models.DateTimeField()
     modified_by = models.ForeignKey(
         ArtifactAuthor,
         related_name='artifact_modified_by',
@@ -138,6 +95,8 @@ class Artifact(models.Model):
     )
     project_name = models.CharField(max_length=255, blank=True, null=True)
     project_uuid = models.CharField(max_length=255, blank=True, null=True)
+    show_authors = models.BooleanField(default=True)
+    show_project = models.BooleanField(default=True)
     tags = models.ManyToManyField(ArtifactTag, related_name="artifact_tags", blank=True)
     title = models.CharField(max_length=255, blank=False, null=False)
     visibility = models.CharField(
@@ -150,6 +109,22 @@ class Artifact(models.Model):
 
     def __str__(self):
         return self.title
+
+    def is_author(self, api_user_uuid: str) -> bool:
+        return api_user_uuid in [a.uuid for a in self.authors.all()]
+
+
+class VersionDownloads(models.Model):
+    """
+    ArtifactDownloads
+    - downloaded_at - datetime in UTC
+    - downloaded_by - APIUser UUID reference
+    """
+    downloaded_at = models.DateTimeField(auto_now_add=True)
+    downloaded_by = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        ordering = ("downloaded_at",)
 
 
 class ArtifactVersion(models.Model):
@@ -165,6 +140,7 @@ class ArtifactVersion(models.Model):
         (GIT, "Git"),
         (ZENODO, "Zenodo"),
     )
+    active = models.BooleanField(default=True)
     artifact = models.ForeignKey(
         Artifact, on_delete=models.CASCADE, related_name="artifact_version"
     )
@@ -182,6 +158,7 @@ class ArtifactVersion(models.Model):
         max_length=24, choices=STORAGE_TYPE_CHOICES, default=FABRIC
     )
     uuid = models.CharField(primary_key=True, max_length=255, blank=False, null=False)
+    version_downloads = models.ManyToManyField(VersionDownloads, related_name="version_downloads")
 
     def __str__(self):
         return f"{self.artifact.title} ({self.created})"
@@ -192,35 +169,3 @@ class ArtifactVersion(models.Model):
 
     class Meta:
         ordering = ('-created',)
-
-
-class TaskTimeoutTracker(models.Model):
-    """
-    Task Timeout Tracker
-    - description
-    - last_updated
-    - name
-    - timeout_in_seconds
-    - uuid
-    - value
-    """
-    description = models.CharField(max_length=255, blank=True, null=True)
-    last_updated = models.DateTimeField(blank=False, null=False)
-    name = models.CharField(max_length=255, blank=False, null=False)
-    timeout_in_seconds = models.IntegerField(default=0, blank=False, null=False)
-    uuid = models.CharField(primary_key=True, max_length=255, blank=False, null=False)
-    value = models.TextField(blank=True, null=True)
-
-    # Order by name
-    class Meta:
-        db_table = "task_timeout_tracker"
-        ordering = ("name",)
-
-    def __str__(self):
-        return self.name
-
-    def timed_out(self) -> bool:
-        if datetime.now(timezone.utc) > (self.last_updated + timedelta(seconds=int(self.timeout_in_seconds))):
-            return True
-        else:
-            return False

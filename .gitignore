@@ -1,13 +1,23 @@
 ### Customization
 
+# version backups
+/versions/migration_scripts/input_files/*
+/versions/migration_scripts/output_files/*
+!/versions/migration_scripts/input_files/.gitkeep
+!/versions/migration_scripts/output_files/.gitkeep
+
+# dumpdata
+/dumpdata/*
+!/dumpdata/.gitkeep
+
 # django static and media files
-/static/
-/media/
+/static/*
+/media/*
 !/static/.gitkeep
 !/media/.gitkeep
 
 # vouch
-/vouch
+/vouch/*
 !/vouch/config.template
 
 # local database volume
@@ -18,8 +28,10 @@
 /apps/artifacts/fixtures/artifacts.json
 
 # migrations files - only keep init file
-/artifactmgr/apps/artifacts/migrations/
+/artifactmgr/apps/artifacts/migrations/*
+/artifactmgr/apps/apiuser/migrations/*
 !/artifactmgr/apps/artifacts/migrations/__init__.py
+!/artifactmgr/apps/apiuser/migrations/__init__.py
 
 ### PyCharm template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider

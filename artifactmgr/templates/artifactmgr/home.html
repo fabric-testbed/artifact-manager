@@ -1,14 +1,142 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static artifact_tags %}
 {% block title %}
     FABRIC Artifact Manager
 {% endblock %}
 
 {% block content %}
-    {% if not api_user.access_expires %}
-        <h3 class="text-center mt-4">Please log in to gain full access.</h3>
-    {% else %}
-        <div class="homepage">
+    <div class="homepage">
+        {% if not api_user.is_authenticated %}
+            <h3>FABRIC Artifact Manager</h3>
+            <span style="font-size: small">
+            <b>WORK IN PROGRESS</b>
+            <p>
+                The Artifacts Manager is a platform for FABRIC users to safely store project related artifacts in a
+                shareable way.
+            </p>
+            <p>
+                Artifacts can be stored and shared at three permission levels
+            </p>
+            <ul>
+                <li>
+                    <b>author</b>: Only the artifact authors can view the artifact and download content versions
+                </li>
+                <li>
+                    <b>project</b>: Artifact authors as well as project personnel (determined by the referenced FABRIC
+                    project) can view the artifact and download content versions
+                </li>
+                <li>
+                    <b>public</b>: All users (including anonymous ones) can view the artifact and download content versions
+                </li>
+            </ul>
+            <i><b>Reminder</b>: Authors are always the only users that can edit the artifact and add new content
+                versions</i>
+        </span>
+            <br><br>
+        {% endif %}
+        {% if artifacts.results|length == 0 %}
+            <div class="alert alert-warning" role="alert">This author has no artifacts.</div>
+        {% endif %}
+        {% if artifacts.results|length > 0 %}
+            <h4>
+                My Artifacts <em style="font-size: x-small; color: darkslategray">(Ordered by: Last Updated)</em>
+            </h4>
+            <table class="table table-striped table-bordered my-4">
+                <tbody>
+                {% for artifact in artifacts.results %}
+                    <tr>
+                        <td>
+                            <div>
+                                <a href="{% url 'artifact_detail' uuid=artifact.uuid %}">
+                                    {{ artifact.title }}
+                                </a>
+                            </div>
+                            <div>
+                                <span style="color: darkslategray">{{ artifact.description_short }}</span>
+                            </div>
+                            <div style="font-size: small" class="inline">
+                                <div class="float-start">
+                                    <span title="Views - total across all versions">
+                                        <em class="fa-solid fa-eye"></em> {{ artifact.artifact_views }}
+                                    </span>&nbsp;&nbsp;
+                                    <span title="Downloads - total across all versions: active (retired)">
+                                        <em class="fa-solid fa-download"></em> {{ artifact.artifact_downloads_active }}
+                                        ({{ artifact.artifact_downloads_retired }})
+                                    </span>&nbsp;&nbsp;
+                                    <span title="Versions - number of published versions">
+                                        <em class="fa-regular fa-clone"></em> {{ artifact.number_of_versions }}
+                                    </span>&nbsp;&nbsp;
+                                    <span style="color: darkslategray" title="Last Updated">
+                                        {{ artifact.modified|normalize_date_to_utc }}
+                                    </span>
+                                </div>
+                                {% if artifact.tags %}
+                                    <div class="float-end">
+                                        {% for tag in artifact.tags %}
+                                            <button disabled class="btn btn-primary mr-2"
+                                                    style="padding: 2px; font-size: small">
+                                                <a href="{% url 'artifact_list' %}?search={{ tag }}"
+                                                   class="badge badge-primary">
+                                                    {{ tag }}
+                                                </a>
+                                            </button>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="d-flex flex-row align-items-center justify-content-between">
+                {% if prev_page %}
+                    <button type="button" class="btn btn-secondary mr-2">
+                        {% if search %}
+                            <a href="{{ artifacts.previous }}&search={{ search }}" class="unlink">
+                                <em class="fa-solid fa-angles-left"></em> Page {{ prev_page }}
+                            </a>
+                        {% else %}
+                            <a href="{{ artifacts.previous }}" class="unlink">
+                                <em class="fa-solid fa-angles-left"></em> Page {{ prev_page }}
+                            </a>
+                        {% endif %}
+                    </button>
+                {% else %}
+                    <button class="btn btn-secondary mr-2 disabled">
+                        <a href="{{ artifacts.previous }}" class="unlink">
+                            <em class="fa-solid fa-angles-left"></em>
+                        </a>
+                    </button>
+                {% endif %}
+                Results: {{ item_range }} of {{ count }}
+                {% if next_page %}
+                    <form type="get" action="." style="margin: 0">
+                        <button type="button" class="btn btn-secondary mr-2">
+                            {% if search %}
+                                <a href="{{ artifacts.next }}&search={{ search }}"
+                                   class="unlink">
+                                    Page {{ next_page }} <em class="fa-solid fa-angles-right"></em>
+                                </a>
+                            {% else %}
+                                <a href="{{ artifacts.next }}" class="unlink">
+                                    Page {{ next_page }} <em class="fa-solid fa-angles-right"></em>
+                                </a>
+                            {% endif %}
+                        </button>
+                    </form>
+                {% else %}
+                    <button class="btn btn-secondary mr-2 disabled">
+                        <a href="{{ artifacts.next }}" class="unlink">
+                            <em class="fa-solid fa-angles-right"></em>
+                        </a>
+                    </button>
+                {% endif %}
+            </div>
+            <br>
+        {% endif %}
+        <h4>User Information (<em style="color: darkcyan; font-size: medium">{{ api_user.name }}</em>)</h4>
+        <span style="font-size: small">
             <table class="table table-striped table-bordered my-4">
                 <tbody>
                 <tr>
@@ -49,6 +177,14 @@
                 </tr>
                 </tbody>
             </table>
-        </div>
-    {% endif %}
+        </span>
+        <br>
+        <p style="font-size: x-small">
+            <b>DISCLAIMER</b>: The code herein may not be up to date nor compliant with the most recent package
+            and/or
+            security notices. The frequency at which this code is reviewed and updated is based solely on the
+            lifecycle of the project for which it was written to support, and is not actively maintained outside of
+            that scope. Use at your own risk.
+        </p>
+    </div>
 {% endblock %}

@@ -11,13 +11,15 @@
     <div class="container w-85">
         <form method="get">
             {% csrf_token %}
-            <h2>Artifacts</h2>
+            <h2>
+                Artifacts <em style="font-size: x-small; color: darkslategray">(Ordered by: Last Updated)</em>
+            </h2>
             <div class="d-flex flex-row justify-content-between">
                 {% if search %}
                     <input id="search" type="text" name="search" class="form-control w-75" value="{{ search }}">
                 {% else %}
                     <input id="search" type="text" name="search" class="form-control w-75"
-                           placeholder="Search artifacts by name or tag...">
+                           placeholder="Search artifacts by title, tag, or project name...">
                 {% endif %}
                 <div>
                     <button class="btn btn-primary ml-1" id="search_submit" type="submit">
@@ -31,19 +33,37 @@
                 </div>
             </div>
         </form>
+        {% if artifacts.results|length == 0 %}
+            <div class="alert alert-warning" role="alert">No artifacts found for the given criteria.</div>
+        {% endif %}
         <table class="table table-striped table-bordered my-4">
             <tbody>
             {% for artifact in artifacts.results %}
                 <tr>
                     <td>
-                        <a href="{% url 'artifact_detail' uuid=artifact.uuid %}">
-                            {{ artifact.title }}
-                        </a>
-                        <br>
-                        {{ artifact.description_short }}<br>
-                        <div class="inline">
+                        <div>
+                            <a href="{% url 'artifact_detail' uuid=artifact.uuid %}">
+                                {{ artifact.title }}
+                            </a>
+                        </div>
+                        <div>
+                            <span style="color: darkslategray">{{ artifact.description_short }}</span>
+                        </div>
+                        <div style="font-size: small" class="inline">
                             <div class="float-start">
-                                <b>created:</b> {{ artifact.created|normalize_date_to_utc }}
+                                <span title="Views - total across all versions">
+                                    <em class="fa-solid fa-eye"></em> {{ artifact.artifact_views }}
+                                </span>&nbsp;&nbsp;
+                                <span title="Downloads - total across all versions: active (retired)">
+                                    <em class="fa-solid fa-download"></em> {{ artifact.artifact_downloads_active }}
+                                    ({{ artifact.artifact_downloads_retired }})
+                                </span>&nbsp;&nbsp;
+                                <span title="Versions - number of published versions">
+                                    <em class="fa-regular fa-clone"></em> {{ artifact.number_of_versions }}
+                                </span>&nbsp;&nbsp;
+                                <span style="color: darkslategray" title="Last Updated">
+                                    {{ artifact.modified|normalize_date_to_utc }}
+                                </span>
                             </div>
                             {% if artifact.tags %}
                                 <div class="float-end">
@@ -69,18 +89,18 @@
                 <button type="button" class="btn btn-secondary mr-2">
                     {% if search %}
                         <a href="{{ artifacts.previous }}&search={{ search }}" class="unlink">
-                            <em class="fa fa-fw fa-angles-left"></em> Page {{ prev_page }}
+                            <em class="fa-solid fa-angles-left"></em> Page {{ prev_page }}
                         </a>
                     {% else %}
                         <a href="{{ artifacts.previous }}" class="unlink">
-                            <em class="fa fa-fw fa-angles-left"></em> Page {{ prev_page }}
+                            <em class="fa-solid fa-angles-left"></em> Page {{ prev_page }}
                         </a>
                     {% endif %}
                 </button>
             {% else %}
                 <button class="btn btn-secondary mr-2 disabled">
                     <a href="{{ artifacts.previous }}" class="unlink">
-                        <em class="fa fa-fw fa-angles-left"></em>
+                        <em class="fa-solid fa-angles-left"></em>
                     </a>
                 </button>
             {% endif %}
@@ -91,11 +111,11 @@
                         {% if search %}
                             <a href="{{ artifacts.next }}&search={{ search }}"
                                class="unlink">
-                                Page {{ next_page }} <em class="fa fa-fw fa-angles-right"></em>
+                                Page {{ next_page }} <em class="fa-solid fa-angles-right"></em>
                             </a>
                         {% else %}
                             <a href="{{ artifacts.next }}" class="unlink">
-                                Page {{ next_page }} <em class="fa fa-fw fa-angles-right"></em>
+                                Page {{ next_page }} <em class="fa-solid fa-angles-right"></em>
                             </a>
                         {% endif %}
                     </button>
@@ -103,7 +123,7 @@
             {% else %}
                 <button class="btn btn-secondary mr-2 disabled">
                     <a href="{{ artifacts.next }}" class="unlink">
-                        <em class="fa fa-fw fa-angles-right"></em>
+                        <em class="fa-solid fa-angles-right"></em>
                     </a>
                 </button>
             {% endif %}

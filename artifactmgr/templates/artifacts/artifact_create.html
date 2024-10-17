@@ -38,10 +38,16 @@
                         {{ form.visibility.label_tag }} {{ form.visibility }}
                     </p>
                     <p>
+                        {{ form.show_project }} {{ form.show_project.label_tag }}
+                    </p>
+                    <p>
                         {{ form.project_uuid.label_tag }} {{ form.project_uuid }}
                     </p>
                     <p>
                         {{ form.tags.label_tag }} {{ form.tags }}
+                    </p>
+                    <p>
+                        {{ form.show_authors }} {{ form.show_authors.label_tag }}
                     </p>
                     <p>
                         Authors (by UUID):
@@ -59,43 +65,44 @@
                         {{ form.author_10 }}
                         {{ form.author_11 }}
                         {{ form.author_12 }}
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <h4>Search for FABRIC authors</h4>
+                        </div>
+                        <div class="col-lg-5">
+                            {% if search %}
+                                <input id="search" type="text" name="search" class="form-control" value="{{ search }}">
+                            {% else %}
+                                <input id="search" type="text" name="search" class="form-control"
+                                       placeholder="search...">
+                            {% endif %}
+                        </div>
+                        <div class="col-lg-2">
+                            <button class="btn btn-primary mr-2" id="search_submit"
+                                    type="submit" style="float: right">
+                                Search
+                            </button>
+                        </div>
+                    </div>
                 </form>
-            </div>
-            <br>
-            <div class="row">
-                <div class="col-lg-5">
-                    <h4>Search for FABRIC authors</h4>
-                </div>
-                <div class="col-lg-5">
-                    {% if search %}
-                        <input id="search" type="text" name="search" class="form-control" value="{{ search }}">
-                    {% else %}
-                        <input id="search" type="text" name="search" class="form-control" placeholder="search...">
+                <br>
+                <div>
+                    {% if fabric_users %}
+                        <br>
+                        <ul>
+                            {% for user in fabric_users %}
+                                <li>{{ user.name }} | {{ user.email }} | <b>{{ user.uuid }}</b></li>
+                            {% endfor %}
+                        </ul>
                     {% endif %}
                 </div>
-                <div class="col-lg-2">
-                    <button class="btn btn-primary mr-2" id="search_submit"
-                            type="submit" style="float: right">
-                        Search
-                    </button>
-                </div>
-            </div>
-            <br>
-            <div>
-                {% if fabric_users %}
-                    <br>
-                    <ul>
-                        {% for user in fabric_users %}
-                            <li>{{ user.name }} | {{ user.email }} | <b>{{ user.uuid }}</b></li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </div>
-            <br>
-            <button class="btn btn-success mr-2" type="submit" form="form" name="save">Save</button>
-            <button class="btn btn-secondary mr-2" value="cancel">
-                <a href="{% url 'artifact_list' %}" class="unlink">Back</a>
-            </button>
+                <br>
+                <button class="btn btn-success mr-2" type="submit" form="form" name="save">Save</button>
+                <button class="btn btn-secondary mr-2" value="cancel">
+                    <a href="{% url 'artifact_list' %}" class="unlink">Back</a>
+                </button>
             </div>
         {% else %}
             You are not able to create an Artifact

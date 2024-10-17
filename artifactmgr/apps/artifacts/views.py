@@ -8,12 +8,13 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 
+from artifactmgr.apps.apiuser.models import ApiUser
 from artifactmgr.apps.artifacts.api.artifact_viewsets import ArtifactViewSet
 from artifactmgr.apps.artifacts.api.author_viewsets import AuthorViewSet
 from artifactmgr.apps.artifacts.api.validators import validate_artifact_version_create
 from artifactmgr.apps.artifacts.api.version_viewsets import ArtifactVersionViewSet
 from artifactmgr.apps.artifacts.forms import ArtifactForm
-from artifactmgr.apps.artifacts.models import ApiUser, Artifact
+from artifactmgr.apps.artifacts.models import Artifact
 from artifactmgr.server.settings import API_DEBUG, REST_FRAMEWORK
 from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
 from artifactmgr.utils.fabric_auth import get_api_user
@@ -60,7 +61,7 @@ def author_list(request):
                   'author_list.html',
                   {
                       'api_user': api_user.as_dict(),
-                      'people': authors.get('list_objects', {}),
+                      'authors': authors.get('list_objects', {}),
                       'item_range': authors.get('item_range', None),
                       'message': message,
                       'next_page': authors.get('next_page', None),
@@ -112,65 +113,102 @@ def artifact_detail(request, *args, **kwargs):
 
     if request.method == 'POST':
         try:
+            artifact_detail_button = request.POST.get('artifact_detail_button', None)
             v_api_request = request.POST.copy()
-            v_api_request.method = 'POST'
             v_api_request.COOKIES = request.COOKIES
             v_api_request.headers = request.headers
-            v_api_request.FILES = request.FILES
             v_api_request.data = QueryDict('', mutable=True)
-            v_api_request.data.update(
-                {
-                    'file': request.FILES,
-                    'data': {
-                        'artifact': kwargs.get('uuid'),
-                        'storage_type': 'fabric',
-                        'storage_repo': 'renci'
+            if artifact_detail_button == 'add_version':
+                v_api_request.method = 'POST'
+                v_api_request.FILES = request.FILES
+                v_api_request.data.update(
+                    {
+                        'file': request.FILES,
+                        'data': {
+                            'artifact': kwargs.get('uuid'),
+                            'storage_type': 'fabric',
+                            'storage_repo': 'renci'
+                        }
                     }
-                }
-            )
-            is_valid, message = validate_artifact_version_create(request=v_api_request, api_user=api_user)
-            print(is_valid, message)
-            if is_valid:
-                v = ArtifactVersionViewSet(request=v_api_request)
-                version = v.create(request=v_api_request)
-                if version.status_code == status.HTTP_201_CREATED:
-                    version = json.loads(json.dumps(version.data))
-                    print(version)
-                    return redirect('artifact_detail', uuid=kwargs.get('uuid'))
-            else:
-                try:
-                    request.method = 'GET'
-                    artifact = ArtifactViewSet.as_view({'get': 'retrieve'})(request=request, *args, **kwargs)
-                    if artifact.data and artifact.status_code == status.HTTP_200_OK:
-                        artifact = json.loads(json.dumps(artifact.data))
-                        is_author = api_user.uuid in [a.get('uuid') for a in artifact.get('authors', [])]
-                    else:
-                        message = {'status_code': artifact.status_code, 'detail': artifact.data.get('detail')}
+                )
+                is_valid, message = validate_artifact_version_create(request=v_api_request, api_user=api_user)
+                if is_valid:
+                    v = ArtifactVersionViewSet(request=v_api_request)
+                    version = v.create(request=v_api_request)
+                    if version.status_code == status.HTTP_201_CREATED:
+                        version = json.loads(json.dumps(version.data))
+                        return redirect('artifact_detail', uuid=kwargs.get('uuid'))
+                else:
+                    try:
+                        request.method = 'GET'
+                        artifact = ArtifactViewSet.as_view({'get': 'retrieve'})(request=request, *args, **kwargs)
+                        if artifact.data and artifact.status_code == status.HTTP_200_OK:
+                            artifact = json.loads(json.dumps(artifact.data))
+                            is_author = api_user.uuid in [a.get('uuid') for a in artifact.get('authors', [])]
+                        else:
+                            message = {'status_code': artifact.status_code, 'detail': artifact.data.get('detail')}
+                            is_author = False
+                        if not message:
+                            message = artifact.get('message', None)
+                    except Exception as exc:
+                        message = exc
+                        artifact = {}
                         is_author = False
-                    if not message:
-                        message = artifact.get('message', None)
-                except Exception as exc:
-                    message = exc
-                    artifact = {}
-                    is_author = False
-                return render(request,
-                              'artifact_detail.html',
-                              {
-                                  'api_user': api_user.as_dict(),
-                                  'artifact': artifact,
-                                  'is_author': is_author,
-                                  'message': message,
-                                  'debug': API_DEBUG
-                              })
+                    return render(request,
+                                  'artifact_detail.html',
+                                  {
+                                      'api_user': api_user.as_dict(),
+                                      'artifact': artifact,
+                                      'is_author': is_author,
+                                      'message': message,
+                                      'debug': API_DEBUG
+                                  })
+            elif artifact_detail_button == "hide_version":
+                v_api_request.method = 'PATCH'
+                v_api_request.data.update(
+                    {
+                        'active': 'false'
+                    }
+                )
+                v = ArtifactVersionViewSet(request=v_api_request)
+                version = v.partial_update(request=v_api_request, uuid=request.POST.get('version_uuid', None))
+                return redirect('artifact_detail', uuid=kwargs.get('uuid'))
+            elif artifact_detail_button == "show_version":
+                v_api_request.method = 'PATCH'
+                v_api_request.data.update(
+                    {
+                        'active': 'true'
+                    }
+                )
+                v = ArtifactVersionViewSet(request=v_api_request)
+                version = v.partial_update(request=v_api_request, uuid=request.POST.get('version_uuid', None))
+                return redirect('artifact_detail', uuid=kwargs.get('uuid'))
+            elif artifact_detail_button == "delete_artifact":
+                artifact_uuid = request.POST.get('artifact_uuid', None)
+                v_api_request.method = 'DELETE'
+                v_api_request.data.update(
+                    {
+                        'uuid': artifact_uuid
+                    }
+                )
+                a = ArtifactViewSet(request=v_api_request)
+                artifact = a.destroy(request=v_api_request)
+                return redirect('artifact_list')
+            else:
+                return redirect('artifact_detail', uuid=kwargs.get('uuid'))
+
         except Exception as exc:
             message = exc
             print(message)
-        return redirect('artifact_detail', uuid=kwargs.get('uuid'))
+            return redirect('artifact_detail', uuid=kwargs.get('uuid'))
+    # get artifact detail page when not method: POST
     try:
         artifact = ArtifactViewSet.as_view({'get': 'retrieve'})(request=request, *args, **kwargs)
         if artifact.data and artifact.status_code == status.HTTP_200_OK:
             artifact = json.loads(json.dumps(artifact.data))
-            is_author = api_user.uuid in [a.get('uuid') for a in artifact.get('authors', [])]
+            artifact_obj = Artifact.objects.get(uuid=kwargs.get('uuid'))
+            is_author = artifact_obj.is_author(api_user_uuid=api_user.uuid)
+            # is_author = api_user.uuid in [a.get('uuid') for a in artifact.get('authors', [])]
         else:
             message = {'status_code': artifact.status_code, 'detail': artifact.data.get('detail')}
             is_author = False
@@ -197,7 +235,7 @@ def artifact_create(request):
     search = None
     fabric_users = []
     if request.method == "POST" and isinstance(request.POST.get('save'), str):
-        form = ArtifactForm(request.POST)
+        form = ArtifactForm(request.POST, api_user=api_user)
         if form.is_valid():
             try:
                 request.data = QueryDict('', mutable=True)
@@ -215,7 +253,7 @@ def artifact_create(request):
         else:
             message = form.errors
     elif request.method == "POST" and isinstance(request.POST.get('search'), str):
-        form = ArtifactForm(request.POST)
+        form = ArtifactForm(request.POST, api_user=api_user)
         search = request.POST.get('search')
         if len(search) < 3:
             message = 'SearchError: Search for FABRIC authors requires 3 or more characters'
@@ -231,7 +269,7 @@ def artifact_create(request):
         if not message and len(fabric_users) == 0:
             fabric_users = [{'name': 'No results found for search = "{0}"'.format(search)}]
     else:
-        form = ArtifactForm()
+        form = ArtifactForm(api_user=api_user)
     return render(request,
                   'artifact_create.html',
                   {
@@ -246,12 +284,13 @@ def artifact_create(request):
 
 def artifact_update(request, *args, **kwargs):
     api_user = get_api_user(request=request)
+    artifact_title = None
     artifact_uuid = kwargs.get('uuid')
     message = None
     search = None
     fabric_users = []
     if request.method == "POST" and isinstance(request.POST.get('save'), str):
-        form = ArtifactForm(request.POST)
+        form = ArtifactForm(request.POST, api_user=api_user)
         if form.is_valid():
             try:
                 request.data = QueryDict('', mutable=True)
@@ -259,7 +298,7 @@ def artifact_update(request, *args, **kwargs):
                 request.data.update(data_dict)
                 a = ArtifactViewSet(request=request)
                 artifact = a.update(request=request, uuid=artifact_uuid)
-                if artifact.status_code == 204:
+                if artifact.status_code == 200:
                     return redirect('artifact_detail', uuid=artifact_uuid)
                 else:
                     message = artifact.data
@@ -268,7 +307,7 @@ def artifact_update(request, *args, **kwargs):
         else:
             message = form.errors
     elif request.method == "POST" and isinstance(request.POST.get('search'), str):
-        form = ArtifactForm(request.POST)
+        form = ArtifactForm(request.POST, api_user=api_user)
         search = request.POST.get('search')
         if len(search) < 3:
             message = 'SearchError: Search for FABRIC authors requires 3 or more characters'
@@ -285,17 +324,20 @@ def artifact_update(request, *args, **kwargs):
             fabric_users = [{'name': 'No results found for search = "{0}"'.format(search)}]
     else:
         artifact = get_object_or_404(Artifact, uuid=artifact_uuid)
-        form = ArtifactForm(instance=artifact, authors=[a.uuid for a in artifact.authors.all()] if artifact else [])
+        artifact_title = artifact.title
+        form = ArtifactForm(instance=artifact, authors=[a.uuid for a in artifact.authors.all()] if artifact else [],
+                            api_user=api_user)
     return render(request,
                   'artifact_update.html',
                   {
                       'api_user': api_user.as_dict(),
+                      'artifact_title': artifact_title,
                       'artifact_uuid': artifact_uuid,
                       'debug': API_DEBUG,
                       'fabric_users': fabric_users,
                       'form': form,
                       'message': message,
-                      'search': search
+                      'search': search,
                   })
 
 

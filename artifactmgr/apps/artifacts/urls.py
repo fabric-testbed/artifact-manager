@@ -24,6 +24,6 @@ urlpatterns = [
     path('create/', artifact_create, name='artifact_create'),
     path('<uuid>', artifact_detail, name='artifact_detail'),
     path('<uuid>/update', artifact_update, name='artifact_update'),
-    path('people/', author_list, name='author_list'),
-    path('people/<uuid>', author_detail, name='author_detail'),
+    path('authors/', author_list, name='author_list'),
+    path('authors/<uuid>', author_detail, name='author_detail'),
 ]

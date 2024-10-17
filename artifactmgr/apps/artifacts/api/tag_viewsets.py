@@ -1,8 +1,10 @@
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, viewsets
 from rest_framework.exceptions import APIException, MethodNotAllowed, PermissionDenied, ValidationError
+from rest_framework.response import Response
 
-from artifactmgr.apps.artifacts.api.tag_serializers import TagSerializer
+from artifactmgr.apps.artifacts.api.tag_serializers import TagSerializer, TagUpdateSerializer
 from artifactmgr.apps.artifacts.models import ArtifactTag
 from artifactmgr.utils.fabric_auth import get_api_user
 
@@ -17,11 +19,31 @@ class TagViewSet(viewsets.ModelViewSet):
     - partial update (PATCH id) - MethodNotAllowed
     - destroy (DELETE id) - delete an existing tag
     """
-    queryset = ArtifactTag.objects.all().order_by('tag')
-    serializer_class = TagSerializer
+    serializer_classes = {
+        'list': TagSerializer,
+        'create': TagSerializer,
+        'retrieve': TagSerializer,
+        'update': TagUpdateSerializer,
+        'partial_update': TagUpdateSerializer,
+        'destroy': TagSerializer,
+    }
+    default_serializer_class = TagSerializer
     search_fields = ['tag']
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     permission_classes = [permissions.AllowAny]
+    lookup_field = 'tag'
+
+    def get_queryset(self):
+        api_user = get_api_user(request=self.request)
+        if api_user.is_artifact_manager_admin:
+            return ArtifactTag.objects.all().order_by('tag')
+        else:
+            return ArtifactTag.objects.filter(
+                restricted=False
+            ).order_by('tag')
+
+    def get_serializer_class(self):
+        return self.serializer_classes.get(self.action, self.default_serializer_class)
 
     def list(self, request, *args, **kwargs):
         """
@@ -38,7 +60,7 @@ class TagViewSet(viewsets.ModelViewSet):
         - User must have "facility-operators" role
         """
         api_user = get_api_user(request=request)
-        if api_user.can_create_tag:
+        if api_user.is_artifact_manager_admin:
             if ArtifactTag.objects.filter(tag=str(request.data.get('tag')).casefold()).first():
                 raise ValidationError(detail="DuplicateEntry: tag '{0}' already exists".format(request.data.get('tag')))
             else:
@@ -60,22 +82,34 @@ class TagViewSet(viewsets.ModelViewSet):
         """
         update (PUT {int:pk})
         """
-        raise MethodNotAllowed(method='PUT', detail='MethodNotAllowed: PUT /api/meta/tags/{tag}')
+        artifact_tag = get_object_or_404(ArtifactTag, tag=str(kwargs.get('tag')).casefold())
+        api_user = get_api_user(request=request)
+        if api_user and api_user.is_artifact_manager_admin:
+            try:
+                artifact_tag.restricted = True if str(request.data.get('restricted')).casefold() == 'true' else False
+                artifact_tag.save()
+                # return updated tag
+                return Response(data=TagSerializer(instance=artifact_tag).data, status=200)
+            except Exception as exc:
+                raise APIException(detail=exc)
+        else:
+            raise PermissionDenied(
+                detail="PermissionDenied: user:'{0}' is unable to update /meta/tags".format(api_user.uuid))
 
     def partial_update(self, request, *args, **kwargs):
         """
         partial_update (PATCH {int:pk})
         """
-        raise MethodNotAllowed(method='PATCH', detail='MethodNotAllowed: PATCH /api/meta/tags/{tag}')
+        return self.update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         """
         Remove FABRIC Artifact Tag
-        - User must have "facility-operators" role
+        - User must have "artifact-manager-admins" role
         - NOTE: Does not remove Tag from previously created Artifacts that already make use of the Tag
         """
         api_user = get_api_user(request=request)
-        if api_user.can_create_tag:
+        if api_user.is_artifact_manager_admin:
             try:
                 return super().destroy(request, *args, **kwargs)
             except Exception as exc:

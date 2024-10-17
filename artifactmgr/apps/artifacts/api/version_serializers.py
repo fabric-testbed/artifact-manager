@@ -23,14 +23,37 @@ class ArtifactVersionSerializer(serializers.ModelSerializer):
     - storage_type = models.CharField(max_length=24, choices=STORAGE_TYPE_CHOICES, default=FABRIC)
     - uuid = models.CharField(primary_key=True, max_length=255, blank=False, null=False)
     """
+    version_downloads = serializers.SerializerMethodField(method_name='get_version_downloads')
     created = serializers.SerializerMethodField(method_name='get_created')
     version = serializers.CharField(source='storage_id')
     lookup_field = 'urn'
 
     class Meta:
         model = ArtifactVersion
-        fields = ['created', 'urn', 'version']
+        fields = ['active', 'created', 'urn', 'uuid', 'version', 'version_downloads']
+
+    @staticmethod
+    def get_version_downloads(self) -> int:
+        return ArtifactVersion.objects.get(uuid=self.uuid).version_downloads.count()
 
     @staticmethod
     def get_created(self) -> str:
         return str(self.created.isoformat(' '))
+
+
+class ArtifactVersionUpdateSerializer(serializers.ModelSerializer):
+    """
+    Artifact Version Update Serializer
+    - artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE, related_name="artifact_version")
+    - created = models.DateTimeField(auto_now_add=True)
+    - filename = models.CharField(max_length=255, blank=False, null=False)
+    - storage_id = models.CharField(max_length=255, blank=False, null=False)
+    - storage_repo = models.CharField(max_length=255, blank=False, null=False)
+    - storage_type = models.CharField(max_length=24, choices=STORAGE_TYPE_CHOICES, default=FABRIC)
+    - uuid = models.CharField(primary_key=True, max_length=255, blank=False, null=False)
+    """
+    lookup_field = 'uuid'
+
+    class Meta:
+        model = ArtifactVersion
+        fields = ['active']

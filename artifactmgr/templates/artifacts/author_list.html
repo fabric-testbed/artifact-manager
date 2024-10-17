@@ -29,7 +29,7 @@
                 <th>Email</th>
                 <th>Affiliation</th>
 
-                {% for author in people.results %}
+                {% for author in authors.results %}
                     <tr>
                         <td>
                             <a href="{% url 'author_detail' uuid=author.uuid %}">
@@ -52,19 +52,19 @@
             {% if prev_page %}
                 <button type="button" class="btn btn-secondary mr-2">
                     {% if search %}
-                        <a href="{{ people.previous }}&search={{ search }}" class="unlink">
-                            <em class="fa fa-fw fa-angles-left"></em> Page {{ prev_page }}
+                        <a href="{{ authors.previous }}&search={{ search }}" class="unlink">
+                            <em class="fa-solid fa-angles-left"></em> Page {{ prev_page }}
                         </a>
                     {% else %}
-                        <a href="{{ people.previous }}" class="unlink">
-                            <em class="fa fa-fw fa-angles-left"></em> Page {{ prev_page }}
+                        <a href="{{ authors.previous }}" class="unlink">
+                            <em class="fa-solid fa-angles-left"></em> Page {{ prev_page }}
                         </a>
                     {% endif %}
                 </button>
             {% else %}
                 <button class="btn btn-secondary mr-2 disabled">
-                    <a href="{{ people.previous }}" class="unlink">
-                        <em class="fa fa-fw fa-angles-left"></em>
+                    <a href="{{ authors.previous }}" class="unlink">
+                        <em class="fa-solid fa-angles-left"></em>
                     </a>
                 </button>
             {% endif %}
@@ -73,21 +73,21 @@
                 <form type="get" action="." style="margin: 0">
                     <button type="button" class="btn btn-secondary mr-2">
                         {% if search %}
-                            <a href="{{ people.next }}&search={{ search }}"
+                            <a href="{{ authors.next }}&search={{ search }}"
                                class="unlink">
-                                Page {{ next_page }} <em class="fa fa-fw fa-angles-right"></em>
+                                Page {{ next_page }} <em class="fa-solid fa-angles-right"></em>
                             </a>
                         {% else %}
-                            <a href="{{ people.next }}" class="unlink">
-                                Page {{ next_page }} <em class="fa fa-fw fa-angles-right"></em>
+                            <a href="{{ authors.next }}" class="unlink">
+                                Page {{ next_page }} <em class="fa-solid fa-angles-right"></em>
                             </a>
                         {% endif %}
                     </button>
                 </form>
             {% else %}
                 <button class="btn btn-secondary mr-2 disabled">
-                    <a href="{{ people.next }}" class="unlink">
-                        <em class="fa fa-fw fa-angles-right"></em>
+                    <a href="{{ authors.next }}" class="unlink">
+                        <em class="fa-solid fa-angles-right"></em>
                     </a>
                 </button>
             {% endif %}
@@ -95,7 +95,7 @@
     </div>
     {% if debug %}
         <hr>
-        <pre><strong>people</strong>:<br>{{ people|pprint }}</pre>
+        <pre><strong>authors</strong>:<br>{{ authors|pprint }}</pre>
         <pre><strong>api_user</strong>:<br>{{ api_user|pprint }}</pre>
         <br>
     {% endif %}

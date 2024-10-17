@@ -55,6 +55,7 @@ esac
 if [[ "${MAKE_MIGRATIONS}" -eq 1 ]]; then
     echo "### MAKE_MIGRATIONS = True ###"
     APPS_LIST=(
+        "apiuser"
         "artifacts"
     )
 else
@@ -90,7 +91,12 @@ done
 python manage.py collectstatic --noinput
 
 # initialize task timeout tracker
+echo "### INIT task timeout tracker ###"
 python manage.py init_task_timeout_tracker
+
+# initialize anonymous api user
+echo "### INIT anonymous api_user ###"
+python manage.py init_anon_api_user
 
 # run mode
 case "${RUN_MODE}" in

@@ -3,7 +3,6 @@
 # - nginx port 8080, 8443 exposed to host (http, https) - self signed certs by default
 # - vouch-proxy port 9090 exposed ot host
 
-version: '3.9'
 services:
 
   database:

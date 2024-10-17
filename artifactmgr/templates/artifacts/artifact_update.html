@@ -22,7 +22,12 @@
     {% if api_user.is_authenticated %}
         {% if api_user.can_create_artifact %}
             <div class="container w-85">
-                <h3>Update Artifact</h3>
+                <h4>
+                    Update:
+                    <em style="font-size: medium; color: darkslategray">
+                        <b>{{ artifact_title }}</b>
+                    </em>
+                </h4>
                 <form id="form" method="POST">
                     {% csrf_token %}
                     <p>
@@ -38,10 +43,16 @@
                         {{ form.visibility.label_tag }} {{ form.visibility }}
                     </p>
                     <p>
+                        {{ form.show_project }} {{ form.show_project.label_tag }}
+                    </p>
+                    <p>
                         {{ form.project_uuid.label_tag }} {{ form.project_uuid }}
                     </p>
                     <p>
                         {{ form.tags.label_tag }} {{ form.tags }}
+                    </p>
+                    <p>
+                        {{ form.show_authors }} {{ form.show_authors.label_tag }}
                     </p>
                     <p>
                         Authors (by UUID):
