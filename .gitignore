@@ -6,9 +6,16 @@
 !/versions/migration_scripts/input_files/.gitkeep
 !/versions/migration_scripts/output_files/.gitkeep
 
+# fixture files
+/artifactmgr/apps/artifacts/fixtures/*
+!/artifactmgr/apps/artifacts/fixtures/.gitkeep
+
 # dumpdata
 /dumpdata/*
 !/dumpdata/.gitkeep
+
+# backup
+/backup
 
 # django static and media files
 /static/*
