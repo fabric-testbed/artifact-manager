@@ -67,7 +67,17 @@ fi
 if [[ "${LOAD_FIXTURES}" -eq 1 ]]; then
     echo "### LOAD_FIXTURES = True ###"
     FIXTURES_LIST=(
-        "artifacts"
+        "apiuser.apiuser.json"
+        "artifacts.artifactauthor.json"
+        "artifacts.artifact.json"
+        "artifacts.artifact_authors.json"
+        "artifacts.artifactversion.json"
+        "artifacts.artifacttag.json"
+        "artifacts.artifact_tags.json"
+        "artifacts.artifactviews.json"
+        "artifacts.artifact_artifact_views.json"
+        "artifacts.versiondownloads.json"
+        "artifacts.artifactversion_version_downloads.json"
     )
 else
     echo "### LOAD_FIXTURES = False ###"

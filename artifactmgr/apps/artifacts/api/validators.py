@@ -42,8 +42,7 @@ def validate_contents_download(urn: str, api_user: ApiUser) -> tuple:
             if artifact.visibility == Artifact.AUTHOR and (not author or author not in artifact.authors.all()):
                 message.append({'PermissionsAuthor': 'api_user does not have permission to download this resource'})
             # project - api_user must be an author of artifact or project member linked to the artifact
-            if artifact.visibility == Artifact.PROJECT and (
-                    not author or author not in artifact.authors.all() or artifact.project_uuid not in api_user.projects):
+            if artifact.visibility == Artifact.PROJECT and artifact.project_uuid not in api_user.projects:
                 message.append({'PermissionsProject': 'api_user does not have permission to download this resource'})
             # public - download available to any user
     except Exception as exc:
