@@ -204,11 +204,12 @@ def artifact_detail(request, *args, **kwargs):
     # get artifact detail page when not method: POST
     try:
         artifact = ArtifactViewSet.as_view({'get': 'retrieve'})(request=request, *args, **kwargs)
+        if artifact.status_code != status.HTTP_200_OK:
+            return redirect('artifact_list')
         if artifact.data and artifact.status_code == status.HTTP_200_OK:
             artifact = json.loads(json.dumps(artifact.data))
             artifact_obj = Artifact.objects.get(uuid=kwargs.get('uuid'))
             is_author = artifact_obj.is_author(api_user_uuid=api_user.uuid)
-            # is_author = api_user.uuid in [a.get('uuid') for a in artifact.get('authors', [])]
         else:
             message = {'status_code': artifact.status_code, 'detail': artifact.data.get('detail')}
             is_author = False
