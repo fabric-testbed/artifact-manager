@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static django_bootstrap5 artifact_tags %}
+
+{% block title %}
+    FABRIC Artifact Manager
+{% endblock %}
+
+{% block content %}
+    {% if message %}
+        <div class="alert alert-danger" role="alert">{{ message }}</div>
+    {% endif %}
+    {% if api_user.is_authenticated %}
+        {% if api_user.can_create_artifact %}
+            <div class="container w-85">
+                <div class="page-header">
+                    <h3>Update Artifact</h3>
+                    <span class="subtitle">{{ artifact_title }}</span>
+                </div>
+                <div class="form-card">
+                    <form id="form" method="POST">
+                        {% csrf_token %}
+                        <p>
+                            {{ form.title.label_tag }} {{ form.title }}
+                        </p>
+                        <p>
+                            {{ form.description_short.label_tag }} {{ form.description_short }}
+                        </p>
+                        <p>
+                            {{ form.description_long.label_tag }} {{ form.description_long }}
+                        </p>
+                        <p>
+                            {{ form.visibility.label_tag }} {{ form.visibility }}
+                        </p>
+                        <hr class="form-divider">
+                        <p>
+                            {{ form.show_project }} {{ form.show_project.label_tag }}
+                        </p>
+                        <p>
+                            {{ form.project_uuid.label_tag }} {{ form.project_uuid }}
+                        </p>
+                        <p>
+                            {{ form.tags.label_tag }} {{ form.tags }}
+                        </p>
+                        <hr class="form-divider">
+                        <p>
+                            {{ form.show_authors }} {{ form.show_authors.label_tag }}
+                        </p>
+                        <p>
+                            Authors (by UUID):
+                        </p>
+                        <div class="artifact-authors">
+                            {{ form.author_1 }}
+                            {{ form.author_2 }}
+                            {{ form.author_3 }}
+                            {{ form.author_4 }}
+                            {{ form.author_5 }}
+                            {{ form.author_6 }}
+                            {{ form.author_7 }}
+                            {{ form.author_8 }}
+                            {{ form.author_9 }}
+                            {{ form.author_10 }}
+                            {{ form.author_11 }}
+                            {{ form.author_12 }}
+                        </div>
+                        <hr class="form-divider">
+                        <div class="row align-items-center">
+                            <div class="col-lg-5">
+                                <h4>Search for FABRIC authors</h4>
+                            </div>
+                            <div class="col-lg-5">
+                                {% if search %}
+                                    <input id="search" type="text" name="search" class="search-bar w-100" value="{{ search }}">
+                                {% else %}
+                                    <input id="search" type="text" name="search" class="search-bar w-100"
+                                           placeholder="Search by name or email...">
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-2">
+                                <button class="btn btn-primary btn-fabric" id="search_submit"
+                                        type="submit" style="float: right"
+                                        title="Search FABRIC users by name or email"
+                                        data-bs-toggle="tooltip" data-bs-placement="bottom">
+                                    <i class="fa fa-magnifying-glass me-1"></i> Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    {% if fabric_users %}
+                        <table class="soft-table mt-3">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>UUID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in fabric_users %}
+                                    <tr>
+                                        <td>{{ user.name }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td><strong>{{ user.uuid }}</strong></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+                <div class="action-row mt-3">
+                    <button class="btn btn-success btn-fabric" type="submit" form="form" name="save"
+                            title="Save changes to this artifact"
+                            data-bs-toggle="tooltip" data-bs-placement="top">Save</button>
+                    <a href="{% url 'artifact_detail' uuid=artifact_uuid %}" class="btn btn-secondary btn-fabric"
+                       title="Discard changes and return to artifact details"
+                       data-bs-toggle="tooltip" data-bs-placement="top">Back</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-warning" role="alert">
+                You are not able to create an Artifact.
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            You are not logged in. Please login first to update the artifact.
+        </div>
+        <a href="/login" class="btn btn-success btn-fabric"
+           title="Sign in with CILogon to update artifacts"
+           data-bs-toggle="tooltip" data-bs-placement="right">Login</a>
+    {% endif %}
+    {% if debug %}
+        <hr>
+        <div class="debug-block">
+            <pre><strong>form</strong>:
+{{ form.data|json_pretty }}</pre>
+        </div>
+        <div class="debug-block mt-2">
+            <pre><strong>fabric_users</strong>:
+{{ fabric_users|json_pretty }}</pre>
+        </div>
+        <div class="debug-block mt-2">
+            <pre><strong>api_user</strong>:
+{{ api_user|json_pretty }}</pre>
+        </div>
+    {% endif %}
+{% endblock %}

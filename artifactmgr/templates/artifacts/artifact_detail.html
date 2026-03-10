@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+{% load static artifact_tags django_bootstrap5 %}
+{% block title %}
+    FABRIC Artifact Manager
+{% endblock %}
+
+{% block content %}
+    {% if message %}
+        <div class="alert alert-danger" role="alert">{{ message }}</div>
+    {% endif %}
+    <div class="container w-85">
+        <div class="d-flex flex-row justify-content-between align-items-start mb-3">
+            <div>
+                <h2 style="margin-bottom: 0.25rem;">
+                    {{ artifact.title }}
+                    <span style="font-size: medium">
+                        (
+                        {% if artifact.visibility == 'author' %}
+                            <span title="visibility: author - view and download available to authors only">
+                                <em style="color: #008e7a;">{{ artifact.visibility }}</em>
+                            </span>
+                        {% elif artifact.visibility == 'project' %}
+                            <span title="visibility: project - view and download available to project members only">
+                                <em style="color: #008e7a;">{{ artifact.visibility }}</em>
+                            </span>
+                        {% elif artifact.visibility == 'public' %}
+                            <span title="visibility: public - view and download available to anyone">
+                                <em style="color: #008e7a;">{{ artifact.visibility }}</em>
+                            </span>
+                        {% endif %}
+                        )
+                    </span>
+                </h2>
+                {% if artifact.project_name %}
+                    <span class="pub-badge-project pub-badge" title="Link to FABRIC project">
+                        {% if api_user.is_authenticated %}
+                            <a href="{{ artifact.project_uuid|project_url_from_uuid }}" target="_blank">
+                                {{ artifact.project_name }}
+                            </a>
+                        {% else %}
+                            <a href="{{ artifact.project_uuid|project_url_from_uuid_anonymous }}" target="_blank">
+                                {{ artifact.project_name }}
+                            </a>
+                        {% endif %}
+                    </span>
+                {% endif %}
+            </div>
+            <div class="action-row">
+                <a href="{% url 'artifact_list' %}" class="btn btn-secondary btn-fabric"
+                   title="Return to artifact list"
+                   data-bs-toggle="tooltip" data-bs-placement="bottom">Back</a>
+                {% if is_author %}
+                    <a href="{% url 'artifact_update' uuid=artifact.uuid %}" class="btn btn-success btn-fabric"
+                       title="Edit artifact details, authors, and tags"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom">Edit</a>
+                    <form action="{% url 'artifact_detail' uuid=artifact.uuid %}" method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="artifact_uuid" value="{{ artifact.uuid }}">
+                        <button class="btn btn-danger btn-fabric" type="submit"
+                                name="artifact_detail_button" value="delete_artifact"
+                                onclick="return confirm('Delete Artifact: {{ artifact.title }}?')"
+                                title="Permanently delete this artifact and all versions"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom">
+                            Delete
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <div style="padding: 1.25rem 1.5rem;">
+                {% if artifact.description_long %}
+                    {{ artifact.description_long|safe }}
+                {% else %}
+                    {{ artifact.description_short|safe }}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-row">
+                <div class="detail-label">
+                    <em class="fa-solid fa-eye"></em> Views
+                </div>
+                <div class="detail-value">{{ artifact.artifact_views }}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">
+                    <em class="fa-solid fa-download"></em> Downloads
+                </div>
+                <div class="detail-value">
+                    {{ artifact.artifact_downloads_active }} active
+                    ({{ artifact.artifact_downloads_retired }} retired)
+                </div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">
+                    <em class="fa-regular fa-clone"></em> Versions
+                </div>
+                <div class="detail-value">{{ artifact.number_of_versions }}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Last Updated</div>
+                <div class="detail-value">{{ artifact.modified|normalize_date_to_utc }}</div>
+            </div>
+            {% if artifact.tags %}
+                <div class="detail-row">
+                    <div class="detail-label">Tags</div>
+                    <div class="detail-value">
+                        {% for tag in artifact.tags %}
+                            <span class="pub-badge">
+                                <a href="{% url 'artifact_list' %}?search={{ tag }}">{{ tag }}</a>
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if artifact.versions %}
+            <div class="page-header">
+                <h4>Versions</h4>
+            </div>
+            {% if artifact.number_of_versions == 0 %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-box-open fa-2x"></i>
+                    This artifact has no versions available for download.
+                </div>
+            {% else %}
+                <table class="soft-table">
+                    <thead>
+                        <tr>
+                            <th>Version</th>
+                            <th>Created</th>
+                            <th>URN</th>
+                            <th>Downloads</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for version in artifact.versions %}
+                        {% if is_author %}
+                            <tr>
+                                <td>
+                                    {% if version.active %}
+                                        {{ version.version }}
+                                    {% else %}
+                                        <s class="text-secondary">{{ version.version }}</s>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if version.active %}
+                                        {{ version.created|normalize_date_to_utc }}
+                                    {% else %}
+                                        <s class="text-secondary">{{ version.created|normalize_date_to_utc }}</s>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if version.active %}
+                                        {{ version.urn }}
+                                    {% else %}
+                                        <s class="text-secondary">{{ version.urn }}</s>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span title="Downloads - for version {{ version.version }}">
+                                        <em class="fa-solid fa-download"></em> {{ version.version_downloads }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if version.active %}
+                                        <form action="{% url 'artifact_detail' uuid=artifact.uuid %}"
+                                              method="POST" class="action-row" style="display: inline-flex;">
+                                            {% csrf_token %}
+                                            {% if version.uuid %}
+                                                <a class="btn btn-success btn-sm"
+                                                   href="/api/contents/download/{{ version.urn }}" target="_blank"
+                                                   title="Download this version as .tgz archive"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top">
+                                                    download
+                                                </a>
+                                                <input type="hidden" name="version_uuid" value="{{ version.uuid }}">
+                                                <button class="btn btn-danger btn-sm" type="submit"
+                                                        name="artifact_detail_button" value="hide_version"
+                                                        onclick="return confirm('Disable/Hide version: {{ version.version }}?')"
+                                                        title="Hide this version from non-author users"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top">
+                                                    disable
+                                                </button>
+                                            {% endif %}
+                                        </form>
+                                    {% else %}
+                                        <form action="{% url 'artifact_detail' uuid=artifact.uuid %}"
+                                              method="POST" class="action-row" style="display: inline-flex;">
+                                            {% csrf_token %}
+                                            {% if version.uuid %}
+                                                <a class="btn btn-secondary btn-sm disabled"
+                                                   href="/api/contents/download/{{ version.urn }}" target="_blank"
+                                                   title="Download unavailable while version is disabled"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top">
+                                                    download
+                                                </a>
+                                                <input type="hidden" name="version_uuid" value="{{ version.uuid }}">
+                                                <button class="btn btn-primary btn-sm" type="submit"
+                                                        name="artifact_detail_button" value="show_version"
+                                                        onclick="return confirm('Enable/Show version: {{ version.version }}?')"
+                                                        title="Re-enable this version for download"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top">
+                                                    enable
+                                                </button>
+                                            {% endif %}
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% elif version.active %}
+                            <tr>
+                                <td>{{ version.version }}</td>
+                                <td>{{ version.created|normalize_date_to_utc }}</td>
+                                <td>{{ version.urn }}</td>
+                                <td>
+                                    <span title="Downloads - for version {{ version.version }}">
+                                        <em class="fa-solid fa-download"></em> {{ version.version_downloads }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a class="btn btn-success btn-sm"
+                                       href="/api/contents/download/{{ version.urn }}" target="_blank"
+                                       title="Download this version as .tgz archive"
+                                       data-bs-toggle="tooltip" data-bs-placement="top">
+                                        download
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        {% endif %}
+
+        {% if is_author %}
+            <div class="form-card mt-3">
+                <h4>Add a new Version</h4>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" name="file" accept=".tgz, .tar, .gz" class="form-control mb-2">
+                    <button class="btn btn-primary btn-sm btn-fabric" type="submit" name="artifact_detail_button"
+                            value="add_version"
+                            title="Upload a .tgz or .tar.gz file as a new version"
+                            data-bs-toggle="tooltip" data-bs-placement="right">
+                        Submit
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+
+        {% if artifact.authors %}
+            <div class="page-header mt-4">
+                <h4>Authors</h4>
+            </div>
+            <div class="detail-card">
+                {% for author in artifact.authors %}
+                    <div class="detail-row">
+                        <div class="detail-label">
+                            <a href="{% url 'author_detail' uuid=author.uuid %}">
+                                {{ author.name }}
+                            </a>
+                        </div>
+                        <div class="detail-value">
+                            {{ author.affiliation }}
+                            {% if author.email %}
+                                &mdash; <a href="mailto:{{ author.email }}">{{ author.email }}</a>
+                            {% else %}
+                                &mdash; <em style="color: #838385;">email is private</em>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if not artifact.show_authors %}
+            <div class="alert alert-warning mt-3" role="alert">
+                <strong>Note</strong>: Authors are not being displayed (double-blind, or other reason)
+            </div>
+        {% endif %}
+        {% if not artifact.show_project %}
+            <div class="alert alert-warning mt-3" role="alert">
+                <strong>Note</strong>: Project reference is not being displayed (double-blind, or other reason)
+            </div>
+        {% endif %}
+    </div>
+    {% if debug %}
+        <hr>
+        <div class="debug-block">
+            <pre><strong>artifact</strong>:
+{{ artifact|json_pretty }}</pre>
+        </div>
+        <div class="debug-block mt-2">
+            <pre><strong>api_user</strong>:
+{{ api_user|json_pretty }}</pre>
+        </div>
+    {% endif %}
+{% endblock %}

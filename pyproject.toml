@@ -1,0 +1,21 @@
+[project]
+name = "artifact-manager"
+version = "1.0.0"
+description = "FABRIC Artifact Manager — a Django platform for sharing and reproducing FABRIC research artifacts"
+requires-python = ">=3.13"
+dependencies = [
+    "cryptography",
+    "django~=6.0",
+    "django-bootstrap5",
+    "django-cors-headers",
+    "django-filter",
+    "djangorestframework",
+    "drf-spectacular",
+    "fontawesomefree",
+    "markdown",
+    "psycopg2-binary",
+    "pyjwt",
+    "python-dateutil",
+    "requests",
+    "uwsgi",
+]

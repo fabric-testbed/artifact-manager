@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static artifact_tags %}
+{% block title %}
+    FABRIC Artifact Manager
+{% endblock %}
+
+{% block content %}
+    {% if message %}
+        <div class="alert alert-danger" role="alert">{{ message }}</div>
+    {% endif %}
+    <div class="container w-85">
+        <div class="page-header">
+            <h2>Artifacts by Project</h2>
+            <span class="subtitle">Artifacts grouped by FABRIC project</span>
+        </div>
+        <form method="get">
+            {% csrf_token %}
+            <div class="d-flex flex-row justify-content-between align-items-center gap-2 mb-3">
+                {% if search %}
+                    <input id="search" type="text" name="search" class="form-control w-75 search-bar" value="{{ search }}">
+                {% else %}
+                    <input id="search" type="text" name="search" class="form-control w-75 search-bar"
+                           placeholder="Search projects by name (3 or more characters)...">
+                {% endif %}
+                <button class="btn btn-primary btn-fabric text-nowrap" id="search_submit" type="submit"
+                        title="Search projects by name"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom">
+                    <i class="fa fa-magnifying-glass me-1"></i> Search
+                </button>
+            </div>
+        </form>
+        {% if projects|length == 0 %}
+            <div class="empty-state">
+                <i class="fa-solid fa-folder-open fa-2x"></i>
+                No projects found.
+            </div>
+        {% else %}
+            <table class="soft-table">
+                <thead>
+                    <tr>
+                        <th style="width: 100px;">Count</th>
+                        <th>Project Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in projects %}
+                        <tr>
+                            <td>{{ project.count }}</td>
+                            <td>
+                                <a href="{% url 'project_detail' uuid=project.project_uuid %}">
+                                    {{ project.project_name }}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="pagination-bar d-flex flex-row align-items-center justify-content-end">
+                <span class="results-count">{{ projects|length }} project{{ projects|length|pluralize }}</span>
+            </div>
+        {% endif %}
+    </div>
+    {% if debug %}
+        <hr>
+        <div class="debug-block">
+            <pre><strong>projects</strong>:
+{{ projects|json_pretty }}</pre>
+        </div>
+        <div class="debug-block mt-2">
+            <pre><strong>api_user</strong>:
+{{ api_user|json_pretty }}</pre>
+        </div>
+    {% endif %}
+{% endblock %}
