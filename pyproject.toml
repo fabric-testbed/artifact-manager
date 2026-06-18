@@ -1,6 +1,6 @@
 [project]
 name = "artifact-manager"
-version = "1.9.0"
+version = "1.9.4"
 description = "FABRIC Artifact Manager — a Django platform for sharing and reproducing FABRIC research artifacts"
 requires-python = ">=3.13"
 dependencies = [

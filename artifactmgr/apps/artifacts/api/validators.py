@@ -227,6 +227,12 @@ def validate_artifact_update(request, api_user: ApiUser) -> tuple:
         authors = request_data.get('authors', [])
         for author in authors:
             if is_valid_uuid(author):
+                # authors already known to the artifact-manager were validated against the
+                # Core API when first added; skip re-validating them. This also prevents an
+                # edit from failing when an existing author's profile is not resolvable via
+                # an as_self=false Core API lookup (e.g. due to profile visibility settings).
+                if ArtifactAuthor.objects.filter(uuid=author).exists():
+                    continue
                 if api_user.access_type == ApiUser.COOKIE:
                     fab_user = query_core_api_by_cookie(
                         query='/people/{0}?as_self=false'.format(author),
