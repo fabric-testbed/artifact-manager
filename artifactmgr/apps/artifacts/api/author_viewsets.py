@@ -2,13 +2,20 @@ import os
 from datetime import datetime, timedelta, timezone
 
 from rest_framework import filters, permissions, viewsets
-from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.exceptions import APIException, MethodNotAllowed
 
 from artifactmgr.apps.apiuser.models import ApiUser, TaskTimeoutTracker
 from artifactmgr.apps.artifacts.api.author_serializers import AuthorSerializer
 from artifactmgr.apps.artifacts.models import ArtifactAuthor
-from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
+from artifactmgr.utils.core_api import PERSON_FOUND, PERSON_LOOKUP_FAILED, lookup_fabric_person
 from artifactmgr.utils.fabric_auth import is_valid_uuid
+
+
+class CoreApiUnavailable(APIException):
+    """Raised when a required FABRIC Core API lookup fails (NOT when a user is simply absent)."""
+    status_code = 503
+    default_detail = 'Unable to reach the FABRIC Core API to verify an author; please retry.'
+    default_code = 'core_api_unavailable'
 
 
 class DynamicSearchFilter(filters.SearchFilter):
@@ -78,34 +85,35 @@ class AuthorViewSet(viewsets.ModelViewSet):
 def create_author_from_uuid(request, api_user: ApiUser, author_uuid: str) -> ArtifactAuthor | None:
     try:
         now = datetime.now(timezone.utc)
-        if is_valid_uuid(author_uuid):
-            author = ArtifactAuthor.objects.filter(uuid=author_uuid).first()
-            arc = TaskTimeoutTracker.objects.get(name=os.getenv('ARC_NAME'))
-            if author and author.updated + timedelta(seconds=int(arc.timeout_in_seconds)) > now:
-                return author
-            else:
-                if api_user.access_type == ApiUser.COOKIE:
-                    fab_user = query_core_api_by_cookie(
-                        query='/people/{0}?as_self=false'.format(author_uuid),
-                        cookie=request.COOKIES.get(os.getenv('VOUCH_COOKIE_NAME'), None))
-                else:
-                    fab_user = query_core_api_by_token(
-                        query='/people/{0}?as_self=false'.format(author_uuid),
-                        token=request.headers.get('authorization', 'Bearer ').replace('Bearer ', ''))
-                if fab_user.get('size') == 1 and fab_user.get('status') == 200:
-                    if not author:
-                        author = ArtifactAuthor()
-                    author.affiliation = fab_user.get('results')[0].get('affiliation', None)
-                    author.email = fab_user.get('results')[0].get('email', None)
-                    author.name = fab_user.get('results')[0].get('name', None)
-                    author.updated = now
-                    author.uuid = fab_user.get('results')[0].get('uuid', None)
-                    author.save()
-                    return author
-                else:
-                    return None
-        else:
+        if not is_valid_uuid(author_uuid):
             return None
+        author = ArtifactAuthor.objects.filter(uuid=author_uuid).first()
+        arc = TaskTimeoutTracker.objects.get(name=os.getenv('ARC_NAME'))
+        if author and author.updated + timedelta(seconds=int(arc.timeout_in_seconds)) > now:
+            return author
+        outcome, person = lookup_fabric_person(request=request, api_user=api_user, uuid=author_uuid)
+        if outcome == PERSON_FOUND:
+            if not author:
+                author = ArtifactAuthor()
+            author.affiliation = person.get('affiliation', None)
+            author.email = person.get('email', None)
+            author.name = person.get('name', None)
+            author.updated = now
+            author.uuid = person.get('uuid', None)
+            author.save()
+            return author
+        if outcome == PERSON_LOOKUP_FAILED:
+            # A failed/transient Core API call is not proof the user is missing. If we already
+            # hold a (possibly stale) record, use it so a known author never blocks the save;
+            # otherwise abort loudly rather than silently dropping the author.
+            if author:
+                return author
+            raise CoreApiUnavailable(
+                detail="unable to verify author '{0}' with the Core API; please retry".format(author_uuid))
+        # PERSON_NOT_FOUND: genuinely no such user
+        return None
+    except CoreApiUnavailable:
+        raise
     except Exception as exc:
         print(exc)
         return None

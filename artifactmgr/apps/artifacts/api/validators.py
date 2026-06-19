@@ -1,14 +1,21 @@
 import json
-import mimetypes
 import os
 
 from artifactmgr.apps.apiuser.models import ApiUser
 from artifactmgr.apps.artifacts.models import Artifact, ArtifactAuthor, ArtifactTag, ArtifactVersion
-from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
+from artifactmgr.utils.core_api import (
+    PERSON_LOOKUP_FAILED,
+    PERSON_NOT_FOUND,
+    lookup_fabric_person,
+    query_core_api_by_cookie,
+    query_core_api_by_token,
+)
 from artifactmgr.utils.fabric_auth import is_valid_uuid
 
-# valid mimetypes for artifact contents (.tgz, .tar, .tar.gz)
-valid_mimetypes = [('application/x-gzip', 'gzip'), ('application/x-tar', None), ('application/x-tar', 'gzip')]
+# valid filename extensions for artifact contents (.tgz, .tar.gz); matched case-insensitively.
+# Checked by extension rather than mimetypes.guess_type(), whose result depends on the host's
+# mime database and is case-sensitive on the compound .tar.gz suffix.
+valid_upload_extensions = ('.tgz', '.tar.gz')
 
 
 def validate_contents_download(urn: str, api_user: ApiUser) -> tuple:
@@ -69,10 +76,10 @@ def validate_artifact_version_create(request, api_user: ApiUser) -> tuple:
             message.append({'file': 'missing a \'file\' to create an artifact from'})
         if 'data' not in request_keys:
             message.append({'data': 'missing the \'data\' attributes to create an artifact from'})
-        file_mimetype = mimetypes.guess_type(request.FILES.get('file').name)
-        if file_mimetype not in valid_mimetypes:
+        upload_filename = request.FILES.get('file').name
+        if not upload_filename.lower().endswith(valid_upload_extensions):
             message.append({'mimetypes': 'Invalid file type for \'{0}\', must be .tgz or .tar.gz'.format(
-                request.FILES.get('file').name)})
+                upload_filename)})
         request_data = request.data['data']
         if not isinstance(request_data, dict):
             request_data = json.loads(request_data)
@@ -136,16 +143,12 @@ def validate_artifact_create(request, api_user: ApiUser) -> tuple:
         authors = request_data.get('authors', [])
         for author in authors:
             if is_valid_uuid(author):
-                if api_user.access_type == ApiUser.COOKIE:
-                    fab_user = query_core_api_by_cookie(
-                        query='/people/{0}?as_self=false'.format(author),
-                        cookie=request.COOKIES.get(os.getenv('VOUCH_COOKIE_NAME'), None))
-                else:
-                    fab_user = query_core_api_by_token(
-                        query='/people/{0}?as_self=false'.format(author),
-                        token=request.headers.get('authorization', 'Bearer ').replace('Bearer ', ''))
-                if fab_user.get('size') != 1 or fab_user.get('status') != 200:
+                outcome, _ = lookup_fabric_person(request=request, api_user=api_user, uuid=author)
+                if outcome == PERSON_NOT_FOUND:
                     message.append({'authors': 'unable to find user: \'{0}\''.format(author)})
+                elif outcome == PERSON_LOOKUP_FAILED:
+                    message.append(
+                        {'authors': 'unable to verify user \'{0}\' with the Core API; please retry'.format(author)})
             else:
                 message.append({'authors': 'invalid uuid format: \'{0}\''.format(author)})
         # 'description_long': 'string' - optional
@@ -227,22 +230,17 @@ def validate_artifact_update(request, api_user: ApiUser) -> tuple:
         authors = request_data.get('authors', [])
         for author in authors:
             if is_valid_uuid(author):
-                # authors already known to the artifact-manager were validated against the
-                # Core API when first added; skip re-validating them. This also prevents an
-                # edit from failing when an existing author's profile is not resolvable via
-                # an as_self=false Core API lookup (e.g. due to profile visibility settings).
+                # authors already known to the artifact-manager were validated when first
+                # added; skip the redundant live Core API lookup for them (also avoids a
+                # transient Core API failure on an existing author blocking the edit).
                 if ArtifactAuthor.objects.filter(uuid=author).exists():
                     continue
-                if api_user.access_type == ApiUser.COOKIE:
-                    fab_user = query_core_api_by_cookie(
-                        query='/people/{0}?as_self=false'.format(author),
-                        cookie=request.COOKIES.get(os.getenv('VOUCH_COOKIE_NAME'), None))
-                else:
-                    fab_user = query_core_api_by_token(
-                        query='/people/{0}?as_self=false'.format(author),
-                        token=request.headers.get('authorization', 'Bearer ').replace('Bearer ', ''))
-                if fab_user.get('size') != 1 or fab_user.get('status') != 200:
+                outcome, _ = lookup_fabric_person(request=request, api_user=api_user, uuid=author)
+                if outcome == PERSON_NOT_FOUND:
                     message.append({'authors': 'unable to find user: \'{0}\''.format(author)})
+                elif outcome == PERSON_LOOKUP_FAILED:
+                    message.append(
+                        {'authors': 'unable to verify user \'{0}\' with the Core API; please retry'.format(author)})
             else:
                 message.append({'authors': 'invalid uuid format: \'{0}\''.format(author)})
         # 'description_long': 'string' - required

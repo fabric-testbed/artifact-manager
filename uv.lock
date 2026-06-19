@@ -4,7 +4,7 @@ requires-python = ">=3.13"
 
 [[package]]
 name = "artifact-manager"
-version = "1.9.4"
+version = "1.9.5"
 source = { virtual = "." }
 dependencies = [
     { name = "cryptography" },

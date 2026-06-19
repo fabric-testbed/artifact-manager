@@ -2,6 +2,7 @@ import os
 from datetime import datetime, timezone
 from uuid import uuid4
 
+from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -107,6 +108,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         response_artifacts = super().list(request, *args, **kwargs)
         return self._redact_hidden_fields(response_artifacts, api_user)
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         """
         Create a FABRIC Artifact
@@ -223,6 +225,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                 response_artifact.data['project_uuid'] = None
         return response_artifact
 
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         """
         FABRIC Artifacts - update

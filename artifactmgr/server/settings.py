@@ -119,7 +119,7 @@ SPECTACULAR_SETTINGS = {
     'PREPROCESSING_HOOKS': ['artifactmgr.server.api_filters.preprocessing_filter_spec'],
     'TITLE': 'FABRIC Artifact Manager',
     'DESCRIPTION': 'A platform for sharing and reproducing FABRIC research artifacts',
-    'VERSION': '1.9.4',
+    'VERSION': '1.9.5',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
     'COMPONENT_SPLIT_REQUEST': True,
