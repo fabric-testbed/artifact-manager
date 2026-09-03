@@ -16,6 +16,10 @@
 
 # backup
 /backup
+/backups/
+
+# claude code local config
+/.claude/
 
 # django static and media files
 /static/*
