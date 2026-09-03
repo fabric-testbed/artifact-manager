@@ -103,7 +103,8 @@ python manage.py init_anon_api_user
 case "${RUN_MODE}" in
     local-dev)
         echo "local-dev"
-        python manage.py runserver 0.0.0.0:8000
+        # --insecure keeps static files served by runserver now that DJANGO_DEBUG defaults to false
+        python manage.py runserver --insecure 0.0.0.0:8000
         ;;
     local-ssl)
         echo "local-ssl"
