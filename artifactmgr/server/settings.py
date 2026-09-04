@@ -17,6 +17,17 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+
+def env_csv(name: str, default: str = '') -> list[str]:
+    """Read a comma-separated environment variable as a list of trimmed, non-empty values."""
+    return [value.strip() for value in os.getenv(name, default).split(',') if value.strip()]
+
+
+def dedupe(values: list[str]) -> list[str]:
+    """Drop duplicates while preserving order."""
+    return list(dict.fromkeys(values))
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -38,13 +49,9 @@ if os.getenv('API_DEBUG').casefold() == 'true':
 else:
     API_DEBUG = False
 
-ARTIFACTMGR_FQDN = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1')
-
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    ARTIFACTMGR_FQDN,
-]
+# Hosts this deployment answers on, as a comma-separated list in .env. Loopback is always
+# allowed; a deployment adds its own FQDN and public IPs there rather than editing this file.
+ALLOWED_HOSTS = dedupe(['localhost', '127.0.0.1', *env_csv('DJANGO_ALLOWED_HOSTS', '127.0.0.1')])
 
 # Application definition
 
@@ -76,11 +83,12 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-# remote servers that will interact with the API should be added here
-CORS_ALLOWED_ORIGINS = [
+# Remote servers that call the API cross-site, as a comma-separated list in .env.
+CORS_ALLOWED_ORIGINS = dedupe([
     'https://127.0.0.1',
     'https://localhost',
-]
+    *env_csv('DJANGO_CORS_ALLOWED_ORIGINS'),
+])
 
 CORS_ALLOW_METHODS = (
     "DELETE",
@@ -119,7 +127,7 @@ SPECTACULAR_SETTINGS = {
     'PREPROCESSING_HOOKS': ['artifactmgr.server.api_filters.preprocessing_filter_spec'],
     'TITLE': 'FABRIC Artifact Manager',
     'DESCRIPTION': 'A platform for sharing and reproducing FABRIC research artifacts',
-    'VERSION': '1.9.8',
+    'VERSION': '1.9.9',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
     'COMPONENT_SPLIT_REQUEST': True,
@@ -211,6 +219,16 @@ STORAGES = {
         },
     },
 }
+
+# Artifact download strategy
+# False: Django streams the bundle itself with FileResponse. Correct in every run mode and
+#        the only option for `--run-mode local-dev`.
+# True:  Django authorizes the request, records the download and returns headers only, letting
+#        Nginx send the bytes from an internal location via X-Accel-Redirect. The uWSGI worker
+#        is released immediately instead of being held for the whole transfer. Requires the
+#        bundled Nginx with the same artifact storage directory mounted.
+USE_X_ACCEL_REDIRECT = os.getenv('USE_X_ACCEL_REDIRECT', 'false').casefold() == 'true'
+X_ACCEL_LOCATION = os.getenv('X_ACCEL_LOCATION', '/protected_artifacts/')
 
 # Login / Logout settings
 LOGIN_URL = '/login'

@@ -2,10 +2,13 @@ import json
 import mimetypes
 import os
 from datetime import datetime, timezone
+from urllib.parse import quote
 from uuid import uuid4
 
+from django.conf import settings
 from django.core.files.storage import storages
-from django.http import HttpResponse
+from django.http import FileResponse, HttpResponse
+from django.utils.http import content_disposition_header
 from rest_framework.exceptions import NotFound
 
 from artifactmgr.apps.apiuser.models import ApiUser
@@ -43,6 +46,9 @@ def download_contents_by_urn(urn: str) -> HttpResponse:
             return download_zenodo_artifact_contents(urn=urn)
         else:
             return HttpResponse(content="UrnNotFound: urn '{0}".format(urn), status=404)
+    except NotFound:
+        # A missing or unresolvable artifact is a 404, not a teapot.
+        raise
     except Exception as exc:
         print(exc)
         return HttpResponse(content="IAmATeapot: I am a teapot", status=418)
@@ -92,28 +98,67 @@ def create_fabric_artifact_contents(request, api_user: ApiUser) -> ArtifactVersi
         return None
 
 
+# mimetypes reports a .tgz bundle as ('application/x-tar', 'gzip'). Advertising that encoding
+# would invite browsers to silently decompress the download, so fold it into the content type
+# instead - the same mapping Django's own FileResponse applies.
+ENCODING_CONTENT_TYPES = {
+    'bzip2': 'application/x-bzip',
+    'gzip': 'application/gzip',
+    'xz': 'application/x-xz',
+}
+
+
+def fabric_artifact_download_headers(version: ArtifactVersion) -> tuple[str, str]:
+    """
+    Content type and download filename for an artifact version, e.g.
+    ('application/gzip', 'My_Artifact.tar.gz'). The file is named after the artifact title
+    rather than its stored filename.
+    """
+    storage = storages['fabric_artifact_storage']
+    content_type, encoding = mimetypes.guess_type(version.filename)
+    extension = mimetypes.guess_extension(content_type) if content_type else None
+    suffix = (extension or '') + '.gz' if encoding == 'gzip' else (extension or '')
+    filename = storage.get_valid_name(version.artifact.title) + suffix
+    return ENCODING_CONTENT_TYPES.get(encoding, content_type or 'application/octet-stream'), filename
+
+
 def download_fabric_artifact_contents(urn: str) -> HttpResponse:
     """
-    Download FABRIC artifact from local storage
+    Download FABRIC artifact from local storage.
+
+    Bundles run to hundreds of megabytes, so the response never materialises the file in
+    memory. Two strategies, chosen by settings.USE_X_ACCEL_REDIRECT:
+
+    - FileResponse (default) streams the file in fixed-size chunks, and lets uWSGI use
+      sendfile() where the server supports wsgi.file_wrapper. Works in every run mode.
+    - X-Accel-Redirect returns headers only, naming an internal Nginx location over the same
+      storage directory. Nginx sends the bytes and the uWSGI worker is released immediately
+      rather than being held for the whole transfer. Requires the bundled Nginx.
     """
-    try:
-        storage = storages['fabric_artifact_storage']
-        c = ArtifactVersion.objects.filter(uuid=urn.split(':')[-1]).first()
-        fabric_artifact_contents = c.artifact_id + '/' + c.storage_id + '/' + c.filename
-        if storage.exists(fabric_artifact_contents):
-            mime_type, encoding = mimetypes.guess_type(storage.path(fabric_artifact_contents))
-            extension = mimetypes.guess_extension(mime_type)
-            print(mime_type, encoding, extension)
-            suffix = extension + '.gz' if encoding == 'gzip' else extension
-            with storage.open(fabric_artifact_contents, mode='rb') as fh:
-                data = fh.read()
-            response = HttpResponse(data, content_type=mime_type)
-            response.headers['Content-Disposition'] = "attachment; filename=%s" % storage.get_valid_name(
-                c.artifact.title) + suffix
-            return response
-    except Exception as exc:
-        print(exc)
+    storage = storages['fabric_artifact_storage']
+    version = ArtifactVersion.objects.filter(uuid=urn.split(':')[-1]).first()
+    if not version:
         raise NotFound(detail="FileNotFound: urn '{0}' not found".format(urn))
+    fabric_artifact_contents = version.artifact_id + '/' + version.storage_id + '/' + version.filename
+    if not storage.exists(fabric_artifact_contents):
+        raise NotFound(detail="FileNotFound: urn '{0}' not found".format(urn))
+    content_type, filename = fabric_artifact_download_headers(version=version)
+
+    if settings.USE_X_ACCEL_REDIRECT:
+        response = HttpResponse(content_type=content_type)
+        # Nginx URL-decodes the redirect target before matching it against the internal
+        # location, so the path has to be encoded on the way out.
+        response.headers['X-Accel-Redirect'] = settings.X_ACCEL_LOCATION + quote(fabric_artifact_contents)
+        response.headers['Content-Disposition'] = content_disposition_header(
+            as_attachment=True, filename=filename)
+        return response
+
+    return FileResponse(
+        storage.open(fabric_artifact_contents, mode='rb'),
+        content_type=content_type,
+        as_attachment=True,
+        filename=filename,
+    )
 
 
 def remove_fabric_artifact_contents() -> bool:

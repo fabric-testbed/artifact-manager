@@ -1,5 +1,11 @@
 # compose/docker-compose.yml.prod-ssl
-# - nginx port 8080, 8443 exposed to host (http, https) - self signed certs by default
+# - Django + PostgreSQL + Nginx + Vouch Proxy, all on the amgr-network bridge
+# - only Nginx publishes ports to the host
+#
+# Everything that varies between deployments is read from .env (see env.template):
+# published ports, host bind-mount paths, TLS certificate filenames, upload size.
+# A deployment should differ from this file only in its .env - do not hand-edit
+# paths or ports here, or the next `git pull` will silently revert them.
 
 services:
 
@@ -17,6 +23,9 @@ services:
       - database
     volumes:
       - ./:/code
+      # Artifact bundles and database backups live outside the checkout in production.
+      - ${HOST_ARTIFACT_STORAGE:-./artifact_storage}:/code/artifact_storage
+      - ${HOST_ARTIFACT_BACKUPS:-./backups}:/code/backups
 #      - ./static:/code/static
 #      - ./media:/code/media
     environment:
@@ -39,24 +48,37 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       PGDATA: ${PGDATA}
-#    volumes:
-#      - ${HOST_DB_DATA}:/var/lib/postgresql/data
+    volumes:
+      - ${HOST_DB_DATA:-./db_data}:/var/lib/postgresql/data
     restart: unless-stopped
 
   nginx:
-    # default port 8080, 8443
+    # container ports 80, 443 - published as NGINX_HTTP_PORT / NGINX_HTTPS_PORT
     image: nginx:1
     container_name: amgr-nginx
     networks:
       - amgr-network
     ports:
-      - "8080:80"
-      - "8443:443"
+      - "${NGINX_HTTP_PORT:-8080}:80"
+      - "${NGINX_HTTPS_PORT:-8443}:443"
     volumes:
       - .:/code
-      - ${NGINX_DEFAULT_CONF}:/etc/nginx/conf.d/default.conf
-      - ${NGINX_NGINX_CONF}:/etc/nginx/nginx.conf
-      - ${NGINX_SSL_CERTS_DIR}:/etc/ssl:ro
+      # Read-only: Nginx only ever sends these bytes for X-Accel-Redirect downloads,
+      # Django owns every write.
+      - ${HOST_ARTIFACT_STORAGE:-./artifact_storage}:/code/artifact_storage:ro
+      - ${NGINX_DEFAULT_CONF_TEMPLATE:-./nginx/default.conf.template}:/etc/nginx/templates/default.conf.template:ro
+      - ${NGINX_NGINX_CONF:-./nginx/nginx.conf}:/etc/nginx/nginx.conf:ro
+      - ${NGINX_SSL_CERTS_DIR:-./ssl}:/etc/ssl:ro
+    environment:
+      # Restrict envsubst to our own ^AMGR_ names so Nginx's runtime variables
+      # ($host, $request_uri, ...) survive template rendering untouched.
+      - NGINX_ENVSUBST_FILTER=^AMGR_
+      - AMGR_HTTPS_PORT=${AMGR_HTTPS_PORT:-8443}
+      - AMGR_SSL_CERT=${AMGR_SSL_CERT:-fullchain.pem}
+      - AMGR_SSL_CERT_KEY=${AMGR_SSL_CERT_KEY:-privkey.pem}
+      - AMGR_CLIENT_MAX_BODY_SIZE=${AMGR_CLIENT_MAX_BODY_SIZE:-75M}
+      - AMGR_X_ACCEL_LOCATION=${AMGR_X_ACCEL_LOCATION:-/protected_artifacts/}
+      - AMGR_ARTIFACT_STORAGE_PATH=${AMGR_ARTIFACT_STORAGE_PATH:-/code/artifact_storage}
     restart: unless-stopped
 
   vouch-proxy:

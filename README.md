@@ -31,10 +31,34 @@ cp vouch/config.template vouch/config
 #   compose/docker-compose.yml.prod-ssl   — production with Nginx SSL
 #   compose/docker-compose.yml.local-ssl  — local development with Nginx SSL
 cp compose/docker-compose.yml.prod-ssl docker-compose.yml
-vim nginx/default.conf
 ```
 
 See `env.template` for the full list of environment variables.
+
+### Deployment-specific settings
+
+Everything that varies between deployments is read from `.env`, so the tracked files stay
+generic and a checkout can be brought forward with `git pull` without losing local changes.
+Do not hand-edit `docker-compose.yml`, `nginx/default.conf.template` or `settings.py` for a
+single environment — set these instead:
+
+| Variable | Purpose |
+| --- | --- |
+| `DJANGO_ALLOWED_HOSTS` | Comma-separated hosts this deployment answers on. Loopback is always allowed. |
+| `DJANGO_CORS_ALLOWED_ORIGINS` | Comma-separated origins permitted to call the API cross-site. |
+| `HOST_ARTIFACT_STORAGE` | Host directory holding artifact bundles. |
+| `HOST_ARTIFACT_BACKUPS` | Host directory holding database backups. |
+| `HOST_DB_DATA` | Host directory backing the PostgreSQL data volume. |
+| `NGINX_HTTP_PORT` / `NGINX_HTTPS_PORT` | Host ports published by the Nginx container. |
+| `NGINX_SSL_CERTS_DIR` | Host directory mounted read-only at `/etc/ssl`. |
+| `AMGR_SSL_CERT` / `AMGR_SSL_CERT_KEY` | Certificate filenames within that directory. |
+| `AMGR_HTTPS_PORT` | Public HTTPS port used in redirects and `server_name`. |
+| `AMGR_CLIENT_MAX_BODY_SIZE` | Largest artifact bundle accepted on upload. |
+| `USE_X_ACCEL_REDIRECT` | Delegate artifact downloads to Nginx — see [Artifact downloads](#downloads). |
+
+`nginx/default.conf.template` is rendered at container start by the official Nginx image's
+envsubst entrypoint. Only `${AMGR_*}` placeholders are substituted, so Nginx's own runtime
+variables (`$host`, `$request_uri`, ...) pass through untouched.
 
 ## <a name="deploy"></a>Deploy
 
@@ -57,6 +81,24 @@ UWSGI_UID=$(id -u) UWSGI_GID=$(id -g) ./run_server.sh --run-mode local-ssl --mak
 ```bash
 MAKE_MIGRATIONS=1 LOAD_FIXTURES=1 docker compose up -d
 ```
+
+### <a name="downloads"></a>Artifact downloads
+
+Bundles reach several hundred megabytes, so a download is never buffered in memory. Two
+strategies, selected by `USE_X_ACCEL_REDIRECT`:
+
+- **`false` (default)** — Django streams the file with `FileResponse`. Correct in every run
+  mode, and the only option for `--run-mode local-dev`. A uWSGI worker stays occupied for the
+  length of the transfer.
+- **`true`** — Django authorizes the request, records the download and returns headers only,
+  naming an internal Nginx location through the `X-Accel-Redirect` header. Nginx sends the
+  bytes with `sendfile()`, so the worker is released immediately and byte-range and
+  conditional requests are handled by Nginx. Requires the bundled Nginx with
+  `HOST_ARTIFACT_STORAGE` mounted, which the supplied compose files do.
+
+Permission checks are identical either way: the Nginx location is marked `internal`, so it
+cannot be requested directly and every download still passes through
+`validate_contents_download()`.
 
 ## <a name="web-ui"></a>Web UI
 
