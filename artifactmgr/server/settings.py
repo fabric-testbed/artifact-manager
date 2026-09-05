@@ -13,11 +13,32 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import logging
 import os
 import time
+import tomllib
 from corsheaders.defaults import default_headers
+from django.core.exceptions import ImproperlyConfigured
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# The single source of truth for the release number, read from pyproject.toml rather than
+# repeated here. It used to be typed twice - pyproject's `version` and
+# SPECTACULAR_SETTINGS['VERSION'] - which is one more place to forget on a release than there
+# needs to be, and nothing checked that the two agreed. The VERSION file stays as the
+# human-facing marker; no code reads it.
+#
+# Reading the file is safe in every deployment: pyproject.toml is tracked, it is listed in
+# .publish-include so it reaches the public mirror the hosts track, and /code is that checkout
+# bind-mounted. `uv sync` never installs this project into the venv (uv.lock has
+# `source = { virtual = "." }`), so importlib.metadata cannot answer this question - the file is
+# the only source there is. Fails loudly, like every other required value in this file.
+try:
+    with open(BASE_DIR / 'pyproject.toml', 'rb') as _pyproject:
+        APP_VERSION = tomllib.load(_pyproject)['project']['version']
+except (OSError, KeyError, tomllib.TOMLDecodeError) as exc:
+    raise ImproperlyConfigured(
+        'could not read [project].version from %s: %s' % (BASE_DIR / 'pyproject.toml', exc)
+    )
 
 
 def env_csv(name: str, default: str = '') -> list[str]:
@@ -140,7 +161,7 @@ SPECTACULAR_SETTINGS = {
     'PREPROCESSING_HOOKS': ['artifactmgr.server.api_filters.preprocessing_filter_spec'],
     'TITLE': 'FABRIC Artifact Manager',
     'DESCRIPTION': 'A platform for sharing and reproducing FABRIC research artifacts',
-    'VERSION': '1.10.1',
+    'VERSION': APP_VERSION,
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
     'COMPONENT_SPLIT_REQUEST': True,
@@ -163,6 +184,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'artifactmgr.server.context_processors.app_version',
             ],
         },
     },

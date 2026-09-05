@@ -1,5 +1,6 @@
 /* Site footer styling */
 .footer {
+    background-color: var(--am-bar-bg);
     position: fixed;
     font-size: 0.9rem;
     display: flex;
@@ -11,7 +12,36 @@
     width: 100%;
 }
 
-.link {
-    color: #000;
+/* Scoped to .footer, and white rather than the black it used to be: these links sit on
+   the dark FABRIC bar, where #000 measured about 2:1 against #374955 - well under the
+   4.5:1 WCAG AA needs for body text. */
+.footer .link {
+    color: #fff;
     font-weight: 400;
+}
+
+.footer .link:hover {
+    color: #a8c9dc !important;
+}
+
+.footer .sm-font,
+.footer .sm-font a {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Copyright and release number share a line; the version is deliberately quieter
+   than the link beside it. */
+.footer .footer-top {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.footer .footer-version {
+    /* 0.65 rather than the 0.55 the sibling app uses: at this size (0.8rem) WCAG AA wants
+       4.5:1, and 0.55 measures 4.10:1 against the light-theme bar. 0.65 gives 5.04:1 there
+       and 6.69:1 on the dark bar, while still reading as quieter than the link beside it. */
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
 }

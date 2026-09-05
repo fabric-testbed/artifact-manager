@@ -11,8 +11,15 @@
 #      side of the bind mount, not the /code/logs/metrics path seen inside the container.
 #      The shipped default HOST_METRICS_LOGS=./logs/metrics is relative to the checkout, which
 #      is fine for local development but should point at durable storage in production.
-#   2. The uid/gid on the `create` line must match UWSGI_UID / UWSGI_GID from the same .env,
-#      or the uWSGI workers cannot write to the file logrotate creates for them.
+#   2. The owner on the `create` and `su` lines must match UWSGI_UID / UWSGI_GID from the same
+#      .env, or the uWSGI workers cannot write to the file logrotate creates for them. Write
+#      them as NAMES, not numeric ids: logrotate resolves them through getpwnam/getgrnam and
+#      fails the whole config with `unknown user '20049'` on a numeric value.
+#
+# The `su` line is not optional when the log directory is group-writable, which it is whenever
+# UWSGI_GID is a shared group: logrotate refuses to rotate as root with `parent directory has
+# insecure permissions` and skips the log entirely. Rotating as the owning user/group is what
+# that error asks for.
 #
 # No signal or restart is needed after a rotation. Django's metrics handler is a
 # logging.handlers.WatchedFileHandler: it stats the path before every record and reopens the
@@ -25,11 +32,12 @@
 # something else; copytruncate is not the fix.
 
 /path/to/logs/metrics/metrics.log {
+    su <UWSGI_UID name> <UWSGI_GID name>
     size 100M
     rotate 10
     compress
     delaycompress
     missingok
     notifempty
-    create 0640 1000 1000
+    create 0640 <UWSGI_UID name> <UWSGI_GID name>
 }
