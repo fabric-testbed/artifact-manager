@@ -16,6 +16,7 @@ from artifactmgr.apps.artifacts.api.validators import validate_artifact_version_
 from artifactmgr.apps.artifacts.api.version_serializers import ArtifactContentsUploadSerializer, \
     ArtifactVersionSerializer, ArtifactVersionUpdateSerializer
 from artifactmgr.apps.artifacts.models import Artifact, ArtifactVersion, VersionDownloads
+from artifactmgr.utils.api_logger import consoleLogger, metrics_event, VERSION
 from artifactmgr.utils.artifact_version_storage import create_fabric_artifact_contents, download_contents_by_urn
 from artifactmgr.utils.fabric_auth import get_api_user
 
@@ -64,7 +65,7 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         try:
             return super().list(request, *args, **kwargs)
         except Exception as e:
-            print(e)
+            consoleLogger.exception('version list: unable to list /contents')
 
     def create(self, request, *args, **kwargs):
         """
@@ -84,7 +85,9 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
             is_valid, message = validate_artifact_version_create(request, api_user=api_user)
             if is_valid:
                 artifact_version = create_fabric_artifact_contents(request=request, api_user=api_user)
-
+                if artifact_version:
+                    metrics_event(VERSION, artifact_version.uuid, 'create', for_artifact=artifact.uuid,
+                                  by=api_user.uuid)
                 return Response(data=ArtifactVersionSerializer(instance=artifact_version).data, status=201)
             else:
                 raise ValidationError(detail={'ValidationError': message})
@@ -112,13 +115,15 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
             if is_valid:
                 request_data = request.data
                 # active
+                active_orig = version.active
                 active = request_data.get('active', None)
                 if str(active).casefold() == 'true':
                     version.active = True
                 if str(active).casefold() == 'false':
                     version.active = False
                 version.save()
-                # print(ArtifactVersionSerializer(instance=version).data)
+                if version.active != active_orig:
+                    metrics_event(VERSION, version.uuid, 'modify', 'active', version.active, by=api_user.uuid)
                 # return updated artifact
                 return Response(data=ArtifactVersionSerializer(instance=version).data, status=204)
             else:
@@ -161,8 +166,9 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
                 version_download.save()
                 artifact_version.version_downloads.add(version_download)
                 artifact_version.save()
+                metrics_event(VERSION, artifact_version.uuid, 'download', by=api_user.uuid)
             except Exception as exc:
-                print(exc)
+                consoleLogger.exception('version download: unable to record a download of %s', version_urn)
             return download_contents_by_urn(urn=kwargs.get('urn'))
         else:
             raise ValidationError(detail={'ValidationError': message})

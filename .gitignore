@@ -31,8 +31,10 @@
 /vouch/*
 !/vouch/config.template
 
-# local database volume
+# local database volume - HOST_DB_DATA defaults to ./pg_data for local development,
+# production points it at durable storage instead
 /db_data
+/pg_data
 
 # local artifact storage
 /artifact_storage
@@ -175,6 +177,11 @@ cover/
 
 # Django stuff:
 *.log
+# `*.log` covers logs/metrics/metrics.log but not the rotated backups it grows
+# (metrics.log.1, metrics.log.2, ...), so ignore the directory and keep only the .gitkeep that
+# lets a fresh clone boot - dictConfig raises if the directory is missing.
+/logs/metrics/*
+!/logs/metrics/.gitkeep
 local_settings.py
 db.sqlite3
 db.sqlite3-journal

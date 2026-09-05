@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from artifactmgr.apps.artifacts.api.tag_serializers import TagSerializer, TagUpdateSerializer
 from artifactmgr.apps.artifacts.models import ArtifactTag
+from artifactmgr.utils.api_logger import metrics_event, TAG
 from artifactmgr.utils.fabric_auth import get_api_user
 
 
@@ -65,7 +66,9 @@ class TagViewSet(viewsets.ModelViewSet):
                 raise ValidationError(detail="DuplicateEntry: tag '{0}' already exists".format(request.data.get('tag')))
             else:
                 try:
-                    return super().create(request, *args, **kwargs)
+                    response = super().create(request, *args, **kwargs)
+                    metrics_event(TAG, response.data.get('tag'), 'create', by=api_user.uuid)
+                    return response
                 except Exception as exc:
                     raise APIException(detail=exc)
         else:
@@ -88,6 +91,8 @@ class TagViewSet(viewsets.ModelViewSet):
             try:
                 artifact_tag.restricted = True if str(request.data.get('restricted')).casefold() == 'true' else False
                 artifact_tag.save()
+                metrics_event(TAG, artifact_tag.tag, 'modify', 'restricted', artifact_tag.restricted,
+                              by=api_user.uuid)
                 # return updated tag
                 return Response(data=TagSerializer(instance=artifact_tag).data, status=200)
             except Exception as exc:
@@ -110,8 +115,11 @@ class TagViewSet(viewsets.ModelViewSet):
         """
         api_user = get_api_user(request=request)
         if api_user.is_artifact_manager_admin:
+            tag = kwargs.get('tag')
             try:
-                return super().destroy(request, *args, **kwargs)
+                response = super().destroy(request, *args, **kwargs)
+                metrics_event(TAG, tag, 'delete', by=api_user.uuid)
+                return response
             except Exception as exc:
                 raise APIException(detail=exc)
         else:

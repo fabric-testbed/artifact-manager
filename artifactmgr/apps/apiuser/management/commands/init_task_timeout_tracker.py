@@ -5,6 +5,7 @@ from uuid import uuid4
 from django.core.management.base import BaseCommand, CommandError
 
 from artifactmgr.apps.apiuser.models import TaskTimeoutTracker
+from artifactmgr.utils.api_logger import consoleLogger
 
 
 def init_task_timeout_tracker():
@@ -65,7 +66,7 @@ def init_task_timeout_tracker():
             trl.timeout_in_seconds = os.getenv('TRL_TIMEOUT_IN_SECONDS')
         trl.save()
     except Exception as exc:
-        print(exc)
+        consoleLogger.exception('init_task_timeout_tracker: could not initialize the TaskTimeoutTracker rows')
 
 
 class Command(BaseCommand):
@@ -76,5 +77,5 @@ class Command(BaseCommand):
             init_task_timeout_tracker()
 
         except Exception as e:
-            print(e)
+            consoleLogger.exception('init_task_timeout_tracker: initialization failed')
             raise CommandError('Initialization failed.')

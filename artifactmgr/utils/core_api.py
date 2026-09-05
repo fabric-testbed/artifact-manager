@@ -3,6 +3,7 @@ import os
 import requests
 
 from artifactmgr.apps.apiuser.models import ApiUser
+from artifactmgr.utils.api_logger import consoleLogger
 
 # Outcomes for lookup_fabric_person(); distinguishes a genuinely missing user from a failed call.
 PERSON_FOUND = 'found'
@@ -30,7 +31,7 @@ def query_core_api_by_cookie(query: str, cookie: str):
         api_call = s.get(url=os.getenv('FABRIC_CORE_API') + query)
         response = api_call.json()
     except Exception as exc:
-        print(exc)
+        consoleLogger.exception('core_api: cookie-authenticated GET %s failed', query)
     s.close()
     return response
 
@@ -46,7 +47,7 @@ def query_core_api_by_token(query: str, token: str):
         api_call = s.get(url=os.getenv('FABRIC_CORE_API') + query)
         response = api_call.json()
     except Exception as exc:
-        print(exc)
+        consoleLogger.exception('core_api: token-authenticated GET %s failed', query)
     s.close()
     return response
 

@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import logging
 import os
+import time
 from corsheaders.defaults import default_headers
 from pathlib import Path
 
@@ -28,6 +30,14 @@ def dedupe(values: list[str]) -> list[str]:
     return list(dict.fromkeys(values))
 
 
+def env_int(name: str, default: int) -> int:
+    """Read an environment variable as an int, tolerating unset, empty and non-numeric values."""
+    try:
+        return int(os.getenv(name, '').strip())
+    except (TypeError, ValueError):
+        return default
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -38,13 +48,16 @@ else:
     SECRET_KEY = 'django-insecure-=lnekk7th8j+qokv%%05cg%x!&%crul1ka579j04mq&s6(hl3h'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if os.getenv('DJANGO_DEBUG').casefold() == 'true':
+# Defaults to false when unset: an unset value must never mean debug, and a bare
+# os.getenv(...).casefold() would crash the settings import with an opaque AttributeError
+# in any context that does not source .env - `docker compose exec django ...`, for one.
+if os.getenv('DJANGO_DEBUG', 'false').casefold() == 'true':
     DEBUG = True
 else:
     DEBUG = False
 
 # SECURITY WARNING: don't run with API debug turned on in production!
-if os.getenv('API_DEBUG').casefold() == 'true':
+if os.getenv('API_DEBUG', 'false').casefold() == 'true':
     API_DEBUG = True
 else:
     API_DEBUG = False
@@ -119,7 +132,7 @@ CORS_AlLOW_CREDENTIALS = True
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': int(os.getenv('REST_FRAMEWORK_PAGE_SIZE')),
+    'PAGE_SIZE': env_int('REST_FRAMEWORK_PAGE_SIZE', 5),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
@@ -127,7 +140,7 @@ SPECTACULAR_SETTINGS = {
     'PREPROCESSING_HOOKS': ['artifactmgr.server.api_filters.preprocessing_filter_spec'],
     'TITLE': 'FABRIC Artifact Manager',
     'DESCRIPTION': 'A platform for sharing and reproducing FABRIC research artifacts',
-    'VERSION': '1.9.9',
+    'VERSION': '1.10.0',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
     'COMPONENT_SPLIT_REQUEST': True,
@@ -199,6 +212,142 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+# Logging
+# https://docs.djangoproject.com/en/6.0/topics/logging/
+#
+# Two named loggers are available to first party code through artifactmgr.utils.api_logger:
+#   consoleLogger - operational messages, to stdout, relayed by uWSGI into the container logs
+#   metricsLogger - the audit event stream, to its own file, never mixed into stdout
+#
+# Timestamps are UTC in both streams. The converter is set here, at module scope, so that it is
+# already in place when uWSGI pre-forks its workers; setting it from a lazily imported module
+# would leave startup and migrate records on local time.
+logging.Formatter.converter = time.gmtime
+
+# One level per logger - the handlers are opened at DEBUG and the loggers do the gating.
+ROOT_LOG_LEVEL = os.getenv('ROOT_LOG_LEVEL', '').strip().upper() or 'WARNING'
+DJANGO_LOG_LEVEL = os.getenv('DJANGO_LOG_LEVEL', '').strip().upper() or 'INFO'
+# Pinned separately so DJANGO_LOG_LEVEL=DEBUG cannot also switch on per-query SQL logging.
+DJANGO_DB_LOG_LEVEL = os.getenv('DJANGO_DB_LOG_LEVEL', '').strip().upper() or 'INFO'
+# Covers consoleLogger and the artifactmgr package logger - the two first party streams.
+CONSOLE_LOG_LEVEL = os.getenv('CONSOLE_LOG_LEVEL', '').strip().upper() or 'INFO'
+METRICS_LOG_LEVEL = os.getenv('METRICS_LOG_LEVEL', '').strip().upper() or 'INFO'
+
+# Metrics log file. A relative path is resolved against the project root, so the file lands in
+# the same place however manage.py is invoked. The directory must already exist and be writable
+# by the uWSGI worker uid - dictConfig opens the file at startup and raises if it cannot.
+METRICS_LOG_FILE = os.getenv('METRICS_LOG_FILE', '').strip() or 'logs/metrics/metrics.log'
+if not os.path.isabs(METRICS_LOG_FILE):
+    METRICS_LOG_FILE = os.path.normpath(os.path.join(BASE_DIR, METRICS_LOG_FILE))
+
+# Rotation of the metrics file. 0, the default, selects WatchedFileHandler, which reopens the
+# file after an external logrotate has moved it. Any value > 0 selects RotatingFileHandler,
+# which rotates in process: opt-in, and local-dev / single-process only. artifactmgr.ini runs
+# `processes = 4` with no `lazy-apps`, so all four workers inherit one file description, each
+# sees the same offset, and they stampede the rollover - destroying backup generations and
+# losing exactly the records an audit is later asked to produce.
+METRICS_LOG_MAX_BYTES = env_int('METRICS_LOG_MAX_BYTES', 0)
+METRICS_LOG_BACKUP_COUNT = env_int('METRICS_LOG_BACKUP_COUNT', 10)
+
+# delay=False is deliberate: a bad path or a root owned directory then fails loudly at boot,
+# instead of silently discarding every audit record at emit time.
+_metrics_handler = {
+    'level': 'DEBUG',
+    'class': 'logging.handlers.WatchedFileHandler',
+    'formatter': 'metrics',
+    'filename': METRICS_LOG_FILE,
+    'delay': False,
+    'encoding': 'utf-8',
+}
+if METRICS_LOG_MAX_BYTES > 0:
+    _metrics_handler.update({
+        'class': 'logging.handlers.RotatingFileHandler',
+        'maxBytes': METRICS_LOG_MAX_BYTES,
+        'backupCount': METRICS_LOG_BACKUP_COUNT,
+    })
+
+# No datefmt anywhere: supplying one routes asctime through time.strftime, which has no %f and
+# would silently drop the milliseconds. The default asctime format keeps them, as ',mmm'.
+LOGGING = {
+    'version': 1,
+    # Load bearing. Django applies DEFAULT_LOGGING first and this dict second; True here would
+    # silently disable every third party module logger created up to that point.
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': '%(asctime)s [%(levelname)s] [pid:%(process)d] %(name)s : %(message)s',
+        },
+        'metrics': {
+            # Deliberately bare - the metrics grammar is '<Datetime> <Event message>'.
+            'format': '%(asctime)s %(message)s',
+        },
+        'django.server': {
+            # Reproduced from DEFAULT_LOGGING so runserver keeps its familiar request lines.
+            '()': 'django.utils.log.ServerFormatter',
+            'format': '[{server_time}] {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'stream': 'ext://sys.stdout',
+            'formatter': 'default',
+        },
+        'django.server': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'django.server',
+        },
+        'metrics': _metrics_handler,
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': ROOT_LOG_LEVEL,
+    },
+    'loggers': {
+        # Intended behavior change: DEFAULT_LOGGING attaches a require_debug_true filter to its
+        # console handler, so with DJANGO_DEBUG=false Django's own records are invisible in
+        # production today. Redefining `django` without that filter means django.request 4xx
+        # warnings and 5xx tracebacks now reach stdout in every run mode. That is the point.
+        # It also drops DEFAULT_LOGGING's mail_admins handler, which this deployment - with no
+        # ADMINS and no mail backend configured - never used.
+        'django': {
+            'handlers': ['console'],
+            'level': DJANGO_LOG_LEVEL,
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['django.server'],
+            'level': DJANGO_LOG_LEVEL,
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': DJANGO_DB_LOG_LEVEL,
+            'propagate': False,
+        },
+        'consoleLogger': {
+            'handlers': ['console'],
+            'level': CONSOLE_LOG_LEVEL,
+            'propagate': False,
+        },
+        'metricsLogger': {
+            'handlers': ['metrics'],
+            'level': METRICS_LOG_LEVEL,
+            # propagate=False is what stops every audit record from being duplicated into the
+            # operational stream.
+            'propagate': False,
+        },
+        'artifactmgr': {
+            'handlers': ['console'],
+            'level': CONSOLE_LOG_LEVEL,
+            'propagate': False,
+        },
+    },
+}
 
 # Storages - Django >= 4.2
 # https://docs.djangoproject.com/en/4.2/ref/settings/#storages

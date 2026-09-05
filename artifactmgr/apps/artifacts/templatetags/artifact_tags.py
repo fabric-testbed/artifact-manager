@@ -7,6 +7,8 @@ from dateutil import parser
 from django import template
 from django.utils.safestring import mark_safe
 
+from artifactmgr.utils.api_logger import consoleLogger
+
 register = template.Library()
 
 
@@ -18,7 +20,7 @@ def normalize_date_to_utc(date_str: str) -> Union[None, str]:
             date_parsed = date_parsed - timedelta(milliseconds=100)
             date_parsed = date_parsed.astimezone(timezone.utc)
         except Exception as exc:
-            print(exc)
+            consoleLogger.warning('artifact_tags: could not normalize %r to UTC; returning it unchanged', date_str)
             return date_str
     else:
         return None
@@ -31,7 +33,7 @@ def project_url_from_uuid(project_uuid: str) -> Union[None, str]:
         try:
             project_url = str(os.getenv('FABRIC_PORTAL')) + '/projects/' + project_uuid
         except Exception as exc:
-            print(exc)
+            consoleLogger.exception('artifact_tags: could not build a project url for %s', project_uuid)
             return None
     else:
         return None
@@ -44,7 +46,7 @@ def project_url_from_uuid_anonymous(project_uuid: str) -> Union[None, str]:
         try:
             project_url = str(os.getenv('FABRIC_PORTAL')) + '/experiments/public-projects/' + project_uuid
         except Exception as exc:
-            print(exc)
+            consoleLogger.exception('artifact_tags: could not build a public project url for %s', project_uuid)
             return None
     else:
         return None

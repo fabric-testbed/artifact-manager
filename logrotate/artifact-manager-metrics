@@ -1,0 +1,35 @@
+# Logrotate configuration for the Artifact Manager metrics log.
+#
+# Install:
+#   sudo cp logrotate/artifact-manager-metrics /etc/logrotate.d/artifact-manager-metrics
+#   sudo chown root:root /etc/logrotate.d/artifact-manager-metrics
+#   sudo chmod 0644 /etc/logrotate.d/artifact-manager-metrics
+#   sudo logrotate -d /etc/logrotate.d/artifact-manager-metrics   # dry run, verify the paths
+#
+# EDIT BEFORE USE. Two things are deployment-specific and no production values are pinned here:
+#   1. The path below must match HOST_METRICS_LOGS in this deployment's .env - it is the host
+#      side of the bind mount, not the /code/logs/metrics path seen inside the container.
+#      The shipped default HOST_METRICS_LOGS=./logs/metrics is relative to the checkout, which
+#      is fine for local development but should point at durable storage in production.
+#   2. The uid/gid on the `create` line must match UWSGI_UID / UWSGI_GID from the same .env,
+#      or the uWSGI workers cannot write to the file logrotate creates for them.
+#
+# No signal or restart is needed after a rotation. Django's metrics handler is a
+# logging.handlers.WatchedFileHandler: it stats the path before every record and reopens the
+# file on its own as soon as it sees the inode change, so writes land in the new file with no
+# operator action.
+#
+# DO NOT ADD copytruncate. It keeps the same inode and everything written between the copy and
+# the truncate is lost - which is exactly the audit-record loss that WatchedFileHandler plus
+# external rotation was chosen to avoid. If rotation appears not to be picked up, the problem is
+# something else; copytruncate is not the fix.
+
+/path/to/logs/metrics/metrics.log {
+    size 100M
+    rotate 10
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 1000 1000
+}

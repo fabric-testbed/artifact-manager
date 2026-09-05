@@ -26,6 +26,10 @@ services:
       # Artifact bundles and database backups live outside the checkout in production.
       - ${HOST_ARTIFACT_STORAGE:-./artifact_storage}:/code/artifact_storage
       - ${HOST_ARTIFACT_BACKUPS:-./backups}:/code/backups
+      # Metrics audit log. The directory must exist and be writable by the uWSGI worker uid
+      # before Django starts - docker-entrypoint.sh creates and chowns it. Rotation is external,
+      # see logrotate/artifact-manager-metrics.
+      - ${HOST_METRICS_LOGS:-./logs/metrics}:/code/logs/metrics
 #      - ./static:/code/static
 #      - ./media:/code/media
     environment:
@@ -33,6 +37,13 @@ services:
       - UWSGI_GID=${UWSGI_GID}
       - LOAD_FIXTURES=${LOAD_FIXTURES:-0}
       - MAKE_MIGRATIONS=${MAKE_MIGRATIONS:-0}
+    # Cap the json-file driver so DJANGO_LOG_LEVEL=DEBUG on a busy day cannot fill the host
+    # disk with container stdout. 50 MB ceiling per container.
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "5"
     restart: unless-stopped
 
   database:

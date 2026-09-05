@@ -7,6 +7,7 @@ from rest_framework.exceptions import APIException, MethodNotAllowed
 from artifactmgr.apps.apiuser.models import ApiUser, TaskTimeoutTracker
 from artifactmgr.apps.artifacts.api.author_serializers import AuthorSerializer
 from artifactmgr.apps.artifacts.models import ArtifactAuthor
+from artifactmgr.utils.api_logger import consoleLogger
 from artifactmgr.utils.core_api import PERSON_FOUND, PERSON_LOOKUP_FAILED, lookup_fabric_person
 from artifactmgr.utils.fabric_auth import is_valid_uuid
 
@@ -115,5 +116,5 @@ def create_author_from_uuid(request, api_user: ApiUser, author_uuid: str) -> Art
     except CoreApiUnavailable:
         raise
     except Exception as exc:
-        print(exc)
+        consoleLogger.exception('author_viewsets: could not create or refresh author %s', author_uuid)
         return None

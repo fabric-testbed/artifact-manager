@@ -18,6 +18,7 @@ from artifactmgr.apps.artifacts.api.artifact_serializers import ArtifactCreateSe
 from artifactmgr.apps.artifacts.api.author_viewsets import create_author_from_uuid
 from artifactmgr.apps.artifacts.api.validators import validate_artifact_create, validate_artifact_update
 from artifactmgr.apps.artifacts.models import Artifact, ArtifactAuthor, ArtifactViews
+from artifactmgr.utils.api_logger import ARTIFACT, consoleLogger, metrics_event, usr
 from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
 from artifactmgr.utils.fabric_auth import get_api_user
 
@@ -96,7 +97,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                             response_artifacts.data['results'][i]['project_name'] = None
                             response_artifacts.data['results'][i]['project_uuid'] = None
         except Exception as exc:
-            print(exc)
+            consoleLogger.exception('artifact list: unable to redact hidden fields for usr:%s', api_user.uuid)
         return response_artifacts
 
     def list(self, request, *args, **kwargs):
@@ -188,6 +189,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                 for tag in tags:
                     artifact.tags.add(tag)
                 artifact.save()
+                metrics_event(ARTIFACT, artifact.uuid, 'create', by=api_user.uuid)
                 # TODO: check for attached version
                 # return new artifact
                 return Response(data=ArtifactSerializer(instance=artifact).data, status=201)
@@ -213,7 +215,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                 artifact.save()
         except Exception as exc:
             artifact = None
-            print(exc)
+            consoleLogger.exception('artifact retrieve: unable to record a view of art:%s', self.kwargs.get('uuid'))
         response_artifact = super().retrieve(request, *args, **kwargs)
         show_authors = response_artifact.data.get('show_authors')
         show_project = response_artifact.data.get('show_project')
@@ -240,10 +242,18 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                 request_data = request.data
                 # description_long
                 if request_data.get('description_long', None):
+                    description_long_orig = artifact.description_long
                     artifact.description_long = request_data.get('description_long', None)
+                    if artifact.description_long != description_long_orig:
+                        metrics_event(ARTIFACT, artifact.uuid, 'modify', 'description_long',
+                                      artifact.description_long, by=api_user.uuid)
                 # description_short
                 if request_data.get('description_short', None):
+                    description_short_orig = artifact.description_short
                     artifact.description_short = request_data.get('description_short', '')
+                    if artifact.description_short != description_short_orig:
+                        metrics_event(ARTIFACT, artifact.uuid, 'modify', 'description_short',
+                                      artifact.description_short, by=api_user.uuid)
                 # modified
                 artifact.modified = now
                 modified_by = create_author_from_uuid(request=request, api_user=api_user, author_uuid=api_user.uuid)
@@ -264,26 +274,46 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                             fab_project = query_core_api_by_token(
                                 query='/projects/{0}'.format(project_uuid),
                                 token=request.headers.get('authorization', 'Bearer ').replace('Bearer ', ''))
+                        project_uuid_orig = artifact.project_uuid
                         artifact.project_name = fab_project.get('results')[0].get('name', None)
                         artifact.project_uuid = project_uuid
+                        if artifact.project_uuid != project_uuid_orig:
+                            metrics_event(ARTIFACT, artifact.uuid, 'modify', 'project_uuid',
+                                          artifact.project_uuid, by=api_user.uuid)
                 # show_authors
+                show_authors_orig = artifact.show_authors
                 show_authors = str(request_data.get('show_authors', None))
                 if show_authors.casefold() == 'false':
                     artifact.show_authors = False
                 else:
                     artifact.show_authors = True
+                if artifact.show_authors != show_authors_orig:
+                    metrics_event(ARTIFACT, artifact.uuid, 'modify', 'show_authors', artifact.show_authors,
+                                  by=api_user.uuid)
                 # show_project
+                show_project_orig = artifact.show_project
                 show_project = str(request_data.get('show_project', None))
                 if show_project.casefold() == 'false':
                     artifact.show_project = False
                 else:
                     artifact.show_project = True
+                if artifact.show_project != show_project_orig:
+                    metrics_event(ARTIFACT, artifact.uuid, 'modify', 'show_project', artifact.show_project,
+                                  by=api_user.uuid)
                 # title
                 if request_data.get('title', ''):
+                    title_orig = artifact.title
                     artifact.title = request_data.get('title', '')
+                    if artifact.title != title_orig:
+                        metrics_event(ARTIFACT, artifact.uuid, 'modify', 'title', artifact.title,
+                                      by=api_user.uuid)
                 # visibility
                 if request_data.get('visibility', None):
+                    visibility_orig = artifact.visibility
                     artifact.visibility = request_data.get('visibility', None)
+                    if artifact.visibility != visibility_orig:
+                        metrics_event(ARTIFACT, artifact.uuid, 'modify', 'visibility', artifact.visibility,
+                                      by=api_user.uuid)
                 # authors
                 if request_data.get('authors', None):
                     authors = request_data.get('authors', None)
@@ -295,10 +325,14 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                         author = create_author_from_uuid(request=request, api_user=api_user, author_uuid=author_uuid)
                         if author:
                             artifact.authors.add(author)
+                            metrics_event(ARTIFACT, artifact.uuid, 'modify-add', 'author', usr(author.uuid),
+                                          by=api_user.uuid)
                     for author_uuid in authors_removed:
                         author = ArtifactAuthor.objects.filter(uuid=author_uuid).first()
                         if author:
                             artifact.authors.remove(author)
+                            metrics_event(ARTIFACT, artifact.uuid, 'modify-remove', 'author', usr(author.uuid),
+                                          by=api_user.uuid)
                 # tags
                 tags = request_data.get('tags', [])
                 tags_orig = [t.tag for t in artifact.tags.all()]
@@ -310,8 +344,10 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                 tags_removed = list(set(tags_orig).difference(set(tags)))
                 for tag in tags_added:
                     artifact.tags.add(tag)
+                    metrics_event(ARTIFACT, artifact.uuid, 'modify-add', 'tag', tag, by=api_user.uuid)
                 for tag in tags_removed:
                     artifact.tags.remove(tag)
+                    metrics_event(ARTIFACT, artifact.uuid, 'modify-remove', 'tag', tag, by=api_user.uuid)
                 # save artifact
                 artifact.save()
                 # return updated artifact
@@ -343,6 +379,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         api_user = get_api_user(request=request)
         if api_user.uuid == artifact.created_by.uuid:
             artifact.delete()
+            metrics_event(ARTIFACT, artifact_uuid, 'delete', by=api_user.uuid)
             return Response(status=204)
         else:
             raise PermissionDenied(

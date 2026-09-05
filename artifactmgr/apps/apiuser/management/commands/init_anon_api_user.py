@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from django.core.management.base import BaseCommand, CommandError
 
 from artifactmgr.apps.apiuser.models import ApiUser
+from artifactmgr.utils.api_logger import consoleLogger
 
 
 def init_anon_api_user():
@@ -32,7 +33,7 @@ def init_anon_api_user():
             # Anonymous API User already exists
             pass
     except Exception as exc:
-        print(exc)
+        consoleLogger.exception('init_anon_api_user: could not initialize the anonymous API user')
 
 
 class Command(BaseCommand):
@@ -43,5 +44,5 @@ class Command(BaseCommand):
             init_anon_api_user()
 
         except Exception as e:
-            print(e)
+            consoleLogger.exception('init_anon_api_user: initialization failed')
             raise CommandError('Initialization failed.')

@@ -8,6 +8,7 @@ A platform for sharing and reproducing FABRIC research artifacts. Built with Dja
 
 - [Configuration](#config)
 - [Deploy](#deploy)
+- [Logging](#logging)
 - [Web UI](#web-ui)
 - [REST API](#rest-api)
 - [Backup and Restore](#backup-restore)
@@ -49,6 +50,7 @@ single environment — set these instead:
 | `HOST_ARTIFACT_STORAGE` | Host directory holding artifact bundles. |
 | `HOST_ARTIFACT_BACKUPS` | Host directory holding database backups. |
 | `HOST_DB_DATA` | Host directory backing the PostgreSQL data volume. |
+| `HOST_METRICS_LOGS` | Host directory holding the metrics log — see [Logging](#logging). |
 | `NGINX_HTTP_PORT` / `NGINX_HTTPS_PORT` | Host ports published by the Nginx container. |
 | `NGINX_SSL_CERTS_DIR` | Host directory mounted read-only at `/etc/ssl`. |
 | `AMGR_SSL_CERT` / `AMGR_SSL_CERT_KEY` | Certificate filenames within that directory. |
@@ -99,6 +101,69 @@ strategies, selected by `USE_X_ACCEL_REDIRECT`:
 Permission checks are identical either way: the Nginx location is marked `internal`, so it
 cannot be requested directly and every download still passes through
 `validate_contents_download()`.
+
+## <a name="logging"></a>Logging
+
+Two loggers, configured by the `LOGGING` dictConfig in `artifactmgr/server/settings.py`:
+
+- **`consoleLogger`** — operational output to stdout, where `docker compose logs django` picks
+  it up. Django's own records share this stream, so `django.request` 4xx warnings and 5xx
+  tracebacks are visible in production rather than swallowed.
+- **`metricsLogger`** — the audit event stream. It writes to its own file and never propagates
+  into stdout, so the event record stays clean enough to grep and parse.
+
+All timestamps are UTC, in both streams, regardless of the host timezone.
+
+Levels are set per logger in `.env`, each variable gating exactly one logger:
+
+| Variable | Purpose |
+| --- | --- |
+| `DJANGO_LOG_LEVEL` | Django's own loggers. Ships as `INFO`; `DEBUG` is very chatty. |
+| `ROOT_LOG_LEVEL` | Everything not covered by a more specific logger, third-party libraries included. |
+| `DJANGO_DB_LOG_LEVEL` | Pinned separately so `DJANGO_LOG_LEVEL=DEBUG` cannot also switch on per-query SQL logging. |
+| `CONSOLE_LOG_LEVEL` | First-party operational output — `consoleLogger` and the `artifactmgr` package logger. |
+| `METRICS_LOG_LEVEL` | The metrics event stream. |
+| `METRICS_LOG_FILE` | Path to the metrics log. A relative path resolves against the project root, `/code` under Docker. |
+| `METRICS_LOG_MAX_BYTES` | `0` (default) uses `WatchedFileHandler` with external rotation. See the warning below. |
+| `METRICS_LOG_BACKUP_COUNT` | Backup generations kept when `METRICS_LOG_MAX_BYTES > 0`. |
+
+### The metrics log directory must exist before start
+
+`METRICS_LOG_FILE` defaults to `./logs/metrics/metrics.log`, and under Docker the containing
+directory is the bind mount named by `HOST_METRICS_LOGS` (default `./logs/metrics`, which works
+out of the box for local development; point it at durable storage in production).
+
+The handler opens the file at process startup rather than at first write. That is deliberate —
+a bad path fails loudly at boot instead of silently discarding every audit record — but it means
+**the directory must already exist and be writable by the uWSGI worker uid, or Django will not
+start.** Under Docker, `docker-entrypoint.sh` creates it and chowns it to
+`UWSGI_UID`/`UWSGI_GID` while still running as root; the chown is a warning rather than a fatal
+error, because it is a no-op on Docker Desktop's virtiofs and on NFS mounts. For a deployment
+whose `HOST_METRICS_LOGS` lives outside the checkout, pre-create the host directory and chown it
+to the same uid before the first `docker compose up`.
+
+### Rotation
+
+Rotation is external. Install the supplied logrotate fragment, editing the path and the
+`create` uid/gid to match this deployment's `.env`:
+
+```bash
+sudo cp logrotate/artifact-manager-metrics /etc/logrotate.d/artifact-manager-metrics
+sudo logrotate -d /etc/logrotate.d/artifact-manager-metrics   # dry run, verify the paths
+```
+
+No signal or restart is needed afterwards: `WatchedFileHandler` notices the inode change and
+reopens the file on its own. The fragment deliberately does not use `copytruncate`, which would
+keep the inode and lose every record written between the copy and the truncate.
+
+Setting `METRICS_LOG_MAX_BYTES` above `0` switches to an in-process `RotatingFileHandler`
+instead. That is **local development only, and only for a single process**: `artifactmgr.ini`
+runs four uWSGI workers with no `lazy-apps`, so all four inherit one file description, all four
+see the same offset, and they stampede the rollover — destroying backup generations and losing
+exactly the records an audit is later asked to produce.
+
+Container stdout is capped by the compose `logging:` block on the `django` service (10 MB per
+file, 5 files) so that raising `DJANGO_LOG_LEVEL` to `DEBUG` cannot fill the host disk.
 
 ## <a name="web-ui"></a>Web UI
 

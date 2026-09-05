@@ -17,6 +17,7 @@ from artifactmgr.apps.artifacts.api.version_viewsets import ArtifactVersionViewS
 from artifactmgr.apps.artifacts.forms import ArtifactForm
 from artifactmgr.apps.artifacts.models import Artifact
 from artifactmgr.server.settings import API_DEBUG, REST_FRAMEWORK
+from artifactmgr.utils.api_logger import consoleLogger
 from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
 from artifactmgr.utils.fabric_auth import get_api_user
 
@@ -215,8 +216,8 @@ def artifact_detail(request, *args, **kwargs):
                 return redirect('artifact_detail', uuid=kwargs.get('uuid'))
 
         except Exception as exc:
-            message = exc
-            print(message)
+            consoleLogger.exception('artifact_detail: POST action %r failed for artifact %s',
+                                    request.POST.get('artifact_detail_button', None), kwargs.get('uuid'))
             return redirect('artifact_detail', uuid=kwargs.get('uuid'))
     # get artifact detail page when not method: POST
     try:
@@ -474,7 +475,10 @@ def list_object_paginator(request, object_type: str, *args, **kwargs):
                 try:
                     prev_page = prev_dict['page'][0]
                 except Exception as exc:
-                    print(exc)
+                    # Routine, not a fault: DRF omits ?page= from the previous link when the
+                    # previous page is page 1, so this fires on every render of listing page 2.
+                    consoleLogger.debug('list_object_paginator: no page number in the previous link'
+                                        ' %s; using page 1', prev_url)
                     prev_page = 1
             next_url = list_objects.get('next', None)
             if next_url:
@@ -482,7 +486,8 @@ def list_object_paginator(request, object_type: str, *args, **kwargs):
                 try:
                     next_page = next_dict['page'][0]
                 except Exception as exc:
-                    print(exc)
+                    consoleLogger.exception('list_object_paginator: could not parse a page number from'
+                                            ' the next link %s; using page 1', next_url)
                     next_page = 1
             count = int(list_objects.get('count'))
             min_range = int(current_page - 1) * int(REST_FRAMEWORK['PAGE_SIZE']) + 1

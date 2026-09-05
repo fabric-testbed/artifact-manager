@@ -13,6 +13,7 @@ from rest_framework.exceptions import NotFound
 
 from artifactmgr.apps.apiuser.models import ApiUser
 from artifactmgr.apps.artifacts.models import Artifact, ArtifactAuthor, ArtifactVersion
+from artifactmgr.utils.api_logger import consoleLogger
 
 """
 Artifact Version object
@@ -50,7 +51,7 @@ def download_contents_by_urn(urn: str) -> HttpResponse:
         # A missing or unresolvable artifact is a 404, not a teapot.
         raise
     except Exception as exc:
-        print(exc)
+        consoleLogger.exception('artifact_version_storage: download failed for urn %s', urn)
         return HttpResponse(content="IAmATeapot: I am a teapot", status=418)
 
 
@@ -91,10 +92,10 @@ def create_fabric_artifact_contents(request, api_user: ApiUser) -> ArtifactVersi
         fabric_artifact.storage_type = storage_type
         fabric_artifact.uuid = version_uuid
         fabric_artifact.save()
-        print('saved to path: ', artifact_file_path)
+        consoleLogger.info('artifact_version_storage: saved version %s to %s', version_uuid, artifact_file_path)
         return fabric_artifact
     except Exception as exc:
-        print(exc)
+        consoleLogger.exception('artifact_version_storage: failed to create a FABRIC artifact version')
         return None
 
 

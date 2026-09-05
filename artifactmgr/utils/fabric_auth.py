@@ -10,6 +10,7 @@ import jwt
 import requests
 
 from artifactmgr.apps.apiuser.models import ApiUser, TaskTimeoutTracker
+from artifactmgr.utils.api_logger import consoleLogger
 
 
 def get_oidc_sub_from_cookie(cookie: str) -> str | None:
@@ -33,7 +34,7 @@ def get_oidc_sub_from_cookie(cookie: str) -> str | None:
         oidc_sub = vouch_json.get('CustomClaims').get('sub')
         return oidc_sub
     except Exception as exc:
-        print(exc)
+        consoleLogger.exception('fabric_auth: could not decode the Vouch cookie into an OIDC subject')
         return None
 
 
@@ -58,7 +59,7 @@ def get_oidc_sub_from_token(token: str) -> str | None:
         )
         oidc_sub = token_json.get('sub')
     except Exception as exc:
-        print(exc)
+        consoleLogger.exception('fabric_auth: could not decode the bearer token into an OIDC subject')
         oidc_sub = None
 
     s.close()
@@ -101,7 +102,7 @@ def auth_user_by_cookie(cookie: str) -> ApiUser:
         else:
             api_user = ApiUser.objects.filter(uuid=os.getenv('API_USER_ANON_UUID')).first()
     except Exception as exc:
-        print(exc)
+        consoleLogger.exception('fabric_auth: cookie authentication failed; falling back to the anonymous user')
         api_user = ApiUser.objects.filter(uuid=os.getenv('API_USER_ANON_UUID')).first()
     s.close()
     return api_user
@@ -143,7 +144,7 @@ def auth_user_by_token(token):
         else:
             api_user = ApiUser.objects.filter(uuid=os.getenv('API_USER_ANON_UUID')).first()
     except Exception as exc:
-        print(exc)
+        consoleLogger.exception('fabric_auth: token authentication failed; falling back to the anonymous user')
         api_user = ApiUser.objects.filter(uuid=os.getenv('API_USER_ANON_UUID')).first()
     s.close()
     return api_user
@@ -160,7 +161,8 @@ def is_token_revoked(token: str) -> bool:
         if token_hash.hexdigest() in revocation_list:
             return True
     except Exception as exc:
-        print(exc)
+        consoleLogger.exception(
+            'fabric_auth: token revocation check failed; failing CLOSED - treating the token as revoked')
         return True
     return False
 
@@ -181,7 +183,9 @@ def get_token_revocation_list() -> [str]:
             trl.last_updated = datetime.now(timezone.utc)
             trl.save()
     except Exception as exc:
-        print(exc)
+        consoleLogger.exception(
+            'fabric_auth: could not retrieve the token revocation list; failing OPEN with an empty list'
+            ' - revoked tokens will not be detected until this recovers')
         token_revocation_list = []
     s.close()
     return list(token_revocation_list)
@@ -228,7 +232,7 @@ def get_api_user(request) -> ApiUser:
                 api_user.access_expires = now + timedelta(minutes=int(os.getenv('API_USER_REFRESH_CHECK_MINUTES')))
                 api_user.save()
     except Exception as exc:
-        print(exc)
+        consoleLogger.exception('fabric_auth: get_api_user failed; falling back to the anonymous user')
         api_user = ApiUser.objects.filter(uuid=os.getenv('API_USER_ANON_UUID')).first()
     # return api user
     return api_user
