@@ -1,19 +1,27 @@
+"""Local storage and streaming downloads for uploaded and GitHub artifact versions."""
+
 import json
 import mimetypes
 import os
+import tempfile
+from contextlib import suppress
 from datetime import datetime, timezone
 from urllib.parse import quote
 from uuid import uuid4
 
 from django.conf import settings
+from django.core.files import File
 from django.core.files.storage import storages
+from django.db import transaction
 from django.http import FileResponse, HttpResponse
+from django.utils.dateparse import parse_datetime
 from django.utils.http import content_disposition_header
 from rest_framework.exceptions import NotFound
 
 from artifactmgr.apps.apiuser.models import ApiUser
 from artifactmgr.apps.artifacts.models import Artifact, ArtifactAuthor, ArtifactVersion
 from artifactmgr.utils.api_logger import consoleLogger
+from artifactmgr.utils import github_api
 
 """
 Artifact Version object
@@ -39,10 +47,8 @@ def download_contents_by_urn(urn: str) -> HttpResponse:
     """
     try:
         storage_type = urn.split(':')[1]
-        if storage_type in [ArtifactVersion.FABRIC]:
-            return download_fabric_artifact_contents(urn=urn)
-        elif storage_type in [ArtifactVersion.GIT]:
-            return download_git_artifact_contents(urn=urn)
+        if storage_type in [ArtifactVersion.FABRIC, ArtifactVersion.GIT]:
+            return download_local_artifact_contents(urn=urn)
         elif storage_type in [ArtifactVersion.ZENODO]:
             return download_zenodo_artifact_contents(urn=urn)
         else:
@@ -53,6 +59,20 @@ def download_contents_by_urn(urn: str) -> HttpResponse:
     except Exception as exc:
         consoleLogger.exception('artifact_version_storage: download failed for urn %s', urn)
         return HttpResponse(content="IAmATeapot: I am a teapot", status=418)
+
+
+
+def allocate_version_folder(storage, artifact, now=None) -> tuple[str, str]:
+    """Find the next YYYY-MM-DD[.n] folder using the existing upload allocation."""
+    now = now or datetime.now(timezone.utc)
+    storage_id = now.strftime('%Y-%m-%d')
+    storage_path = artifact.uuid + '/' + storage_id + '/'
+    ver = 1
+    while storage.exists(storage_path):
+        storage_id = now.strftime('%Y-%m-%d') + '.{0}'.format(str(ver))
+        storage_path = artifact.uuid + '/' + storage_id + '/'
+        ver += 1
+    return storage_id, storage_path
 
 
 def create_fabric_artifact_contents(request, api_user: ApiUser) -> ArtifactVersion | None:
@@ -73,13 +93,7 @@ def create_fabric_artifact_contents(request, api_user: ApiUser) -> ArtifactVersi
         now = datetime.now(timezone.utc)
         storage_type = request_data.get('storage_type', None)
         version_uuid = str(uuid4())
-        version_storage_id = now.strftime('%Y-%m-%d')
-        storage_path = artifact.uuid + '/' + version_storage_id + '/'
-        ver = 1
-        while storage.exists(storage_path):
-            version_storage_id = now.strftime('%Y-%m-%d') + '.{0}'.format(str(ver))
-            storage_path = artifact.uuid + '/' + version_storage_id + '/'
-            ver += 1
+        version_storage_id, storage_path = allocate_version_folder(storage, artifact, now)
         artifact_file_path = storage.save(storage_path + artifact_file.name, artifact_file)
         fabric_artifact = ArtifactVersion()
         fabric_artifact.active = True
@@ -123,7 +137,7 @@ def fabric_artifact_download_headers(version: ArtifactVersion) -> tuple[str, str
     return ENCODING_CONTENT_TYPES.get(encoding, content_type or 'application/octet-stream'), filename
 
 
-def download_fabric_artifact_contents(urn: str) -> HttpResponse:
+def download_local_artifact_contents(urn: str) -> HttpResponse:
     """
     Download FABRIC artifact from local storage.
 
@@ -169,20 +183,44 @@ def remove_fabric_artifact_contents() -> bool:
     return True
 
 
-def create_git_artifact_contents() -> ArtifactVersion | None:
-    """
-    Create Git artifact
-    """
-    git_artifact = ArtifactVersion()
-    return None
+def create_git_artifact_contents(artifact, link, release, commit, created_by, trigger) -> ArtifactVersion:
+    """Copy a source archive to local storage and insert its provenance atomically.
 
-
-def download_git_artifact_contents(urn: str) -> HttpResponse:
+    The caller holds the import locks. On failure, clean up this attempt's saved
+    file and folder without masking the original error (including an idempotency race).
     """
-    Download Git artifact
-    """
-    response = HttpResponse()
-    return response
+    storage = storages['fabric_artifact_storage']
+    os.makedirs(storage.location, exist_ok=True)
+    saved_name = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=storage.location, prefix='.github-') as temporary:
+            github_api.download_tarball(link.repo_full_name, commit, temporary)
+            temporary.flush()
+            temporary.seek(0)
+            storage_id, folder = allocate_version_folder(storage, artifact)
+            filename = '%s-%s.tar.gz' % (link.repo_full_name.split('/')[1], release['tag_name'].replace('/', '-'))
+            saved_name = storage.save(folder + filename, File(temporary))
+        published_at = release.get('published_at')
+        with transaction.atomic():
+            version = ArtifactVersion.objects.create(
+                artifact=artifact, created_by=created_by, uuid=str(uuid4()),
+                filename=os.path.basename(saved_name), storage_id=storage_id,
+                storage_type=ArtifactVersion.GIT, storage_repo='github',
+                source_repo=link.repo_full_name, source_repo_id=link.repo_id,
+                source_tag=release['tag_name'], source_commit=commit,
+                source_url=release['html_url'], source_release_name=release.get('name'),
+                source_published_at=parse_datetime(published_at) if published_at else None,
+                source_trigger=trigger, source_prerelease=release.get('prerelease', False),
+            )
+        consoleLogger.info('artifact_version_storage: saved git version %s to %s', version.uuid, saved_name)
+        return version
+    except Exception:
+        if saved_name:
+            with suppress(Exception):
+                storage.delete(saved_name)
+            with suppress(OSError):
+                os.rmdir(storage.path(folder))
+        raise
 
 
 def remove_git_artifact_contents() -> bool:

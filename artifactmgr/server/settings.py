@@ -165,6 +165,14 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
     'COMPONENT_SPLIT_REQUEST': True,
+    'APPEND_COMPONENTS': {
+        'securitySchemes': {
+            'GitHubActionsOIDC': {
+                'type': 'http', 'scheme': 'bearer', 'bearerFormat': 'JWT',
+                'description': 'GitHub Actions OIDC token issued for GITHUB_OIDC_AUDIENCE.',
+            },
+        },
+    },
 }
 
 ROOT_URLCONF = 'artifactmgr.server.urls'
@@ -400,6 +408,12 @@ STORAGES = {
 #        bundled Nginx with the same artifact storage directory mounted.
 USE_X_ACCEL_REDIRECT = os.getenv('USE_X_ACCEL_REDIRECT', 'false').casefold() == 'true'
 X_ACCEL_LOCATION = os.getenv('X_ACCEL_LOCATION', '/protected_artifacts/')
+
+# GitHub release imports. An unset audience disables Actions trusted publishing.
+GITHUB_OIDC_AUDIENCE = os.getenv('GITHUB_OIDC_AUDIENCE', '')
+GITHUB_IMPORT_MAX_BYTES = int(os.getenv('GITHUB_IMPORT_MAX_BYTES', '78643200'))
+GITHUB_IMPORTS_PER_DAY = int(os.getenv('GITHUB_IMPORTS_PER_DAY', '10'))
+GITHUB_API_TOKEN = os.getenv('GITHUB_API_TOKEN', '')
 
 # Login / Logout settings
 LOGIN_URL = '/login'

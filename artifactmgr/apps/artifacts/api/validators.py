@@ -1,6 +1,8 @@
 import json
 import os
 
+from rest_framework.exceptions import ValidationError
+
 from artifactmgr.apps.apiuser.models import ApiUser
 from artifactmgr.apps.artifacts.models import Artifact, ArtifactAuthor, ArtifactTag, ArtifactVersion
 from artifactmgr.utils.core_api import (
@@ -11,6 +13,7 @@ from artifactmgr.utils.core_api import (
     query_core_api_by_token,
 )
 from artifactmgr.utils.fabric_auth import is_valid_uuid
+from artifactmgr.utils.github_api import GitHubError, validate_repository, validate_tag
 
 # valid filename extensions for artifact contents (.tgz, .tar.gz); matched case-insensitively.
 # Checked by extension rather than mimetypes.guess_type(), whose result depends on the host's
@@ -103,8 +106,7 @@ def validate_artifact_version_create(request, api_user: ApiUser) -> tuple:
                     message.append(
                         {'data.storage_repo': 'invalid storage_repo for storage_type: \'{0}\''.format(storage_type)})
             elif storage_type == ArtifactVersion.GIT and storage_repo:
-                # TODO: update once Git support is available
-                message.append({'data.storage_repo': 'Git is not supported at this time'})
+                message.append({'data.storage_type': 'Import GitHub releases via POST /api/artifacts/{uuid}/repo/import'})
                 if storage_repo not in ['github']:
                     message.append(
                         {'data.storage_repo': 'invalid storage_repo for storage_type: \'{0}\''.format(storage_type)})
@@ -323,3 +325,19 @@ def validate_artifact_version_update(request) -> tuple:
         return False, message
     else:
         return True, None
+
+
+def validate_github_repository(value):
+    """DRF field validator for the shared GitHub owner/repo allowlist."""
+    try:
+        return validate_repository(value)
+    except GitHubError as exc:
+        raise ValidationError(str(exc)) from exc
+
+
+def validate_github_tag(value):
+    """DRF field validator for tags, including tags containing slashes."""
+    try:
+        return validate_tag(value)
+    except GitHubError as exc:
+        raise ValidationError(str(exc)) from exc

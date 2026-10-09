@@ -11,6 +11,7 @@ A platform for sharing and reproducing FABRIC research artifacts. Built with Dja
 - [Logging](#logging)
 - [Web UI](#web-ui)
 - [REST API](#rest-api)
+- [Publishing releases from GitHub](#publishing-releases-from-github)
 - [Backup and Restore](#backup-restore)
 - [References](#references)
 
@@ -57,6 +58,10 @@ single environment — set these instead:
 | `AMGR_HTTPS_PORT` | Public HTTPS port used in redirects and `server_name`. |
 | `AMGR_CLIENT_MAX_BODY_SIZE` | Largest artifact bundle accepted on upload. |
 | `USE_X_ACCEL_REDIRECT` | Delegate artifact downloads to Nginx — see [Artifact downloads](#downloads). |
+| `GITHUB_OIDC_AUDIENCE` | Public site URL expected in GitHub Actions tokens; empty disables Actions publishing. |
+| `GITHUB_IMPORT_MAX_BYTES` | Maximum compressed source archive size; default `78643200` (75 MiB). |
+| `GITHUB_IMPORTS_PER_DAY` | New GitHub versions allowed per artifact per UTC day; default `10`. |
+| `GITHUB_API_TOKEN` | Optional server-side GitHub API token; recommended to increase the rate limit. |
 
 `nginx/default.conf.template` is rendered at container start by the official Nginx image's
 envsubst entrypoint. Only `${AMGR_*}` placeholders are substituted, so Nginx's own runtime
@@ -204,6 +209,12 @@ Interactive API documentation is available at:
 | `PUT /api/artifacts/{uuid}` | | Update a specific artifact |
 | `PATCH /api/artifacts/{uuid}` | | Partially update a specific artifact |
 | `DELETE /api/artifacts/{uuid}` | | Delete a specific artifact |
+| `GET /api/artifacts/{uuid}/repo` | | Show the linked repository, subject to artifact visibility and author redaction |
+| `PUT /api/artifacts/{uuid}/repo` | | Author: link or re-confirm with JSON `{"repository": "owner/repo"}` |
+| `DELETE /api/artifacts/{uuid}/repo` | | Author: unlink; existing versions are retained |
+| `GET /api/artifacts/{uuid}/repo/releases` | | Author: list published releases from up to 500 GitHub releases, marked when imported |
+| `POST /api/artifacts/{uuid}/repo/import` | | Author: import with JSON `{"tag": "v1.0"}` and FABRIC authentication |
+| `POST /api/artifacts/{uuid}/repo/publish` | | GitHub Actions: import with JSON `{"tag": "v1.0"}` and an OIDC bearer token |
 | `GET /api/artifacts/by-author/{uuid}` | `search`, `page` | List artifacts by a specific author with search by title, tag, or project name |
 | `GET /api/artifacts/by-project/{uuid}` | `search`, `page` | List artifacts for a specific project with search by title, tag, or project name |
 
@@ -218,7 +229,98 @@ Interactive API documentation is available at:
 | `GET /api/contents/download/{urn}` | Download an artifact version by URN |
 | `GET /api/meta/tags` | List all artifact tags |
 
-All list endpoints support paginated results and enforce visibility-based authorization.
+List endpoints enforce visibility-based authorization. The GitHub release list returns one
+bounded list; other list endpoints support pagination. Repository write actions accept JSON,
+with `Content-Type: application/json`; the existing contents upload endpoint still accepts only
+uploaded `fabric` bundles.
+
+Version responses include `storage_type` and `source`. For a GitHub version, `version` is its tag
+and `source` records the repository, tag, full commit, release URL/name/date, trigger and pre-release
+flag; uploaded versions have `source: null`. When authors are hidden, non-authors receive
+`repository: null`, `source: null`, and a date-based version label in both artifact and
+`/api/contents` responses.
+
+## Publishing releases from GitHub
+
+An artifact author can link a public GitHub repository from the artifact detail page. Enter
+`owner/repo` or `https://github.com/owner/repo`, then choose **Link repository**. Anyone with write
+access to that repository can then publish versions of this artifact through GitHub Actions.
+Choose **Show releases** and **Import** to copy a published release manually; the equivalent API
+call is `POST /api/artifacts/{uuid}/repo/import` with `{"tag": "v1.0"}` and the author's FABRIC token.
+
+The source tarball is copied into FABRIC storage at the resolved commit. GitHub and uploaded
+versions can coexist, and downloads follow the artifact's visibility even after the repository
+is unlinked. Each GitHub version shows its tag, commit, release link and pre-release badge.
+Hiding authors also hides the repository and GitHub provenance from non-authors.
+
+### Automatic publishing
+
+On the artifact page, expand **Publish automatically with GitHub Actions** and copy the workflow
+into `.github/workflows/publish-artifact.yml` in the linked repository. The page fills in the site
+URL and artifact UUID; for the example below, replace both values. The site administrator must
+set `GITHUB_OIDC_AUDIENCE` to that exact public site URL to enable Actions publishing.
+
+```yaml
+name: Publish release to FABRIC Artifact Manager
+on:
+  release:
+    types: [published]
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish ${{ github.event.release.tag_name }}
+        env:
+          AMGR_URL: "https://artifacts.example.org"
+          ARTIFACT_UUID: "replace-with-artifact-uuid"
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          OIDC_TOKEN=$(curl -sSf --get --data-urlencode "audience=$AMGR_URL" \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r .value)
+          curl -sSf --retry 3 --retry-all-errors -X POST \
+            "${AMGR_URL%/}/api/artifacts/$ARTIFACT_UUID/repo/publish" \
+            -H "Authorization: Bearer $OIDC_TOKEN" -H 'Content-Type: application/json' \
+            --data "$(jq -cn --arg tag "$TAG" '{tag: $tag}')"
+```
+
+GitHub supplies a short-lived OIDC token for each run, so no stored Artifact Manager secret is
+needed. The audience request is URL-encoded; a trailing slash in the configured audience is
+preserved for token verification and removed only when constructing the publish endpoint URL.
+
+### Trust model
+
+The publish endpoint verifies an RS256 signature from `https://token.actions.githubusercontent.com`,
+token expiry and the exact configured audience, and requires the linked public repository and
+owner IDs to match the token. Imports are attributed to the author who confirmed the link and
+require that person to remain an author; `pull_request` and `pull_request_target` events are
+refused, while other events (including `release` and `workflow_dispatch`) are allowed.
+
+If the confirming author is removed, the repository card shows **Publishing paused** until a
+current author chooses **Re-confirm**. A repository transfer also needs author re-confirmation.
+**Unlink** stops future publishing and preserves previously imported versions.
+
+### Limits
+
+- Only public repositories on GitHub.com are supported. GitHub Enterprise OIDC issuers are
+  unsupported. Only published releases, including pre-releases, can be imported; drafts, bare
+  tags and attached release assets are not imported.
+- Source archives are limited to 75 MiB (`78643200` bytes) by default, configurable through
+  `GITHUB_IMPORT_MAX_BYTES`. Downloads have a 50-second budget shared with metadata requests;
+  stalled reads time out after at most 15 seconds.
+- The default cap is 10 new imports per artifact per UTC day (`GITHUB_IMPORTS_PER_DAY`), shared
+  by web, API and Actions publishing. Re-importing the same repository ID and tag returns the
+  existing version (HTTP 200; a new version returns 201), even when the cap has been reached.
+- Release listing reads at most five pages of 100 GitHub releases. Older tags can still be
+  imported by name through the API. Two imports can run concurrently across the site; busy,
+  rate-limited or timed-out requests can be retried. `GITHUB_API_TOKEN` is recommended for
+  production to raise GitHub's API rate limit.
+- There is no `jti` replay tracking. A captured token remains valid for its few minutes, including
+  the verification leeway, and can only import already-published tags of the linked repository.
 
 ## <a name="backup-restore"></a>Backup and Restore
 

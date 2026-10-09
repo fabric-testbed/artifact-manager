@@ -58,7 +58,7 @@
                         <input type="hidden" name="artifact_uuid" value="{{ artifact.uuid }}">
                         <button class="btn btn-danger btn-fabric" type="submit"
                                 name="artifact_detail_button" value="delete_artifact"
-                                onclick="return confirm('Delete Artifact: {{ artifact.title }}?')"
+                                onclick="return confirm('Delete Artifact: {{ artifact.title|escapejs }}?')"
                                 title="Permanently delete this artifact and all versions"
                                 data-bs-toggle="tooltip" data-bs-placement="bottom">
                             Delete
@@ -118,11 +118,114 @@
             {% endif %}
         </div>
 
+        {% if artifact.repository %}
+            <div class="form-card mt-3" id="repository-card">
+                <div class="page-header">
+                    <h4><i class="fa-brands fa-github" aria-hidden="true"></i> Repository</h4>
+                </div>
+                <p><a href="{{ artifact.repository.html_url }}">{{ artifact.repository.repo_full_name }}</a></p>
+                {% if is_author %}
+                    {% if not artifact.repository.publishing_enabled %}
+                        <div class="alert alert-warning" role="alert">
+                            <strong>Publishing paused.</strong> A current author must re-confirm this repository
+                            before GitHub Actions can publish versions.
+                            <form method="POST" class="mt-2">
+                                {% csrf_token %}
+                                <button class="btn btn-primary btn-sm" type="submit"
+                                        name="artifact_detail_button" value="reconfirm_repo">Re-confirm</button>
+                            </form>
+                        </div>
+                    {% endif %}
+                    {% if not artifact.show_authors %}
+                        <p class="text-secondary">The repository is only shown to authors.</p>
+                    {% endif %}
+                    <form method="POST" class="mb-3">
+                        {% csrf_token %}
+                        <button class="btn btn-danger btn-sm" type="submit"
+                                name="artifact_detail_button" value="unlink_repo"
+                                onclick="return confirm('Unlink repository {{ artifact.repository.repo_full_name|escapejs }}? Existing versions will be kept.')">
+                            Unlink
+                        </button>
+                    </form>
+                    <div class="page-header">
+                        <h5>GitHub releases</h5>
+                    </div>
+                    <p><a href="{% url 'artifact_detail' uuid=artifact.uuid %}?releases=1">Show releases</a></p>
+                    {% if releases is not None %}
+                        <p class="text-secondary">Showing published releases from up to 500 GitHub releases.</p>
+                        <div class="table-responsive">
+                            <table class="soft-table">
+                                <thead>
+                                    <tr><th>Tag</th><th>Name</th><th>Published</th><th>Actions</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for release in releases %}
+                                        <tr>
+                                            <td>
+                                                <a href="{{ release.html_url }}">{{ release.tag_name }}</a>
+                                                {% if release.prerelease %}<span class="badge text-bg-warning">pre-release</span>{% endif %}
+                                            </td>
+                                            <td>{{ release.name|default_if_none:'' }}</td>
+                                            <td>{{ release.published_at|normalize_date_to_utc }}</td>
+                                            <td>
+                                                {% if release.imported %}
+                                                    <span class="text-secondary">imported</span>
+                                                {% else %}
+                                                    <form method="POST">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="tag" value="{{ release.tag_name }}">
+                                                        <button class="btn btn-primary btn-sm" type="submit"
+                                                                name="artifact_detail_button" value="import_release"
+                                                                onclick="return confirm('Import release {{ release.tag_name|escapejs }}?')">Import</button>
+                                                    </form>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr><td colspan="4">No published releases found.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                    <details class="mt-3">
+                        <summary>Publish automatically with GitHub Actions</summary>
+                        {% if workflow %}
+                            <p class="mt-2">Save this workflow as <code>.github/workflows/publish-artifact.yml</code>
+                                in the linked repository.</p>
+                            <pre class="p-3 border rounded"><code id="github-workflow">{{ workflow }}</code></pre>
+                            <button class="btn btn-secondary btn-sm" type="button" id="copy-workflow">Copy workflow</button>
+                            <span id="copy-workflow-status" class="ms-2" role="status"></span>
+                        {% else %}
+                            <p class="mt-2">Actions publishing is not enabled on this site.</p>
+                        {% endif %}
+                    </details>
+                {% endif %}
+            </div>
+        {% elif is_author %}
+            <div class="form-card mt-3">
+                <div class="page-header">
+                    <h4><i class="fa-brands fa-github" aria-hidden="true"></i> Link a GitHub repository</h4>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <label for="repository" class="form-label">Public GitHub repository</label>
+                    <input id="repository" name="repository" type="text" class="form-control" required
+                           placeholder="owner/repo or https://github.com/owner/repo" aria-describedby="repository-help">
+                    <p id="repository-help" class="form-text">
+                        Anyone with write access to this repository will then be able to publish versions of this artifact.
+                    </p>
+                    <button class="btn btn-primary btn-sm btn-fabric" type="submit"
+                            name="artifact_detail_button" value="link_repo">Link repository</button>
+                </form>
+            </div>
+        {% endif %}
+
         {% if artifact.versions %}
             <div class="page-header">
                 <h4>Versions</h4>
             </div>
-            {% if artifact.number_of_versions == 0 %}
+            {% if artifact.number_of_versions == 0 and not is_author %}
                 <div class="empty-state">
                     <i class="fa-solid fa-box-open fa-2x"></i>
                     This artifact has no versions available for download.
@@ -143,11 +246,16 @@
                         {% if is_author %}
                             <tr>
                                 <td>
-                                    {% if version.active %}
-                                        {{ version.version }}
-                                    {% else %}
-                                        <s class="text-secondary">{{ version.version }}</s>
-                                    {% endif %}
+                                    <span {% if not version.active %}class="text-decoration-line-through text-secondary"{% endif %}>
+                                        {% if version.storage_type == 'git' and version.source %}
+                                            <i class="fa-brands fa-github" aria-hidden="true"></i>
+                                            <a href="{{ version.source.url }}">{{ version.version }}</a>
+                                            <small><a href="https://github.com/{{ version.source.repo }}/commit/{{ version.source.commit }}">{{ version.source.commit|slice:':7' }}</a></small>
+                                            {% if version.source.prerelease %}<span class="badge text-bg-warning">pre-release</span>{% endif %}
+                                        {% else %}
+                                            {{ version.version }}
+                                        {% endif %}
+                                    </span>
                                 </td>
                                 <td>
                                     {% if version.active %}
@@ -183,7 +291,7 @@
                                                 <input type="hidden" name="version_uuid" value="{{ version.uuid }}">
                                                 <button class="btn btn-danger btn-sm" type="submit"
                                                         name="artifact_detail_button" value="hide_version"
-                                                        onclick="return confirm('Disable/Hide version: {{ version.version }}?')"
+                                                        onclick="return confirm('Disable/Hide version: {{ version.version|escapejs }}?')"
                                                         title="Hide this version from non-author users"
                                                         data-bs-toggle="tooltip" data-bs-placement="top">
                                                     disable
@@ -204,7 +312,7 @@
                                                 <input type="hidden" name="version_uuid" value="{{ version.uuid }}">
                                                 <button class="btn btn-primary btn-sm" type="submit"
                                                         name="artifact_detail_button" value="show_version"
-                                                        onclick="return confirm('Enable/Show version: {{ version.version }}?')"
+                                                        onclick="return confirm('Enable/Show version: {{ version.version|escapejs }}?')"
                                                         title="Re-enable this version for download"
                                                         data-bs-toggle="tooltip" data-bs-placement="top">
                                                     enable
@@ -216,7 +324,16 @@
                             </tr>
                         {% elif version.active %}
                             <tr>
-                                <td>{{ version.version }}</td>
+                                <td>
+                                    {% if version.storage_type == 'git' and version.source %}
+                                        <i class="fa-brands fa-github" aria-hidden="true"></i>
+                                        <a href="{{ version.source.url }}">{{ version.version }}</a>
+                                        <small><a href="https://github.com/{{ version.source.repo }}/commit/{{ version.source.commit }}">{{ version.source.commit|slice:':7' }}</a></small>
+                                        {% if version.source.prerelease %}<span class="badge text-bg-warning">pre-release</span>{% endif %}
+                                    {% else %}
+                                        {{ version.version }}
+                                    {% endif %}
+                                </td>
                                 <td>{{ version.created|normalize_date_to_utc }}</td>
                                 <td>{{ version.urn }}</td>
                                 <td>
@@ -292,6 +409,19 @@
             </div>
         {% endif %}
     </div>
+    {% if workflow %}
+        <script>
+            document.getElementById('copy-workflow').addEventListener('click', async function () {
+                var status = document.getElementById('copy-workflow-status');
+                try {
+                    await navigator.clipboard.writeText(document.getElementById('github-workflow').textContent);
+                    status.textContent = 'Workflow copied.';
+                } catch (error) {
+                    status.textContent = 'Copy unavailable. Select and copy the workflow above.';
+                }
+            });
+        </script>
+    {% endif %}
     {% if debug %}
         <hr>
         <div class="debug-block">

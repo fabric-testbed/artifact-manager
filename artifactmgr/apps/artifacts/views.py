@@ -1,7 +1,8 @@
 import json
 import os
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, urlparse, urlsplit
 
+from django.conf import settings
 from django.db import models
 from django.db.models import Count, Q
 from django.http import QueryDict
@@ -12,6 +13,7 @@ from rest_framework import status
 from artifactmgr.apps.apiuser.models import ApiUser
 from artifactmgr.apps.artifacts.api.artifact_viewsets import ArtifactViewSet
 from artifactmgr.apps.artifacts.api.author_viewsets import AuthorViewSet
+from artifactmgr.apps.artifacts.api.context import request_api_user
 from artifactmgr.apps.artifacts.api.validators import validate_artifact_version_create
 from artifactmgr.apps.artifacts.api.version_viewsets import ArtifactVersionViewSet
 from artifactmgr.apps.artifacts.forms import ArtifactForm
@@ -20,6 +22,51 @@ from artifactmgr.server.settings import API_DEBUG, REST_FRAMEWORK
 from artifactmgr.utils.api_logger import consoleLogger
 from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
 from artifactmgr.utils.fabric_auth import get_api_user
+from artifactmgr.utils import github_api, repo_link
+
+
+GITHUB_PUBLISH_WORKFLOW = r'''name: Publish release to FABRIC Artifact Manager
+on:
+  release:
+    types: [published]
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish ${{ github.event.release.tag_name }}
+        env:
+          AMGR_URL: __AMGR_URL__
+          ARTIFACT_UUID: __ARTIFACT_UUID__
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          OIDC_TOKEN=$(curl -sSf --get --data-urlencode "audience=$AMGR_URL" \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r .value)
+          curl -sSf --retry 3 --retry-all-errors -X POST \
+            "${AMGR_URL%/}/api/artifacts/$ARTIFACT_UUID/repo/publish" \
+            -H "Authorization: Bearer $OIDC_TOKEN" -H 'Content-Type: application/json' \
+            --data "$(jq -cn --arg tag "$TAG" '{tag: $tag}')"
+'''
+
+
+def _github_repository_name(value):
+    repository = value.strip()
+    hosts = ('github.com', 'www.github.com')
+    try:
+        parsed = urlsplit(repository)
+        if not parsed.scheme and not parsed.netloc and repository.split('/')[0].lower() in hosts:
+            parsed = urlsplit('//' + repository)
+        if parsed.scheme or parsed.netloc:
+            if parsed.hostname not in hosts:
+                raise github_api.GitHubError('Repository URL must use github.com.', 400)
+            repository = '/'.join(parsed.path.strip('/').split('/')[:2])
+    except ValueError as exc:
+        raise github_api.GitHubError('Invalid repository URL.', 400) from exc
+    return github_api.validate_repository(repository.rstrip('/').removesuffix('.git'))
 
 
 class ListObjectType(models.TextChoices):
@@ -30,7 +77,7 @@ class ListObjectType(models.TextChoices):
 
 
 def artifact_list(request):
-    api_user = get_api_user(request=request)
+    api_user = request_api_user(request, get_api_user)
     try:
         artifacts = list_object_paginator(request=request, object_type=ListObjectType.ARTIFACTS)
         message = artifacts.get('message', None)
@@ -53,7 +100,7 @@ def artifact_list(request):
 
 
 def author_list(request):
-    api_user = get_api_user(request=request)
+    api_user = request_api_user(request, get_api_user)
     try:
         authors = list_object_paginator(request=request, object_type=ListObjectType.AUTHORS)
         message = authors.get('message', None)
@@ -91,7 +138,7 @@ def author_list(request):
 
 
 def author_detail(request, *args, **kwargs):
-    api_user = get_api_user(request=request)
+    api_user = request_api_user(request, get_api_user)
     message = None
     try:
         author = AuthorViewSet.as_view({'get': 'retrieve'})(request=request, *args, **kwargs)
@@ -126,15 +173,33 @@ def author_detail(request, *args, **kwargs):
 
 
 def artifact_detail(request, *args, **kwargs):
-    api_user = get_api_user(request=request)
-    message = kwargs.get('message', None)
+    api_user = request_api_user(request, get_api_user)
+    message = request.session.pop('artifact_detail_message', None) or kwargs.get('message', None)
+    releases = None
+    workflow = None
 
     if request.method == 'POST':
         try:
             artifact_detail_button = request.POST.get('artifact_detail_button', None)
+            if artifact_detail_button in ('link_repo', 'unlink_repo', 'reconfirm_repo', 'import_release'):
+                artifact_obj = get_object_or_404(Artifact, uuid=kwargs.get('uuid'))
+                if not artifact_obj.is_author(api_user.uuid):
+                    raise repo_link.RepoLinkError('Only an artifact author may perform this operation.', 403)
+                if artifact_detail_button == 'link_repo':
+                    repository = _github_repository_name(request.POST.get('repository', ''))
+                    repo_link.link_repo(artifact_obj, repository, api_user)
+                elif artifact_detail_button == 'unlink_repo':
+                    repo_link.unlink_repo(artifact_obj, api_user)
+                elif artifact_detail_button == 'reconfirm_repo':
+                    link = repo_link.get_link(artifact_obj)
+                    repo_link.link_repo(artifact_obj, link.repo_full_name, api_user)
+                else:
+                    repo_link.import_release(artifact_obj, request.POST.get('tag', ''), api_user, 'web')
+                return redirect('artifact_detail', uuid=kwargs.get('uuid'))
             v_api_request = request.POST.copy()
             v_api_request.COOKIES = request.COOKIES
             v_api_request.headers = request.headers
+            v_api_request._artifact_api_user = api_user
             v_api_request.data = QueryDict('', mutable=True)
             if artifact_detail_button == 'add_version':
                 v_api_request.method = 'POST'
@@ -215,9 +280,13 @@ def artifact_detail(request, *args, **kwargs):
             else:
                 return redirect('artifact_detail', uuid=kwargs.get('uuid'))
 
+        except (repo_link.RepoLinkError, github_api.GitHubError) as exc:
+            request.session['artifact_detail_message'] = str(exc)
+            return redirect('artifact_detail', uuid=kwargs.get('uuid'))
         except Exception as exc:
             consoleLogger.exception('artifact_detail: POST action %r failed for artifact %s',
                                     request.POST.get('artifact_detail_button', None), kwargs.get('uuid'))
+            request.session['artifact_detail_message'] = 'Unable to complete this operation; please retry.'
             return redirect('artifact_detail', uuid=kwargs.get('uuid'))
     # get artifact detail page when not method: POST
     try:
@@ -233,6 +302,16 @@ def artifact_detail(request, *args, **kwargs):
             is_author = False
         if not message:
             message = artifact.get('message', None)
+        if is_author and artifact.get('repository'):
+            if settings.GITHUB_OIDC_AUDIENCE:
+                workflow = GITHUB_PUBLISH_WORKFLOW.replace(
+                    '__AMGR_URL__', json.dumps(settings.GITHUB_OIDC_AUDIENCE)).replace(
+                    '__ARTIFACT_UUID__', json.dumps(artifact['uuid']))
+            if request.GET.get('releases') == '1':
+                try:
+                    releases = repo_link.list_releases(artifact_obj, api_user)
+                except (repo_link.RepoLinkError, github_api.GitHubError) as exc:
+                    message = str(exc)
     except Exception as exc:
         message = exc
         artifact = {}
@@ -244,12 +323,14 @@ def artifact_detail(request, *args, **kwargs):
                       'artifact': artifact,
                       'is_author': is_author,
                       'message': message,
+                      'releases': releases,
+                      'workflow': workflow,
                       'debug': API_DEBUG
                   })
 
 
 def project_list(request):
-    api_user = get_api_user(request=request)
+    api_user = request_api_user(request, get_api_user)
     message = None
     search = request.GET.get('search', None)
     if search and len(search) < 3:
@@ -264,7 +345,7 @@ def project_list(request):
             Q(authors__uuid__contains=api_user.uuid)
         ).distinct()
         # Exclude artifacts where show_project is False (unless user is an author),
-        # matching the redaction in ArtifactViewSet.list()
+        # matching the serializer's shared visibility check
         visible_with_project = visible_artifacts.filter(
             Q(show_project=True) | Q(authors__uuid__in=[api_user.uuid])
         ).distinct()
@@ -291,7 +372,7 @@ def project_list(request):
 
 
 def project_detail(request, *args, **kwargs):
-    api_user = get_api_user(request=request)
+    api_user = request_api_user(request, get_api_user)
     message = None
     project_uuid = kwargs.get('uuid')
     # Look up the project name from any artifact with this project_uuid
@@ -325,7 +406,7 @@ def project_detail(request, *args, **kwargs):
 
 
 def artifact_create(request):
-    api_user = get_api_user(request=request)
+    api_user = request_api_user(request, get_api_user)
     message = None
     search = None
     fabric_users = []
@@ -378,9 +459,12 @@ def artifact_create(request):
 
 
 def artifact_update(request, *args, **kwargs):
-    api_user = get_api_user(request=request)
+    api_user = request_api_user(request, get_api_user)
     artifact_title = None
     artifact_uuid = kwargs.get('uuid')
+    # Authorize every entry path before exposing metadata or processing a form.
+    # Use the same 404 for missing artifacts and artifacts this user cannot edit.
+    artifact = get_object_or_404(Artifact, uuid=artifact_uuid, authors__uuid=api_user.uuid)
     message = None
     search = None
     fabric_users = []
@@ -418,7 +502,6 @@ def artifact_update(request, *args, **kwargs):
         if not message and len(fabric_users) == 0:
             fabric_users = [{'name': 'No results found for search = "{0}"'.format(search)}]
     else:
-        artifact = get_object_or_404(Artifact, uuid=artifact_uuid)
         artifact_title = artifact.title
         form = ArtifactForm(instance=artifact, authors=[a.uuid for a in artifact.authors.all()] if artifact else [],
                             api_user=api_user)

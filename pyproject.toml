@@ -1,6 +1,6 @@
 [project]
 name = "artifact-manager"
-version = "1.11.1"
+version = "1.12.0"
 description = "FABRIC Artifact Manager — a Django platform for sharing and reproducing FABRIC research artifacts"
 requires-python = ">=3.13"
 dependencies = [
@@ -20,3 +20,14 @@ dependencies = [
     "urllib3>=2.8.0",  # transitive via requests; floor pins CVE fixes
     "uwsgi",
 ]
+
+[dependency-groups]
+test = [
+    "pytest",
+    "pytest-django",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+addopts = "--no-migrations"
+testpaths = ["tests"]

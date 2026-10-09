@@ -1,3 +1,5 @@
+"""Artifacts, authors, local versions and their optional GitHub provenance."""
+
 from django.db import models
 
 from artifactmgr.apps.apiuser.models import ApiUser
@@ -114,6 +116,23 @@ class Artifact(models.Model):
         return api_user_uuid in [a.uuid for a in self.authors.all()]
 
 
+class ArtifactRepoLink(models.Model):
+    """A public repository trusted to publish versions of an existing artifact."""
+
+    artifact = models.OneToOneField(Artifact, related_name='repo_link', on_delete=models.CASCADE)
+    provider = models.CharField(max_length=24, default='github')
+    repo_full_name = models.CharField(max_length=255, default='')
+    repo_id = models.CharField(max_length=255, default='')
+    repo_owner_id = models.CharField(max_length=255, default='')
+    html_url = models.URLField(max_length=2048, default='')
+    linked_by = models.ForeignKey(ArtifactAuthor, null=True, on_delete=models.SET_NULL)
+    linked_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def publishing_enabled(self) -> bool:
+        return bool(self.linked_by_id and self.artifact.authors.filter(uuid=self.linked_by_id).exists())
+
+
 class VersionDownloads(models.Model):
     """
     ArtifactDownloads
@@ -159,6 +178,18 @@ class ArtifactVersion(models.Model):
     )
     uuid = models.CharField(primary_key=True, max_length=255, blank=False, null=False)
     version_downloads = models.ManyToManyField(VersionDownloads, related_name="version_downloads")
+    source_repo = models.CharField(max_length=255, blank=True, null=True)
+    source_repo_id = models.CharField(max_length=255, blank=True, null=True)
+    source_tag = models.CharField(max_length=128, blank=True, null=True)
+    source_commit = models.CharField(max_length=40, blank=True, null=True)
+    source_url = models.URLField(max_length=2048, blank=True, null=True)
+    source_release_name = models.TextField(blank=True, null=True)
+    source_published_at = models.DateTimeField(blank=True, null=True)
+    source_trigger = models.CharField(
+        max_length=24, choices=(('action', 'Action'), ('web', 'Web'), ('api', 'API')),
+        blank=True, null=True,
+    )
+    source_prerelease = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.artifact.title} ({self.created})"
@@ -169,3 +200,10 @@ class ArtifactVersion(models.Model):
 
     class Meta:
         ordering = ('-created',)
+        constraints = [
+            models.UniqueConstraint(
+                fields=('artifact', 'source_repo_id', 'source_tag'),
+                condition=models.Q(source_repo_id__isnull=False, source_tag__isnull=False),
+                name='unique_artifact_github_release',
+            ),
+        ]

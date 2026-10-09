@@ -1,4 +1,10 @@
+"""Serializers for uploaded and GitHub-sourced artifact versions."""
+
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
+
+from artifactmgr.apps.artifacts.api.repo_serializers import GitHubSourceSerializer
+from artifactmgr.apps.artifacts.api.context import artifact_visibility
 
 from artifactmgr.apps.artifacts.models import ArtifactVersion
 
@@ -25,16 +31,34 @@ class ArtifactVersionSerializer(serializers.ModelSerializer):
     """
     version_downloads = serializers.SerializerMethodField(method_name='get_version_downloads')
     created = serializers.SerializerMethodField(method_name='get_created')
-    version = serializers.CharField(source='storage_id')
+    version = serializers.SerializerMethodField()
+    source = serializers.SerializerMethodField()
     lookup_field = 'urn'
 
     class Meta:
         model = ArtifactVersion
-        fields = ['active', 'created', 'urn', 'uuid', 'version', 'version_downloads']
+        fields = ['active', 'created', 'urn', 'uuid', 'version', 'version_downloads', 'storage_type', 'source']
+
+    def get_version(self, version) -> str:
+        if version.storage_type == ArtifactVersion.GIT and artifact_visibility(version.artifact, self.context)[0]:
+            return version.source_tag or version.storage_id
+        return version.storage_id
+
+    @extend_schema_field(GitHubSourceSerializer(allow_null=True))
+    def get_source(self, version):
+        if version.storage_type != ArtifactVersion.GIT or not artifact_visibility(version.artifact, self.context)[0]:
+            return None
+        return GitHubSourceSerializer({
+            name: getattr(version, 'source_' + name)
+            for name in ('repo', 'repo_id', 'tag', 'commit', 'url', 'release_name',
+                         'published_at', 'trigger', 'prerelease')
+        }).data
 
     @staticmethod
     def get_version_downloads(self) -> int:
-        return ArtifactVersion.objects.get(uuid=self.uuid).version_downloads.count()
+        if hasattr(self, 'download_count'):
+            return self.download_count
+        return self.version_downloads.count()
 
     @staticmethod
     def get_created(self) -> str:

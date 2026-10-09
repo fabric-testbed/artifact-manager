@@ -1,6 +1,11 @@
+"""Artifact request and response serializers."""
+
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from artifactmgr.apps.artifacts.api.author_serializers import AuthorSerializer
+from artifactmgr.apps.artifacts.api.context import artifact_visibility
+from artifactmgr.apps.artifacts.api.repo_serializers import RepoLinkSerializer
 from artifactmgr.apps.artifacts.api.version_serializers import ArtifactVersionSerializer
 from artifactmgr.apps.artifacts.models import Artifact, ArtifactVersion
 
@@ -37,6 +42,26 @@ class ArtifactSerializer(serializers.ModelSerializer):
     number_of_versions = serializers.SerializerMethodField(method_name='get_number_of_versions')
     tags = serializers.SerializerMethodField(method_name='get_tags')
     versions = ArtifactVersionSerializer(source='artifact_version', many=True)
+    repository = serializers.SerializerMethodField()
+
+    @extend_schema_field(RepoLinkSerializer(allow_null=True))
+    def get_repository(self, artifact):
+        if not artifact_visibility(artifact, self.context)[0]:
+            return None
+        link = getattr(artifact, 'repo_link', None)
+        return RepoLinkSerializer(link).data if link else None
+
+    def to_representation(self, instance):
+        show_authors, show_project = artifact_visibility(instance, self.context)
+        data = super().to_representation(instance)
+        if not show_authors:
+            data['authors'] = []
+            data['created_by'] = None
+            data['modified_by'] = None
+        if not show_project:
+            data['project_name'] = None
+            data['project_uuid'] = None
+        return data
 
     class Meta:
         model = Artifact
@@ -44,7 +69,7 @@ class ArtifactSerializer(serializers.ModelSerializer):
                   'created_by', 'deleted', 'deleted_at','description_long',
                   'description_short', 'modified', 'modified_by', 'number_of_versions', 'project_name',
                   'project_uuid', 'show_authors', 'show_project', 'tags', 'title', 'versions',
-                  'visibility', 'uuid']
+                  'visibility', 'uuid', 'repository']
 
     @staticmethod
     def get_artifact_downloads_active(self) -> int:

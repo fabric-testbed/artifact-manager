@@ -1,6 +1,6 @@
 import json
 
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -11,6 +11,7 @@ from rest_framework.exceptions import MethodNotAllowed, PermissionDenied, Valida
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 
+from artifactmgr.apps.artifacts.api.context import request_api_user
 from artifactmgr.apps.artifacts.api.validators import validate_artifact_version_create, \
     validate_artifact_version_update, validate_contents_download
 from artifactmgr.apps.artifacts.api.version_serializers import ArtifactContentsUploadSerializer, \
@@ -47,12 +48,22 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
     lookup_field = 'uuid'
 
     def get_queryset(self):
-        api_user = get_api_user(request=self.request)
+        if getattr(self, 'swagger_fake_view', False):
+            return ArtifactVersion.objects.none()
+        api_user = request_api_user(self.request, get_api_user)
         return ArtifactVersion.objects.filter(
             Q(artifact__visibility=Artifact.PUBLIC) |
             Q(artifact__project_uuid__in=api_user.projects) |
             Q(artifact__authors__uuid__contains=api_user.uuid)
+        ).select_related('artifact').annotate(
+            download_count=Count('version_downloads', distinct=True)
         ).distinct().order_by('-created')
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        if not getattr(self, 'swagger_fake_view', False):
+            context['api_user'] = request_api_user(self.request, get_api_user)
+        return context
 
     def get_serializer_class(self):
         return self.serializer_classes.get(self.action, self.default_serializer_class)
@@ -74,7 +85,7 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         - Contents must be associated to an existing Artifact
         - Once created the Contents cannot be altered
         """
-        api_user = get_api_user(request=request)
+        api_user = request_api_user(self.request, get_api_user)
         try:
             request_data = json.loads(request.data.getlist('data')[0])
         except Exception as exc:
@@ -88,7 +99,7 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
                 if artifact_version:
                     metrics_event(VERSION, artifact_version.uuid, 'create', for_artifact=artifact.uuid,
                                   by=api_user.uuid)
-                return Response(data=ArtifactVersionSerializer(instance=artifact_version).data, status=201)
+                return Response(data=ArtifactVersionSerializer(instance=artifact_version, context={'api_user': api_user}).data, status=201)
             else:
                 raise ValidationError(detail={'ValidationError': message})
         else:
@@ -107,7 +118,7 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         update (PATCH {int:pk})
         - Must be an author of the Artifact to update Artifact contents
         """
-        api_user = get_api_user(request=request)
+        api_user = request_api_user(self.request, get_api_user)
         version = get_object_or_404(ArtifactVersion, uuid=kwargs.get('uuid'))
         artifact = version.artifact
         if api_user.uuid in [a.uuid for a in artifact.authors.all()]:
@@ -125,7 +136,7 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
                 if version.active != active_orig:
                     metrics_event(VERSION, version.uuid, 'modify', 'active', version.active, by=api_user.uuid)
                 # return updated artifact
-                return Response(data=ArtifactVersionSerializer(instance=version).data, status=204)
+                return Response(data=ArtifactVersionSerializer(instance=version, context={'api_user': api_user}).data, status=204)
             else:
                 raise ValidationError(detail={'ValidationError': message})
         else:
@@ -154,7 +165,7 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         Download FABRIC Artifact Contents by URN
         - Must have proper access permissions to download files
         """
-        api_user = get_api_user(request=request)
+        api_user = request_api_user(self.request, get_api_user)
         version_urn = str(kwargs.get('urn', None))
         is_valid, message = validate_contents_download(urn=version_urn, api_user=api_user)
         if is_valid:

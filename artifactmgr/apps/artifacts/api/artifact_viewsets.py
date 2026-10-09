@@ -1,3 +1,5 @@
+"""Artifact API, including JSON-only GitHub repository and release actions."""
+
 import os
 from datetime import datetime, timezone
 from uuid import uuid4
@@ -6,21 +8,28 @@ from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from rest_framework import filters, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
+from rest_framework.parsers import JSONParser
 
 from artifactmgr.apps.apiuser.models import ApiUser
+from artifactmgr.apps.artifacts.api.context import request_api_user
 from artifactmgr.apps.artifacts.api.artifact_serializers import ArtifactCreateSerializer, ArtifactSerializer, \
     ArtifactUpdateSerializer
 from artifactmgr.apps.artifacts.api.author_viewsets import create_author_from_uuid
+from artifactmgr.apps.artifacts.api.repo_serializers import (
+    GitHubReleaseSerializer, ReleaseImportSerializer, RepoLinkRequestSerializer, RepoLinkSerializer,
+)
+from artifactmgr.apps.artifacts.api.version_serializers import ArtifactVersionSerializer
 from artifactmgr.apps.artifacts.api.validators import validate_artifact_create, validate_artifact_update
 from artifactmgr.apps.artifacts.models import Artifact, ArtifactAuthor, ArtifactViews
 from artifactmgr.utils.api_logger import ARTIFACT, consoleLogger, metrics_event, usr
 from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
 from artifactmgr.utils.fabric_auth import get_api_user
+from artifactmgr.utils import github_api, github_oidc, repo_link
 
 
 class DynamicSearchFilter(filters.SearchFilter):
@@ -31,6 +40,9 @@ class DynamicSearchFilter(filters.SearchFilter):
             return []
 
 
+@extend_schema_view(list=extend_schema(
+    description="FABRIC Artifacts - list view\n- Search by 'title', 'project_name'",
+))
 class ArtifactViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -55,9 +67,12 @@ class ArtifactViewSet(viewsets.ModelViewSet):
     lookup_field = 'uuid'
 
     def get_queryset(self):
-        api_user = get_api_user(request=self.request)
+        if getattr(self, 'swagger_fake_view', False):
+            return Artifact.objects.none()
+        api_user = request_api_user(self.request, get_api_user)
+        queryset = Artifact.objects.select_related('repo_link')
         if self.kwargs.get('author_uuid', None):
-            return Artifact.objects.filter(
+            return queryset.filter(
                 authors__uuid__in=[self.kwargs.get('author_uuid')]
             ).filter(
                 Q(visibility=Artifact.PUBLIC) |
@@ -65,7 +80,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                 Q(authors__uuid__in=[api_user.uuid])
             ).distinct().order_by('-modified')
         elif self.kwargs.get('filter_project_uuid', None):
-            return Artifact.objects.filter(
+            return queryset.filter(
                 project_uuid=self.kwargs.get('filter_project_uuid')
             ).filter(
                 Q(visibility=Artifact.PUBLIC) |
@@ -73,7 +88,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                 Q(authors__uuid__in=[api_user.uuid])
             ).distinct().order_by('-modified')
         else:
-            return Artifact.objects.filter(
+            return queryset.filter(
                 Q(visibility=Artifact.PUBLIC) |
                 Q(project_uuid__in=api_user.projects) |
                 Q(authors__uuid__contains=api_user.uuid)
@@ -82,32 +97,11 @@ class ArtifactViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         return self.serializer_classes.get(self.action, self.default_serializer_class)
 
-    def _redact_hidden_fields(self, response_artifacts, api_user):
-        """Apply show_authors / show_project redaction to a paginated list response."""
-        try:
-            for i in range(len(response_artifacts.data.get('results'))):
-                show_authors = response_artifacts.data.get('results')[i].get('show_authors')
-                show_project = response_artifacts.data.get('results')[i].get('show_project')
-                if not show_authors or not show_project:
-                    artifact = Artifact.objects.get(uuid=response_artifacts.data.get('results')[i].get('uuid'))
-                    if artifact:
-                        if not show_authors and not artifact.is_author(api_user_uuid=api_user.uuid):
-                            response_artifacts.data['results'][i]['authors'] = []
-                        if not show_project and not artifact.is_author(api_user_uuid=api_user.uuid):
-                            response_artifacts.data['results'][i]['project_name'] = None
-                            response_artifacts.data['results'][i]['project_uuid'] = None
-        except Exception as exc:
-            consoleLogger.exception('artifact list: unable to redact hidden fields for usr:%s', api_user.uuid)
-        return response_artifacts
-
-    def list(self, request, *args, **kwargs):
-        """
-        FABRIC Artifacts - list view
-        - Search by 'title', 'project_name'
-        """
-        api_user = get_api_user(request=request)
-        response_artifacts = super().list(request, *args, **kwargs)
-        return self._redact_hidden_fields(response_artifacts, api_user)
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        if not getattr(self, 'swagger_fake_view', False) and self.action != 'repo_publish':
+            context['api_user'] = request_api_user(self.request, get_api_user)
+        return context
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
@@ -115,7 +109,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         Create a FABRIC Artifact
         - Must be an active FABRIC user and be a member of a project
         """
-        api_user = get_api_user(request=request)
+        api_user = request_api_user(self.request, get_api_user)
         if api_user.can_create_artifact:
             is_valid, message = validate_artifact_create(request, api_user=api_user)
             if is_valid:
@@ -192,7 +186,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                 metrics_event(ARTIFACT, artifact.uuid, 'create', by=api_user.uuid)
                 # TODO: check for attached version
                 # return new artifact
-                return Response(data=ArtifactSerializer(instance=artifact).data, status=201)
+                return Response(data=ArtifactSerializer(instance=artifact, context={'api_user': api_user}).data, status=201)
             else:
                 raise ValidationError(detail={'ValidationError': message})
         else:
@@ -204,7 +198,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         FABRIC Artifacts - detailed view
         """
         # increment artifact_views
-        api_user = get_api_user(request=request)
+        api_user = request_api_user(self.request, get_api_user)
         try:
             artifact = get_object_or_404(Artifact, uuid=self.kwargs.get('uuid'))
             # view count can only be incremented by non-authors of the artifact
@@ -216,16 +210,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         except Exception as exc:
             artifact = None
             consoleLogger.exception('artifact retrieve: unable to record a view of art:%s', self.kwargs.get('uuid'))
-        response_artifact = super().retrieve(request, *args, **kwargs)
-        show_authors = response_artifact.data.get('show_authors')
-        show_project = response_artifact.data.get('show_project')
-        if artifact:
-            if not show_authors and not artifact.is_author(api_user_uuid=api_user.uuid):
-                response_artifact.data['authors'] = []
-            if not show_project and not artifact.is_author(api_user_uuid=api_user.uuid):
-                response_artifact.data['project_name'] = None
-                response_artifact.data['project_uuid'] = None
-        return response_artifact
+        return super().retrieve(request, *args, **kwargs)
 
     @transaction.atomic
     def update(self, request, *args, **kwargs):
@@ -234,7 +219,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         - Must be an author of the Artifact to update it
         """
         artifact = get_object_or_404(Artifact, uuid=kwargs.get('uuid'))
-        api_user = get_api_user(request=request)
+        api_user = request_api_user(self.request, get_api_user)
         if api_user.uuid in [a.uuid for a in artifact.authors.all()]:
             is_valid, message = validate_artifact_update(request, api_user=api_user)
             if is_valid:
@@ -351,7 +336,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                 # save artifact
                 artifact.save()
                 # return updated artifact
-                return Response(data=ArtifactSerializer(instance=artifact).data, status=200)
+                return Response(data=ArtifactSerializer(instance=artifact, context={'api_user': api_user}).data, status=200)
             else:
                 raise ValidationError(detail={'ValidationError': message})
         else:
@@ -376,7 +361,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         if not artifact_uuid:
             artifact_uuid = kwargs.get('uuid')
         artifact = get_object_or_404(Artifact, uuid=artifact_uuid)
-        api_user = get_api_user(request=request)
+        api_user = request_api_user(self.request, get_api_user)
         if api_user.uuid == artifact.created_by.uuid:
             artifact.delete()
             metrics_event(ARTIFACT, artifact_uuid, 'delete', by=api_user.uuid)
@@ -401,14 +386,12 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         - Retrieve artifacts by author where api_user can view them
         - get_queryset returns intersection of all artifacts by author x viewable artifacts by api_user
         """
-        api_user = get_api_user(request=request)
         author = ArtifactAuthor.objects.filter(uuid=kwargs.get('uuid')).first()
         if author:
             self.kwargs.update({'author_uuid': author.uuid})
         else:
             self.kwargs.update({'author_uuid': os.getenv('API_USER_ANON_UUID')})
-        response_artifacts = super().list(request, *args, **kwargs)
-        return self._redact_hidden_fields(response_artifacts, api_user)
+        return super().list(request, *args, **kwargs)
 
     @extend_schema(
         parameters=[
@@ -425,7 +408,101 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         - Retrieve artifacts by project_uuid where api_user can view them
         - get_queryset returns intersection of all artifacts in the project x viewable artifacts by api_user
         """
-        api_user = get_api_user(request=request)
         self.kwargs.update({'filter_project_uuid': kwargs.get('uuid')})
-        response_artifacts = super().list(request, *args, **kwargs)
-        return self._redact_hidden_fields(response_artifacts, api_user)
+        return super().list(request, *args, **kwargs)
+
+    @staticmethod
+    def _repo_error(exc):
+        return Response({'detail': str(exc)}, status=exc.status_code)
+
+    @extend_schema(responses=RepoLinkSerializer)
+    @action(detail=True, methods=['get'], url_path='repo', parser_classes=[JSONParser])
+    def repo(self, request, *args, **kwargs):
+        """Show the repository to viewers permitted to see author details."""
+        artifact = self.get_object()
+        serializer = ArtifactSerializer(context=self.get_serializer_context())
+        return Response(serializer.get_repository(artifact))
+
+    @extend_schema(request=RepoLinkRequestSerializer, responses=RepoLinkSerializer)
+    @repo.mapping.put
+    def repo_put(self, request, *args, **kwargs):
+        """Link or re-confirm a public repository as a current author."""
+        artifact = self.get_object()
+        api_user = request_api_user(self.request, get_api_user)
+        serializer = RepoLinkRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            link = repo_link.link_repo(artifact, serializer.validated_data['repository'], api_user)
+        except (repo_link.RepoLinkError, github_api.GitHubError) as exc:
+            return self._repo_error(exc)
+        return Response(RepoLinkSerializer(link).data)
+
+    @extend_schema(request=None, responses={204: None})
+    @repo.mapping.delete
+    def repo_delete(self, request, *args, **kwargs):
+        """Unlink without altering previously imported versions."""
+        artifact = self.get_object()
+        api_user = request_api_user(self.request, get_api_user)
+        # Force parser validation even though DELETE does not need a body.
+        request.data
+        try:
+            repo_link.unlink_repo(artifact, api_user)
+        except repo_link.RepoLinkError as exc:
+            return self._repo_error(exc)
+        return Response(status=204)
+
+    @extend_schema(responses=GitHubReleaseSerializer(many=True))
+    @action(detail=True, methods=['get'], url_path='repo/releases', parser_classes=[JSONParser],
+            pagination_class=None, filter_backends=[])
+    def repo_releases(self, request, *args, **kwargs):
+        """List up to 5 GitHub pages (500 releases), marking already imported tags."""
+        artifact = self.get_object()
+        api_user = request_api_user(self.request, get_api_user)
+        try:
+            releases = repo_link.list_releases(artifact, api_user)
+        except (repo_link.RepoLinkError, github_api.GitHubError) as exc:
+            return self._repo_error(exc)
+        return Response(GitHubReleaseSerializer(releases, many=True).data)
+
+    @extend_schema(request=ReleaseImportSerializer,
+                   responses={200: ArtifactVersionSerializer, 201: ArtifactVersionSerializer})
+    @action(detail=True, methods=['post'], url_path='repo/import', parser_classes=[JSONParser])
+    def repo_import(self, request, *args, **kwargs):
+        """Import a published release using the caller's FABRIC identity."""
+        artifact = self.get_object()
+        api_user = request_api_user(self.request, get_api_user)
+        serializer = ReleaseImportSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            version, created = repo_link.import_release(artifact, serializer.validated_data['tag'], api_user, 'api')
+        except (repo_link.RepoLinkError, github_api.GitHubError) as exc:
+            return self._repo_error(exc)
+        return Response(ArtifactVersionSerializer(version, context={'api_user': api_user}).data, status=201 if created else 200)
+
+    @extend_schema(request=ReleaseImportSerializer, auth=[{'GitHubActionsOIDC': []}],
+                   responses={200: ArtifactVersionSerializer, 201: ArtifactVersionSerializer},
+                   description='Publish with a GitHub Actions OIDC bearer token for this site audience.')
+    @action(detail=True, methods=['post'], url_path='repo/publish', parser_classes=[JSONParser])
+    def repo_publish(self, request, *args, **kwargs):
+        """Authenticate Actions before any artifact lookup; never invoke FABRIC auth."""
+        authorization = request.headers.get('Authorization', '').split()
+        token = authorization[1] if len(authorization) == 2 and authorization[0].lower() == 'bearer' else ''
+        try:
+            claims = github_oidc.verify_actions_token(token)
+        except github_oidc.InvalidActionsToken:
+            return Response({'detail': 'Invalid GitHub Actions token.'}, status=401,
+                            headers={'WWW-Authenticate': 'Bearer'})
+        except github_oidc.ActionsUnavailable as exc:
+            return Response({'detail': str(exc)}, status=503)
+        artifact = Artifact.objects.filter(uuid=kwargs.get('uuid')).first()
+        try:
+            link = repo_link.validate_publisher(artifact, claims)
+            serializer = ReleaseImportSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            consoleLogger.info('github publish: artifact %s workflow_ref=%s run_id=%s actor=%s',
+                               artifact.uuid, claims.get('workflow_ref'), claims.get('run_id'), claims.get('actor'))
+            version, created = repo_link.import_release(
+                artifact, serializer.validated_data['tag'], link.linked_by, 'action', claims=claims)
+        except (repo_link.RepoLinkError, github_api.GitHubError) as exc:
+            return self._repo_error(exc)
+        return Response(ArtifactVersionSerializer(version, context={'api_user': link.linked_by}).data, status=201 if created else 200)
