@@ -5,7 +5,7 @@ from urllib.parse import parse_qs, urlparse, urlsplit
 from django.conf import settings
 from django.db import models
 from django.db.models import Count, Q
-from django.http import QueryDict
+from django.http import Http404, QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
@@ -76,13 +76,28 @@ class ListObjectType(models.TextChoices):
     PROJECT_BY_UUID = 'project_by_uuid', _('Project by UUID')
 
 
+def _visible_artifacts(api_user):
+    """Artifacts this viewer may see: the same filter ArtifactViewSet.get_queryset() applies to list.
+
+    Public artifacts, artifacts in one of the viewer's projects, or artifacts the viewer authored.
+    """
+    return Artifact.objects.filter(
+        Q(visibility=Artifact.PUBLIC) |
+        Q(project_uuid__in=api_user.projects) |
+        Q(authors__uuid__in=[api_user.uuid])
+    ).distinct()
+
+
 def artifact_list(request):
     api_user = request_api_user(request, get_api_user)
     try:
         artifacts = list_object_paginator(request=request, object_type=ListObjectType.ARTIFACTS)
         message = artifacts.get('message', None)
-    except Exception as exc:
-        message = exc
+    except Http404:
+        raise
+    except Exception:
+        consoleLogger.exception('artifact_list: unable to list artifacts for user %s', api_user.uuid)
+        message = 'Unable to load this page; please retry.'
         artifacts = {}
     return render(request,
                   'artifact_list.html',
@@ -104,12 +119,7 @@ def author_list(request):
     try:
         authors = list_object_paginator(request=request, object_type=ListObjectType.AUTHORS)
         message = authors.get('message', None)
-        # Visible artifacts queryset (same filter as ArtifactViewSet.get_queryset for list)
-        visible_artifacts = Artifact.objects.filter(
-            Q(visibility=Artifact.PUBLIC) |
-            Q(project_uuid__in=api_user.projects) |
-            Q(authors__uuid__in=[api_user.uuid])
-        ).distinct()
+        visible_artifacts = _visible_artifacts(api_user)
         # For each author on this page, count their artifacts that are also visible
         # This mirrors the intersection logic used by ArtifactViewSet.by_author
         list_objects = authors.get('list_objects', {})
@@ -118,8 +128,11 @@ def author_list(request):
                 authors__uuid__in=[author.get('uuid')]
             ).distinct()
             author['artifact_count'] = authored.intersection(visible_artifacts).count()
-    except Exception as exc:
-        message = exc
+    except Http404:
+        raise
+    except Exception:
+        consoleLogger.exception('author_list: unable to list authors for user %s', api_user.uuid)
+        message = 'Unable to load this page; please retry.'
         authors = {}
         list_objects = {}
     return render(request,
@@ -142,18 +155,22 @@ def author_detail(request, *args, **kwargs):
     message = None
     try:
         author = AuthorViewSet.as_view({'get': 'retrieve'})(request=request, *args, **kwargs)
+        if author.status_code == status.HTTP_404_NOT_FOUND:
+            raise Http404('Author not found.')
         if author.data and author.status_code == status.HTTP_200_OK:
             author = json.loads(json.dumps(author.data))
             kwargs.update({'author_uuid': kwargs.get('uuid')})
         else:
             message = {'status_code': author.status_code, 'detail': author.data.get('detail')}
             author = {}
-            kwargs.update({'author_uuid': os.getenv('API_USER_ANON_UUID')})
         artifacts = list_object_paginator(request=request, object_type=ListObjectType.AUTHOR_BY_UUID, *args, **kwargs)
         if not message:
             message = artifacts.get('message', None)
-    except Exception as exc:
-        message = exc
+    except Http404:
+        raise
+    except Exception:
+        consoleLogger.exception('author_detail: unable to render author %s', kwargs.get('uuid'))
+        message = 'Unable to load this page; please retry.'
         author = {}
         artifacts = {}
     return render(request,
@@ -233,8 +250,12 @@ def artifact_detail(request, *args, **kwargs):
                             is_author = False
                         if not message:
                             message = artifact.get('message', None)
-                    except Exception as exc:
-                        message = exc
+                    except Http404:
+                        raise
+                    except Exception:
+                        consoleLogger.exception('artifact_detail: unable to render artifact %s after a rejected'
+                                                ' version upload', kwargs.get('uuid'))
+                        message = 'Unable to load this page; please retry.'
                         artifact = {}
                         is_author = False
                     return render(request,
@@ -283,7 +304,9 @@ def artifact_detail(request, *args, **kwargs):
         except (repo_link.RepoLinkError, github_api.GitHubError) as exc:
             request.session['artifact_detail_message'] = str(exc)
             return redirect('artifact_detail', uuid=kwargs.get('uuid'))
-        except Exception as exc:
+        except Http404:
+            raise
+        except Exception:
             consoleLogger.exception('artifact_detail: POST action %r failed for artifact %s',
                                     request.POST.get('artifact_detail_button', None), kwargs.get('uuid'))
             request.session['artifact_detail_message'] = 'Unable to complete this operation; please retry.'
@@ -291,8 +314,9 @@ def artifact_detail(request, *args, **kwargs):
     # get artifact detail page when not method: POST
     try:
         artifact = ArtifactViewSet.as_view({'get': 'retrieve'})(request=request, *args, **kwargs)
-        if artifact.status_code != status.HTTP_200_OK:
-            return redirect('artifact_list')
+        if artifact.status_code == status.HTTP_404_NOT_FOUND:
+            # Unknown, or not visible to this viewer: the API answers 404 for both.
+            raise Http404('Artifact not found.')
         if artifact.data and artifact.status_code == status.HTTP_200_OK:
             artifact = json.loads(json.dumps(artifact.data))
             artifact_obj = Artifact.objects.get(uuid=kwargs.get('uuid'))
@@ -312,8 +336,11 @@ def artifact_detail(request, *args, **kwargs):
                     releases = repo_link.list_releases(artifact_obj, api_user)
                 except (repo_link.RepoLinkError, github_api.GitHubError) as exc:
                     message = str(exc)
-    except Exception as exc:
-        message = exc
+    except Http404:
+        raise
+    except Exception:
+        consoleLogger.exception('artifact_detail: unable to render artifact %s', kwargs.get('uuid'))
+        message = 'Unable to load this page; please retry.'
         artifact = {}
         is_author = False
     return render(request,
@@ -337,13 +364,7 @@ def project_list(request):
         message = 'Search requires 3 or more characters'
         search = None
     try:
-        # Apply the same visibility filter used by ArtifactViewSet.get_queryset():
-        #   public artifacts, artifacts in the user's projects, or artifacts the user authored
-        visible_artifacts = Artifact.objects.filter(
-            Q(visibility=Artifact.PUBLIC) |
-            Q(project_uuid__in=api_user.projects) |
-            Q(authors__uuid__contains=api_user.uuid)
-        ).distinct()
+        visible_artifacts = _visible_artifacts(api_user)
         # Exclude artifacts where show_project is False (unless user is an author),
         # matching the serializer's shared visibility check
         visible_with_project = visible_artifacts.filter(
@@ -357,8 +378,11 @@ def project_list(request):
             .annotate(count=Count('uuid', distinct=True))
             .order_by('project_name')
         )
-    except Exception as exc:
-        message = exc
+    except Http404:
+        raise
+    except Exception:
+        consoleLogger.exception('project_list: unable to list projects for user %s', api_user.uuid)
+        message = 'Unable to load this page; please retry.'
         projects = []
     return render(request,
                   'project_list.html',
@@ -375,9 +399,13 @@ def project_detail(request, *args, **kwargs):
     api_user = request_api_user(request, get_api_user)
     message = None
     project_uuid = kwargs.get('uuid')
-    # Look up the project name from any artifact with this project_uuid
-    project_obj = Artifact.objects.filter(project_uuid=project_uuid).first()
-    project_name = project_obj.project_name if project_obj else project_uuid
+    # Take the project name only from an artifact this viewer may see, so an unknown
+    # project, or one whose artifacts are all hidden from the viewer, is a 404 rather
+    # than a page that confirms the name or echoes the path.
+    project_obj = _visible_artifacts(api_user).filter(project_uuid=project_uuid).first()
+    if not project_obj:
+        raise Http404('Project not found.')
+    project_name = project_obj.project_name
     try:
         kwargs.update({'uuid': project_uuid})
         artifacts = list_object_paginator(
@@ -385,8 +413,11 @@ def project_detail(request, *args, **kwargs):
         )
         if not message:
             message = artifacts.get('message', None)
-    except Exception as exc:
-        message = exc
+    except Http404:
+        raise
+    except Exception:
+        consoleLogger.exception('project_detail: unable to render project %s', project_uuid)
+        message = 'Unable to load this page; please retry.'
         artifacts = {}
     return render(request,
                   'project_detail.html',
@@ -424,8 +455,11 @@ def artifact_create(request):
                     return redirect('artifact_detail', uuid=artifact.get('uuid'))
                 else:
                     message = artifact.data
-            except Exception as exc:
-                message = exc
+            except Http404:
+                raise
+            except Exception:
+                consoleLogger.exception('artifact_create: unable to create an artifact for user %s', api_user.uuid)
+                message = 'Unable to load this page; please retry.'
         else:
             message = form.errors
     elif request.method == "POST" and isinstance(request.POST.get('search'), str):
@@ -481,8 +515,11 @@ def artifact_update(request, *args, **kwargs):
                     return redirect('artifact_detail', uuid=artifact_uuid)
                 else:
                     message = artifact.data
-            except Exception as exc:
-                message = exc
+            except Http404:
+                raise
+            except Exception:
+                consoleLogger.exception('artifact_update: unable to update artifact %s', artifact_uuid)
+                message = 'Unable to load this page; please retry.'
         else:
             message = form.errors
     elif request.method == "POST" and isinstance(request.POST.get('search'), str):
@@ -521,9 +558,18 @@ def artifact_update(request, *args, **kwargs):
 
 def list_object_paginator(request, object_type: str, *args, **kwargs):
     message = None
+    # Validate the page number before the broad handler below: a bad value is a 404,
+    # never exception text rendered to the user (issue #65).
+    current_page = 1
+    if request.GET.get('page'):
+        try:
+            current_page = int(request.GET.get('page'))
+        except ValueError:
+            raise Http404('Invalid page.')
+        if current_page < 1:
+            raise Http404('Invalid page.')
     try:
         # check for query parameters
-        current_page = 1
         search_term = None
         data_dict = {}
         if request.GET.get('search'):
@@ -531,7 +577,6 @@ def list_object_paginator(request, object_type: str, *args, **kwargs):
             search_term = request.GET.get('search')
         if request.GET.get('page'):
             data_dict['page'] = request.GET.get('page')
-            current_page = int(request.GET.get('page'))
         request.query_params = QueryDict('', mutable=True)
         request.query_params.update(data_dict)
         if object_type == ListObjectType.ARTIFACTS:
@@ -544,6 +589,9 @@ def list_object_paginator(request, object_type: str, *args, **kwargs):
             list_objects = ArtifactViewSet.as_view({'get': 'by_project'})(request=request, *args, **kwargs)
         else:
             list_objects = {}
+        if getattr(list_objects, 'status_code', None) == status.HTTP_404_NOT_FOUND:
+            # DRF's paginator answers 404 for a page past the end.
+            raise Http404('Invalid page.')
         # get prev, next and item range
         next_page = None
         prev_page = None
@@ -580,8 +628,11 @@ def list_object_paginator(request, object_type: str, *args, **kwargs):
         else:
             list_objects = {}
         item_range = '{0} - {1}'.format(str(min_range), str(max_range))
-    except Exception as exc:
-        message = exc
+    except Http404:
+        raise
+    except Exception:
+        consoleLogger.exception('list_object_paginator: unable to list %s', object_type)
+        message = 'Unable to load this page; please retry.'
         list_objects = {}
         item_range = None
         next_page = None

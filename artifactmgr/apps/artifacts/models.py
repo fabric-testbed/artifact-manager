@@ -84,8 +84,6 @@ class Artifact(models.Model):
         null=True,
         on_delete=models.CASCADE,
     )
-    deleted = models.BooleanField(default=False)
-    deleted_at = models.DateTimeField(blank=True, null=True)
     description_long = models.TextField(max_length=5000, blank=False, null=False)
     description_short = models.CharField(max_length=255, blank=True, null=True)
     modified = models.DateTimeField()

@@ -7,13 +7,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import filters, permissions, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed, PermissionDenied, ValidationError
+from rest_framework.exceptions import MethodNotAllowed, NotFound, PermissionDenied, ValidationError
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 
-from artifactmgr.apps.artifacts.api.context import request_api_user
+from artifactmgr.apps.artifacts.api.context import is_crawler, request_api_user
 from artifactmgr.apps.artifacts.api.validators import validate_artifact_version_create, \
-    validate_artifact_version_update, validate_contents_download
+    validate_artifact_version_update
 from artifactmgr.apps.artifacts.api.version_serializers import ArtifactContentsUploadSerializer, \
     ArtifactVersionSerializer, ArtifactVersionUpdateSerializer
 from artifactmgr.apps.artifacts.models import Artifact, ArtifactVersion, VersionDownloads
@@ -73,10 +73,7 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         FABRIC Artifact Contents - list view
         - Search by 'storage_repo', 'storage_type'
         """
-        try:
-            return super().list(request, *args, **kwargs)
-        except Exception as e:
-            consoleLogger.exception('version list: unable to list /contents')
+        return super().list(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         """
@@ -86,10 +83,15 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         - Once created the Contents cannot be altered
         """
         api_user = request_api_user(self.request, get_api_user)
+        data = request.data.getlist('data')
+        request_data = data[0] if data else None
         try:
-            request_data = json.loads(request.data.getlist('data')[0])
-        except Exception as exc:
-            request_data = request.data.getlist('data')[0]
+            request_data = json.loads(request_data)
+        except (TypeError, ValueError):
+            # the web UI posts 'data' as a dict inside the QueryDict rather than as a JSON string
+            pass
+        if not isinstance(request_data, dict):
+            raise ValidationError(detail={'ValidationError': [{'data': 'must be a JSON object'}]})
         artifact = Artifact.objects.filter(uuid=request_data.get('artifact', None)).first()
         # ensure artifact exists and that api_user is an author of the artifact
         if artifact and api_user.uuid in [a.uuid for a in artifact.authors.all()]:
@@ -160,26 +162,26 @@ class ArtifactVersionViewSet(viewsets.ModelViewSet, viewsets.ViewSet):
         parameters=[OpenApiParameter(name="urn", type=str, location=OpenApiParameter.PATH)]
     )
     @action(detail=False, methods=['get'], url_path='download/(?P<urn>[^/.]+)')
-    def download(self, request, *args, **kwargs) -> HttpResponse | ValidationError:
+    def download(self, request, *args, **kwargs) -> HttpResponse:
         """
         Download FABRIC Artifact Contents by URN
         - Must have proper access permissions to download files
         """
         api_user = request_api_user(self.request, get_api_user)
         version_urn = str(kwargs.get('urn', None))
-        is_valid, message = validate_contents_download(urn=version_urn, api_user=api_user)
-        if is_valid:
-            # increment version_downloads
-            try:
-                version_uuid = version_urn.split(':')[-1]
-                artifact_version = get_object_or_404(ArtifactVersion, uuid=version_uuid)
+        # visibility-filtered lookup: a version that is missing, hidden from api_user, does not match the
+        # requested urn, or is retired is a 404 so that the endpoint confirms nothing to the caller
+        version = self.get_queryset().filter(uuid=version_urn.split(':')[-1]).first()
+        if version is None or version.urn != version_urn or not version.active:
+            raise NotFound(detail="No artifact contents match urn '{0}'.".format(version_urn))
+        # increment version_downloads - crawler requests are served without being counted, but the
+        # metrics event is always written so the audit stream stays complete
+        try:
+            if not is_crawler(request):
                 version_download = VersionDownloads(downloaded_by=str(api_user.uuid))
                 version_download.save()
-                artifact_version.version_downloads.add(version_download)
-                artifact_version.save()
-                metrics_event(VERSION, artifact_version.uuid, 'download', by=api_user.uuid)
-            except Exception as exc:
-                consoleLogger.exception('version download: unable to record a download of %s', version_urn)
-            return download_contents_by_urn(urn=kwargs.get('urn'))
-        else:
-            raise ValidationError(detail={'ValidationError': message})
+                version.version_downloads.add(version_download)
+            metrics_event(VERSION, version.uuid, 'download', by=api_user.uuid)
+        except Exception:
+            consoleLogger.exception('version download: unable to record a download of %s', version_urn)
+        return download_contents_by_urn(urn=version_urn)

@@ -5,6 +5,7 @@ from rest_framework.exceptions import ValidationError
 
 from artifactmgr.apps.apiuser.models import ApiUser
 from artifactmgr.apps.artifacts.models import Artifact, ArtifactAuthor, ArtifactTag, ArtifactVersion
+from artifactmgr.utils.api_logger import consoleLogger
 from artifactmgr.utils.core_api import (
     PERSON_LOOKUP_FAILED,
     PERSON_NOT_FOUND,
@@ -21,49 +22,6 @@ from artifactmgr.utils.github_api import GitHubError, validate_repository, valid
 valid_upload_extensions = ('.tgz', '.tar.gz')
 
 
-def validate_contents_download(urn: str, api_user: ApiUser) -> tuple:
-    """
-    GET api/contents/download/{urn}
-    - api_user - user making the request
-    urn:storage_type:contents:storage_repo:uuid
-    - urn - static
-    - storage_type - in [fabric, git, zenodo]
-    - contents - static
-    - storage_repo - in [renci, github, zenodo]
-    - uuid - unique identifier of artifact version
-    """
-    message = []
-    try:
-        # artifact version check
-        artifact_version = ArtifactVersion.objects.filter(uuid=urn.split(':')[-1]).first()
-        if not artifact_version:
-            message.append({'NotFound': 'artifact with urn = \'{0}\' not found'.format(urn)})
-        else:
-            # check that urn matches requested urn
-            if artifact_version.urn != urn:
-                message.append({'DoesNotMatch': 'artifact urn does not match urn = \'{0}\' not found'.format(urn)})
-            # check that version requested is active
-            if str(artifact_version.active).casefold() != 'true':
-                message.append({'DownloadNotAvailable': 'urn {0} is marked as not active'.format(artifact_version.urn)})
-            artifact = artifact_version.artifact
-            # artifact permissions check
-            author = ArtifactAuthor.objects.filter(uuid=api_user.uuid).first()
-            # author - api_user must be an author of artifact
-            if artifact.visibility == Artifact.AUTHOR and (not author or author not in artifact.authors.all()):
-                message.append({'PermissionsAuthor': 'api_user does not have permission to download this resource'})
-            # project - api_user must be an author of artifact or project member linked to the artifact
-            if artifact.visibility == Artifact.PROJECT and artifact.project_uuid not in api_user.projects:
-                message.append({'PermissionsProject': 'api_user does not have permission to download this resource'})
-            # public - download available to any user
-    except Exception as exc:
-        message.append({'APIException': exc})
-
-    if len(message) > 0:
-        return False, message
-    else:
-        return True, None
-
-
 def validate_artifact_version_create(request, api_user: ApiUser) -> tuple:
     """
     POST /api/contents
@@ -75,14 +33,14 @@ def validate_artifact_version_create(request, api_user: ApiUser) -> tuple:
     message = []
     try:
         request_keys = request.data.keys()
-        if 'file' not in request_keys:
+        upload_file = request.FILES.get('file')
+        if upload_file is None:
             message.append({'file': 'missing a \'file\' to create an artifact from'})
+        elif not upload_file.name.lower().endswith(valid_upload_extensions):
+            message.append({'mimetypes': 'Invalid file type for \'{0}\', must be .tgz or .tar.gz'.format(
+                upload_file.name)})
         if 'data' not in request_keys:
             message.append({'data': 'missing the \'data\' attributes to create an artifact from'})
-        upload_filename = request.FILES.get('file').name
-        if not upload_filename.lower().endswith(valid_upload_extensions):
-            message.append({'mimetypes': 'Invalid file type for \'{0}\', must be .tgz or .tar.gz'.format(
-                upload_filename)})
         request_data = request.data['data']
         if not isinstance(request_data, dict):
             request_data = json.loads(request_data)
@@ -119,6 +77,7 @@ def validate_artifact_version_create(request, api_user: ApiUser) -> tuple:
             else:
                 message.append({'data.storage_repo': 'invalid storage_repo'})
     except Exception as exc:
+        consoleLogger.warning('validate_artifact_version_create: %s: %s', type(exc).__name__, exc)
         message.append({'APIException': exc})
 
     if len(message) > 0:
@@ -207,6 +166,7 @@ def validate_artifact_create(request, api_user: ApiUser) -> tuple:
         else:
             message.append({'visibility': 'invalid option: \'{0}\''.format(visibility)})
     except Exception as exc:
+        consoleLogger.warning('validate_artifact_create: %s: %s', type(exc).__name__, exc)
         message.append({'APIException': exc})
     if len(message) > 0:
         return False, message
@@ -300,6 +260,7 @@ def validate_artifact_update(request, api_user: ApiUser) -> tuple:
                 message.append({'visibility': 'corresponding project_uuid required: \'{0}\''.format(visibility)})
 
     except Exception as exc:
+        consoleLogger.warning('validate_artifact_update: %s: %s', type(exc).__name__, exc)
         message.append({'APIException': exc})
     if len(message) > 0:
         return False, message
@@ -320,6 +281,7 @@ def validate_artifact_version_update(request) -> tuple:
         if active and str(active).casefold() not in ['true', 'false']:
             message.append({'active': 'must be boolean or None, not: \'{0}\''.format(active)})
     except Exception as exc:
+        consoleLogger.warning('validate_artifact_version_update: %s: %s', type(exc).__name__, exc)
         message.append({'APIException': exc})
     if len(message) > 0:
         return False, message

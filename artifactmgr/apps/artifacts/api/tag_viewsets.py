@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, viewsets
-from rest_framework.exceptions import APIException, MethodNotAllowed, PermissionDenied, ValidationError
+from rest_framework.exceptions import MethodNotAllowed, PermissionDenied, ValidationError
 from rest_framework.response import Response
 
 from artifactmgr.apps.artifacts.api.tag_serializers import TagSerializer, TagUpdateSerializer
@@ -35,6 +35,8 @@ class TagViewSet(viewsets.ModelViewSet):
     lookup_field = 'tag'
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return ArtifactTag.objects.none()
         api_user = get_api_user(request=self.request)
         if api_user.is_artifact_manager_admin:
             return ArtifactTag.objects.all().order_by('tag')
@@ -65,12 +67,9 @@ class TagViewSet(viewsets.ModelViewSet):
             if ArtifactTag.objects.filter(tag=str(request.data.get('tag')).casefold()).first():
                 raise ValidationError(detail="DuplicateEntry: tag '{0}' already exists".format(request.data.get('tag')))
             else:
-                try:
-                    response = super().create(request, *args, **kwargs)
-                    metrics_event(TAG, response.data.get('tag'), 'create', by=api_user.uuid)
-                    return response
-                except Exception as exc:
-                    raise APIException(detail=exc)
+                response = super().create(request, *args, **kwargs)
+                metrics_event(TAG, response.data.get('tag'), 'create', by=api_user.uuid)
+                return response
         else:
             raise PermissionDenied(
                 detail="PermissionDenied: user:'{0}' is unable to create /meta/tags".format(api_user.uuid))
@@ -88,15 +87,12 @@ class TagViewSet(viewsets.ModelViewSet):
         artifact_tag = get_object_or_404(ArtifactTag, tag=str(kwargs.get('tag')).casefold())
         api_user = get_api_user(request=request)
         if api_user and api_user.is_artifact_manager_admin:
-            try:
-                artifact_tag.restricted = True if str(request.data.get('restricted')).casefold() == 'true' else False
-                artifact_tag.save()
-                metrics_event(TAG, artifact_tag.tag, 'modify', 'restricted', artifact_tag.restricted,
-                              by=api_user.uuid)
-                # return updated tag
-                return Response(data=TagSerializer(instance=artifact_tag).data, status=200)
-            except Exception as exc:
-                raise APIException(detail=exc)
+            artifact_tag.restricted = True if str(request.data.get('restricted')).casefold() == 'true' else False
+            artifact_tag.save()
+            metrics_event(TAG, artifact_tag.tag, 'modify', 'restricted', artifact_tag.restricted,
+                          by=api_user.uuid)
+            # return updated tag
+            return Response(data=TagSerializer(instance=artifact_tag).data, status=200)
         else:
             raise PermissionDenied(
                 detail="PermissionDenied: user:'{0}' is unable to update /meta/tags".format(api_user.uuid))
@@ -116,13 +112,10 @@ class TagViewSet(viewsets.ModelViewSet):
         api_user = get_api_user(request=request)
         if api_user.is_artifact_manager_admin:
             tag = kwargs.get('tag')
-            try:
-                response = super().destroy(request, *args, **kwargs)
-                metrics_event(TAG, tag, 'delete', by=api_user.uuid)
-                return response
-            except Exception as exc:
-                raise APIException(detail=exc)
+            response = super().destroy(request, *args, **kwargs)
+            metrics_event(TAG, tag, 'delete', by=api_user.uuid)
+            return response
         else:
             raise PermissionDenied(
                 detail="PermissionDenied: user:'{0}' is unable to delete /meta/tags/{1}".format(api_user.uuid,
-                                                                                                kwargs.get('pk')))
+                                                                                                kwargs.get('tag')))

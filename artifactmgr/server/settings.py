@@ -83,6 +83,15 @@ if os.getenv('API_DEBUG', 'false').casefold() == 'true':
 else:
     API_DEBUG = False
 
+# Django admin. Off by default: nothing in the deployment creates a superuser, and the admin's
+# own username/password form is a second, unthrottled authentication surface. When on,
+# AdminGateMiddleware still 404s /admin for everyone except FABRIC users holding
+# ARTIFACT_MANAGER_ADMINS_ROLE; a Django superuser is then needed to actually log in.
+if os.getenv('DJANGO_ADMIN_ENABLED', 'false').casefold() == 'true':
+    DJANGO_ADMIN_ENABLED = True
+else:
+    DJANGO_ADMIN_ENABLED = False
+
 # Hosts this deployment answers on, as a comma-separated list in .env. Loopback is always
 # allowed; a deployment adds its own FQDN and public IPs there rather than editing this file.
 ALLOWED_HOSTS = dedupe(['localhost', '127.0.0.1', *env_csv('DJANGO_ALLOWED_HOSTS', '127.0.0.1')])
@@ -112,6 +121,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'artifactmgr.server.middleware.AdminGateMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -415,8 +425,19 @@ GITHUB_IMPORT_MAX_BYTES = int(os.getenv('GITHUB_IMPORT_MAX_BYTES', '78643200'))
 GITHUB_IMPORTS_PER_DAY = int(os.getenv('GITHUB_IMPORTS_PER_DAY', '10'))
 GITHUB_API_TOKEN = os.getenv('GITHUB_API_TOKEN', '')
 
+# Crawler detection for the view and download counters. Each marker is matched case-insensitively
+# as a substring of the User-Agent; a matching request is served normally but records no
+# ArtifactViews or VersionDownloads row (the metrics log still gets the download event).
+# Deliberately not listed: curl, wget and python-requests, which FABRIC users and the README
+# examples drive by hand.
+CRAWLER_USER_AGENT_MARKERS = [marker.casefold() for marker in env_csv(
+    'CRAWLER_USER_AGENT_MARKERS', 'bot,crawler,spider,slurp,facebookexternalhit,ia_archiver,semrush,ahrefs')]
+
 # Login / Logout settings
 LOGIN_URL = '/login'
+# Lifetime in seconds of the Django session cookie (flash messages, admin login). FABRIC login
+# is carried by the Vouch cookie, whose lifetime Vouch Proxy sets separately.
+SESSION_COOKIE_AGE = env_int('DJANGO_SESSION_COOKIE_AGE', 14400)
 LOGIN_REDIRECT_URL = '/'
 
 LOGOUT_URL = '/logout'

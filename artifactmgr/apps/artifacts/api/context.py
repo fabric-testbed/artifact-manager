@@ -1,4 +1,6 @@
-"""Request identity and shared, per-artifact serializer visibility."""
+"""Request identity, crawler detection and shared, per-artifact serializer visibility."""
+
+from django.conf import settings
 
 
 def request_api_user(request, resolve):
@@ -7,6 +9,15 @@ def request_api_user(request, resolve):
     if not hasattr(request, '_artifact_api_user'):
         request._artifact_api_user = resolve(request=request)
     return request._artifact_api_user
+
+
+def is_crawler(request) -> bool:
+    """True when the User-Agent carries a CRAWLER_USER_AGENT_MARKERS substring; memoised per request."""
+    request = getattr(request, '_request', request)
+    if not hasattr(request, '_artifact_is_crawler'):
+        user_agent = request.META.get('HTTP_USER_AGENT', '').casefold()
+        request._artifact_is_crawler = any(marker in user_agent for marker in settings.CRAWLER_USER_AGENT_MARKERS)
+    return request._artifact_is_crawler
 
 
 def artifact_visibility(artifact, context):

@@ -16,8 +16,6 @@ class ArtifactSerializer(serializers.ModelSerializer):
     - authors = models.ManyToManyField(ArtifactAuthor, related_name="artifact_authors")
     - created = models.DateTimeField(auto_now_add=True)
     - created_by = models.ForeignKey(ArtifactAuthor, ...)
-    - deleted = models.BooleanField(default=False)
-    - deleted_at = models.DateTimeField(blank=True, null=True)
     - description_long = models.TextField(max_length=5000, blank=False, null=False)
     - description_short = models.CharField(max_length=255, blank=True, null=True)
     - modified = models.DateTimeField(auto_now=True)
@@ -66,7 +64,7 @@ class ArtifactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Artifact
         fields = ['artifact_downloads_active', 'artifact_downloads_retired', 'artifact_views', 'authors', 'created',
-                  'created_by', 'deleted', 'deleted_at','description_long',
+                  'created_by', 'description_long',
                   'description_short', 'modified', 'modified_by', 'number_of_versions', 'project_name',
                   'project_uuid', 'show_authors', 'show_project', 'tags', 'title', 'versions',
                   'visibility', 'uuid', 'repository']

@@ -1,9 +1,29 @@
+from django.http import Http404, HttpResponse
 from django.shortcuts import render
 
 from artifactmgr.apps.artifacts.models import ArtifactAuthor
 from artifactmgr.apps.artifacts.views import list_object_paginator, ListObjectType
 from artifactmgr.server.settings import API_DEBUG
+from artifactmgr.utils.api_logger import consoleLogger
 from artifactmgr.utils.fabric_auth import get_api_user
+
+# Served by Django rather than nginx so every run mode answers /robots.txt the same way. The
+# artifact listing and detail pages stay crawlable; the API, admin and authentication paths and
+# the create/update forms do not.
+ROBOTS_TXT = '\n'.join([
+    'User-agent: *',
+    'Disallow: /api/',
+    'Disallow: /admin/',
+    'Disallow: /auth',
+    'Disallow: /login',
+    'Disallow: /logout',
+    'Disallow: /artifacts/create/',
+    'Disallow: /*/update',
+]) + '\n'
+
+
+def robots_txt(request):
+    return HttpResponse(ROBOTS_TXT, content_type='text/plain')
 
 
 def landing_page(request, *args, **kwargs):
@@ -17,8 +37,11 @@ def landing_page(request, *args, **kwargs):
         artifacts = list_object_paginator(request=request, object_type=ListObjectType.AUTHOR_BY_UUID, *args, **kwargs)
         if not message:
             message = artifacts.get('message', None)
-    except Exception as exc:
-        message = exc
+    except Http404:
+        raise
+    except Exception:
+        consoleLogger.exception('landing_page: unable to render the landing page for user %s', api_user.uuid)
+        message = 'Unable to load this page; please retry.'
         artifacts = {}
     return render(request,
                   'home.html',

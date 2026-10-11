@@ -3,6 +3,7 @@
 import json
 import mimetypes
 import os
+import shutil
 import tempfile
 from contextlib import suppress
 from datetime import datetime, timezone
@@ -176,10 +177,30 @@ def download_local_artifact_contents(urn: str) -> HttpResponse:
     )
 
 
-def remove_fabric_artifact_contents() -> bool:
+def remove_artifact_contents(artifact_uuid: str) -> bool:
     """
-    Remove FABRIC artifact from local storage
+    Remove every stored bundle of an artifact from local storage.
+
+    Storage is laid out as <storage>/<artifact_uuid>/<YYYY-MM-DD[.n]>/<filename>, so one
+    rmtree of the artifact directory removes every version, whatever its storage type. There
+    is no per-version delete endpoint - versions are only ever retired - so the only cleanup
+    this service needs is the whole-artifact one, called by ArtifactViewSet.destroy() after
+    the row delete commits rather than from a model signal.
+
+    Never raises: a directory that does not exist is success, and any other error is logged
+    with its traceback and reported as False, leaving the already-committed delete intact.
     """
+    storage = storages['fabric_artifact_storage']
+    try:
+        shutil.rmtree(storage.path(artifact_uuid))
+    except FileNotFoundError:
+        consoleLogger.info('artifact_version_storage: no stored files for art:%s', artifact_uuid)
+        return True
+    except Exception:
+        consoleLogger.exception('artifact_version_storage: failed to remove stored files for art:%s',
+                                artifact_uuid)
+        return False
+    consoleLogger.info('artifact_version_storage: removed stored files for art:%s', artifact_uuid)
     return True
 
 
@@ -223,13 +244,6 @@ def create_git_artifact_contents(artifact, link, release, commit, created_by, tr
         raise
 
 
-def remove_git_artifact_contents() -> bool:
-    """
-    Remove Git artifact
-    """
-    return True
-
-
 def create_zenodo_artifact_contents() -> ArtifactVersion | None:
     """
     Create Zenodo artifact
@@ -244,10 +258,3 @@ def download_zenodo_artifact_contents(urn: str) -> HttpResponse:
     """
     response = HttpResponse()
     return response
-
-
-def remove_zenodo_artifact_contents() -> bool:
-    """
-    Remove Zenodo artifact
-    """
-    return True

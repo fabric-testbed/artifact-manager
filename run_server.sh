@@ -85,7 +85,7 @@ python manage.py migrate
 
 # load fixtures
 for fixture in "${FIXTURES_LIST[@]}"; do
-    python manage.py loaddata $fixture
+    python manage.py loaddata --ignorenonexistent $fixture
 done
 
 # static files

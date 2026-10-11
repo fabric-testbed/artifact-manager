@@ -71,9 +71,9 @@ by default. If an author email ever has to be recorded, it goes in an attribute 
 deliberately, and never in an identifier.
 
 ``delete`` means a **hard delete**. ``ArtifactViewSet.destroy()`` calls ``artifact.delete()``,
-which removes the row and cascades to every ``ArtifactVersion``. The ``deleted`` / ``deleted_at``
-model fields are vestigial and never written - there is no soft delete in this service,
-whatever ``CLAUDE.md`` says.
+which removes the row and cascades to every ``ArtifactVersion`` and the ``ArtifactRepoLink``,
+and removes the artifact's bundle directory from storage once the transaction has committed.
+There is no soft delete in this service.
 
 Examples
 --------

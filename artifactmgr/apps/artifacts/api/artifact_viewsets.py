@@ -16,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 
 from artifactmgr.apps.apiuser.models import ApiUser
-from artifactmgr.apps.artifacts.api.context import request_api_user
+from artifactmgr.apps.artifacts.api.context import is_crawler, request_api_user
 from artifactmgr.apps.artifacts.api.artifact_serializers import ArtifactCreateSerializer, ArtifactSerializer, \
     ArtifactUpdateSerializer
 from artifactmgr.apps.artifacts.api.author_viewsets import create_author_from_uuid
@@ -30,6 +30,7 @@ from artifactmgr.utils.api_logger import ARTIFACT, consoleLogger, metrics_event,
 from artifactmgr.utils.core_api import query_core_api_by_cookie, query_core_api_by_token
 from artifactmgr.utils.fabric_auth import get_api_user
 from artifactmgr.utils import github_api, github_oidc, repo_link
+from artifactmgr.utils.artifact_version_storage import remove_artifact_contents
 
 
 class DynamicSearchFilter(filters.SearchFilter):
@@ -122,9 +123,6 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                 created_by = create_author_from_uuid(request=request, api_user=api_user, author_uuid=api_user.uuid)
                 if created_by:
                     artifact.created_by = created_by
-                # deleted
-                artifact.deleted = False
-                # deleted_at
                 # description_long
                 artifact.description_long = request_data.get('description_long', '')
                 # description_short
@@ -197,20 +195,19 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         """
         FABRIC Artifacts - detailed view
         """
-        # increment artifact_views
         api_user = request_api_user(self.request, get_api_user)
+        # visibility-filtered lookup: missing or hidden artifacts are a 404 and nothing is logged
+        artifact = self.get_object()
+        # increment artifact_views - view count can only be incremented by non-authors of the artifact,
+        # and crawler requests are served without being counted
         try:
-            artifact = get_object_or_404(Artifact, uuid=self.kwargs.get('uuid'))
-            # view count can only be incremented by non-authors of the artifact
-            if api_user.uuid not in [a.uuid for a in artifact.authors.all()]:
+            if not is_crawler(request) and not artifact.is_author(api_user.uuid):
                 artifact_view = ArtifactViews(viewed_by=str(api_user.uuid))
                 artifact_view.save()
                 artifact.artifact_views.add(artifact_view)
-                artifact.save()
-        except Exception as exc:
-            artifact = None
-            consoleLogger.exception('artifact retrieve: unable to record a view of art:%s', self.kwargs.get('uuid'))
-        return super().retrieve(request, *args, **kwargs)
+        except Exception:
+            consoleLogger.exception('artifact retrieve: unable to record a view of art:%s', artifact.uuid)
+        return Response(self.get_serializer(artifact).data)
 
     @transaction.atomic
     def update(self, request, *args, **kwargs):
@@ -355,15 +352,22 @@ class ArtifactViewSet(viewsets.ModelViewSet):
         """
         FABRIC Artifacts - Remove
         - Must be the Artifact creator to remove it
-        TODO: remove stored object files - fail gracefully if files do not exist
+        - Hard delete: removes the artifact, its versions, repository link, view and download
+          counters, and the stored bundle files once the row delete has committed
         """
         artifact_uuid = request.data.get('uuid', None)
         if not artifact_uuid:
             artifact_uuid = kwargs.get('uuid')
         artifact = get_object_or_404(Artifact, uuid=artifact_uuid)
         api_user = request_api_user(self.request, get_api_user)
-        if api_user.uuid == artifact.created_by.uuid:
-            artifact.delete()
+        if api_user.uuid == artifact.created_by_id:
+            with transaction.atomic():
+                # Counters hang off M2M tables with no FK back, so the cascade would orphan them.
+                artifact.artifact_views.all().delete()
+                for version in artifact.artifact_version.all():
+                    version.version_downloads.all().delete()
+                artifact.delete()
+                transaction.on_commit(lambda: remove_artifact_contents(artifact_uuid))
             metrics_event(ARTIFACT, artifact_uuid, 'delete', by=api_user.uuid)
             return Response(status=204)
         else:

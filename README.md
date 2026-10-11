@@ -48,6 +48,7 @@ single environment — set these instead:
 | --- | --- |
 | `DJANGO_ALLOWED_HOSTS` | Comma-separated hosts this deployment answers on. Loopback is always allowed. |
 | `DJANGO_CORS_ALLOWED_ORIGINS` | Comma-separated origins permitted to call the API cross-site. |
+| `DJANGO_ADMIN_ENABLED` | Expose the Django admin at `/admin` to FABRIC users holding `ARTIFACT_MANAGER_ADMINS_ROLE`; default `false` (404 for everyone). |
 | `HOST_ARTIFACT_STORAGE` | Host directory holding artifact bundles. |
 | `HOST_ARTIFACT_BACKUPS` | Host directory holding database backups. |
 | `HOST_DB_DATA` | Host directory backing the PostgreSQL data volume. |
@@ -62,10 +63,17 @@ single environment — set these instead:
 | `GITHUB_IMPORT_MAX_BYTES` | Maximum compressed source archive size; default `78643200` (75 MiB). |
 | `GITHUB_IMPORTS_PER_DAY` | New GitHub versions allowed per artifact per UTC day; default `10`. |
 | `GITHUB_API_TOKEN` | Optional server-side GitHub API token; recommended to increase the rate limit. |
+| `CRAWLER_USER_AGENT_MARKERS` | Comma-separated substrings matched case-insensitively against `User-Agent`; matching requests are served but not counted as views or downloads. `curl`, `wget` and `python-requests` count as real. |
 
 `nginx/default.conf.template` is rendered at container start by the official Nginx image's
 envsubst entrypoint. Only `${AMGR_*}` placeholders are substituted, so Nginx's own runtime
 variables (`$host`, `$request_uri`, ...) pass through untouched.
+
+Django serves `/robots.txt` itself in every run mode, so no Nginx change is needed. It keeps
+well-behaved crawlers off the API, the Django admin, the authentication paths and the create and
+update forms while leaving the artifact listing and detail pages indexable. Crawlers that ignore it
+are still served, but requests whose `User-Agent` matches `CRAWLER_USER_AGENT_MARKERS` do not add
+to an artifact's view or download counts.
 
 ## <a name="deploy"></a>Deploy
 
@@ -208,7 +216,7 @@ Interactive API documentation is available at:
 | `GET /api/artifacts/{uuid}` | | Retrieve a specific artifact |
 | `PUT /api/artifacts/{uuid}` | | Update a specific artifact |
 | `PATCH /api/artifacts/{uuid}` | | Partially update a specific artifact |
-| `DELETE /api/artifacts/{uuid}` | | Delete a specific artifact |
+| `DELETE /api/artifacts/{uuid}` | | Delete a specific artifact (permanent; removes all versions and stored files) |
 | `GET /api/artifacts/{uuid}/repo` | | Show the linked repository, subject to artifact visibility and author redaction |
 | `PUT /api/artifacts/{uuid}/repo` | | Author: link or re-confirm with JSON `{"repository": "owner/repo"}` |
 | `DELETE /api/artifacts/{uuid}/repo` | | Author: unlink; existing versions are retained |
