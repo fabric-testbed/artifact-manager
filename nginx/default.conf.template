@@ -16,23 +16,41 @@ upstream django {
     server amgr-django:8000;
 }
 
+# Catch-all for requests naming none of AMGR_SERVER_NAMES, including scanners that send no
+# Host header at all. 444 closes the connection without a response, before auth_request could
+# hand Vouch a hostless subrequest (which it answers 400, surfacing as a 500 - #90). The
+# certificate is only there so the TLS handshake completes; nothing is served under it.
+server {
+    listen 80 default_server;
+    listen 443 ssl default_server;
+    server_name _;
+
+    ssl_protocols  TLSv1.2 TLSv1.3;
+    ssl_certificate           /etc/ssl/${AMGR_SSL_CERT};
+    ssl_certificate_key       /etc/ssl/${AMGR_SSL_CERT_KEY};
+
+    return 444;
+}
+
 server {
     listen 80;
+    server_name ${AMGR_SERVER_NAMES};
     return 301 https://$host:${AMGR_HTTPS_PORT}$request_uri;
 }
 
 server {
-    listen   443 ssl default_server;
-    # the domain name it will serve for
-    server_name $host:${AMGR_HTTPS_PORT};
+    listen   443 ssl;
+    # The names this deployment answers on: space-separated, IPv6 literals in brackets.
+    # Keep in step with DJANGO_ALLOWED_HOSTS.
+    server_name ${AMGR_SERVER_NAMES};
 
     # Enable support for TLS 1.2 and/or 1.3
     ssl_protocols  TLSv1.2 TLSv1.3;
 
-    # If they come here using HTTP, bounce them to the correct scheme
-    error_page 497 https://$server_name$request_uri;
-    # Or if you're on the default port 443, then this should work too
-    # error_page 497 https://;
+    # Plain HTTP sent to the TLS port: bounce it to https on the same host. $host, not
+    # $server_name - server_name never expands variables, and with several names
+    # $server_name would only ever be the first of them.
+    error_page 497 https://$host:${AMGR_HTTPS_PORT}$request_uri;
 
     # Certificate filenames, resolved inside NGINX_SSL_CERTS_DIR (mounted at /etc/ssl).
     # ssl_trusted_certificate is omitted: it only matters for OCSP stapling and client

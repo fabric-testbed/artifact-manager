@@ -56,7 +56,8 @@ single environment — set these instead:
 | `NGINX_HTTP_PORT` / `NGINX_HTTPS_PORT` | Host ports published by the Nginx container. |
 | `NGINX_SSL_CERTS_DIR` | Host directory mounted read-only at `/etc/ssl`. |
 | `AMGR_SSL_CERT` / `AMGR_SSL_CERT_KEY` | Certificate filenames within that directory. |
-| `AMGR_HTTPS_PORT` | Public HTTPS port used in redirects and `server_name`. |
+| `AMGR_HTTPS_PORT` | Public HTTPS port used in redirects. |
+| `AMGR_SERVER_NAMES` | **Required.** Space-separated names Nginx serves (as `DJANGO_ALLOWED_HOSTS`, IPv6 in brackets); any other or missing Host is closed with 444. |
 | `AMGR_CLIENT_MAX_BODY_SIZE` | Largest artifact bundle accepted on upload. |
 | `USE_X_ACCEL_REDIRECT` | Delegate artifact downloads to Nginx — see [Artifact downloads](#downloads). |
 | `GITHUB_OIDC_AUDIENCE` | Public site URL expected in GitHub Actions tokens; empty disables Actions publishing. |

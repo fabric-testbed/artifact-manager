@@ -48,6 +48,9 @@ services:
       # ($host, $request_uri, ...) survive template rendering untouched.
       - NGINX_ENVSUBST_FILTER=^AMGR_
       - AMGR_HTTPS_PORT=${AMGR_HTTPS_PORT:-8443}
+      # Required: without it the site's server blocks would match nothing and every request
+      # would hit the 444 catch-all, so fail `docker compose config` instead.
+      - AMGR_SERVER_NAMES=${AMGR_SERVER_NAMES:?set AMGR_SERVER_NAMES in .env - see env.template}
       - AMGR_SSL_CERT=${AMGR_SSL_CERT:-fullchain.pem}
       - AMGR_SSL_CERT_KEY=${AMGR_SSL_CERT_KEY:-privkey.pem}
       - AMGR_CLIENT_MAX_BODY_SIZE=${AMGR_CLIENT_MAX_BODY_SIZE:-75M}
