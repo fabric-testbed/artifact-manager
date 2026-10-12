@@ -1,7 +1,8 @@
 from django import forms
 from django.forms import CheckboxSelectMultiple
 
-from artifactmgr.apps.artifacts.models import ApiUser, Artifact, ArtifactAuthor, ArtifactTag
+from artifactmgr.apps.apiuser.models import ApiUser
+from artifactmgr.apps.artifacts.models import Artifact, ArtifactAuthor, ArtifactTag
 
 
 class ArtifactForm(forms.ModelForm):

@@ -14,7 +14,6 @@ import logging
 import os
 import time
 import tomllib
-from corsheaders.defaults import default_headers
 from django.core.exceptions import ImproperlyConfigured
 from pathlib import Path
 
@@ -62,12 +61,6 @@ def env_int(name: str, default: int) -> int:
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-if os.getenv('DJANGO_SECRET_KEY'):
-    SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
-else:
-    SECRET_KEY = 'django-insecure-=lnekk7th8j+qokv%%05cg%x!&%crul1ka579j04mq&s6(hl3h'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 # Defaults to false when unset: an unset value must never mean debug, and a bare
 # os.getenv(...).casefold() would crash the settings import with an opaque AttributeError
@@ -76,6 +69,17 @@ if os.getenv('DJANGO_DEBUG', 'false').casefold() == 'true':
     DEBUG = True
 else:
     DEBUG = False
+
+# SECURITY WARNING: keep the secret key used in production secret!
+# No shipped fallback: a key committed to the repo signs every deployment's sessions and CSRF
+# tokens alike. Outside DEBUG an unset key fails the settings import; under DEBUG each process
+# gets a throwaway key, so local sessions simply reset on restart.
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', '').strip()
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured('DJANGO_SECRET_KEY must be set when DJANGO_DEBUG is not true')
+    from django.core.management.utils import get_random_secret_key
+    SECRET_KEY = get_random_secret_key()
 
 # SECURITY WARNING: don't run with API debug turned on in production!
 if os.getenv('API_DEBUG', 'false').casefold() == 'true':
@@ -447,6 +451,29 @@ LOGIN_URL = '/login'
 # Lifetime in seconds of the Django session cookie (flash messages, admin login). FABRIC login
 # is carried by the Vouch cookie, whose lifetime Vouch Proxy sets separately.
 SESSION_COOKIE_AGE = env_int('DJANGO_SESSION_COOKIE_AGE', 14400)
+
+# HTTPS hardening (#72). Nginx terminates TLS and passes `HTTPS on` through uwsgi_params, so
+# uWSGI sets wsgi.url_scheme and request.is_secure() is already true behind it. That is why
+# SECURE_PROXY_SSL_HEADER stays unset: under uwsgi_pass nothing overwrites a client's own
+# X-Forwarded-Proto header, so trusting it would let a client choose its scheme.
+#
+# Browsers treat http://localhost as a secure context, so Secure cookies still work under
+# local-dev's runserver.
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+# Strict-Transport-Security max-age in seconds; 0 disables the header. The default is a short
+# trial: browsers keep enforcing HSTS for max-age after the last response that sent it, so
+# raise it (31536000 = one year) only once a deployment has run cleanly at the short value.
+# There is no preload; it cannot be undone quickly.
+SECURE_HSTS_SECONDS = env_int('DJANGO_SECURE_HSTS_SECONDS', 3600)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_HSTS_SECONDS > 0
+# security.W008 (SECURE_SSL_REDIRECT unset): Nginx owns the redirect - port 80 returns 301 to
+# https and error_page 497 catches plain HTTP on the TLS port - and Django is reachable only
+# through Nginx. A Django redirect would add nothing there and would break local-dev, which
+# serves plain HTTP.
+# security.W021 (SECURE_HSTS_PRELOAD unset): preload list removal takes months, so it is a
+# deliberate non-goal here, not an oversight.
+SILENCED_SYSTEM_CHECKS = ['security.W008', 'security.W021']
 LOGIN_REDIRECT_URL = '/'
 
 LOGOUT_URL = '/logout'

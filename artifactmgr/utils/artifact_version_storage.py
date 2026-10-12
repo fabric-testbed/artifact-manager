@@ -57,7 +57,7 @@ def download_contents_by_urn(urn: str) -> HttpResponse:
     except NotFound:
         # A missing or unresolvable artifact is a 404, not a teapot.
         raise
-    except Exception as exc:
+    except Exception:
         consoleLogger.exception('artifact_version_storage: download failed for urn %s', urn)
         return HttpResponse(content="IAmATeapot: I am a teapot", status=418)
 
@@ -109,7 +109,7 @@ def create_fabric_artifact_contents(request, api_user: ApiUser) -> ArtifactVersi
         fabric_artifact.save()
         consoleLogger.info('artifact_version_storage: saved version %s to %s', version_uuid, artifact_file_path)
         return fabric_artifact
-    except Exception as exc:
+    except Exception:
         consoleLogger.exception('artifact_version_storage: failed to create a FABRIC artifact version')
         return None
 
@@ -248,7 +248,6 @@ def create_zenodo_artifact_contents() -> ArtifactVersion | None:
     """
     Create Zenodo artifact
     """
-    zenodo_artifact = ArtifactVersion()
     return None
 
 

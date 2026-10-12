@@ -610,7 +610,7 @@ def list_object_paginator(request, object_type: str, *args, **kwargs):
                 prev_dict = parse_qs(urlparse(prev_url).query)
                 try:
                     prev_page = prev_dict['page'][0]
-                except Exception as exc:
+                except Exception:
                     # Routine, not a fault: DRF omits ?page= from the previous link when the
                     # previous page is page 1, so this fires on every render of listing page 2.
                     consoleLogger.debug('list_object_paginator: no page number in the previous link'
@@ -621,7 +621,7 @@ def list_object_paginator(request, object_type: str, *args, **kwargs):
                 next_dict = parse_qs(urlparse(next_url).query)
                 try:
                     next_page = next_dict['page'][0]
-                except Exception as exc:
+                except Exception:
                     consoleLogger.exception('list_object_paginator: could not parse a page number from'
                                             ' the next link %s; using page 1', next_url)
                     next_page = 1

@@ -30,7 +30,7 @@ def query_core_api_by_cookie(query: str, cookie: str):
         s.cookies.set(os.getenv('VOUCH_COOKIE_NAME'), cookie)
         api_call = s.get(url=os.getenv('FABRIC_CORE_API') + query)
         response = api_call.json()
-    except Exception as exc:
+    except Exception:
         consoleLogger.exception('core_api: cookie-authenticated GET %s failed', query)
     s.close()
     return response
@@ -46,7 +46,7 @@ def query_core_api_by_token(query: str, token: str):
         s.auth = BearerAuth(token=token)
         api_call = s.get(url=os.getenv('FABRIC_CORE_API') + query)
         response = api_call.json()
-    except Exception as exc:
+    except Exception:
         consoleLogger.exception('core_api: token-authenticated GET %s failed', query)
     s.close()
     return response

@@ -65,7 +65,7 @@ def init_task_timeout_tracker():
             trl.name = os.getenv('TRL_NAME')
             trl.timeout_in_seconds = os.getenv('TRL_TIMEOUT_IN_SECONDS')
         trl.save()
-    except Exception as exc:
+    except Exception:
         consoleLogger.exception('init_task_timeout_tracker: could not initialize the TaskTimeoutTracker rows')
 
 
@@ -76,6 +76,6 @@ class Command(BaseCommand):
         try:
             init_task_timeout_tracker()
 
-        except Exception as e:
+        except Exception:
             consoleLogger.exception('init_task_timeout_tracker: initialization failed')
             raise CommandError('Initialization failed.')

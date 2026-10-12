@@ -115,6 +115,6 @@ def create_author_from_uuid(request, api_user: ApiUser, author_uuid: str) -> Art
         return None
     except CoreApiUnavailable:
         raise
-    except Exception as exc:
+    except Exception:
         consoleLogger.exception('author_viewsets: could not create or refresh author %s', author_uuid)
         return None

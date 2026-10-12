@@ -32,7 +32,7 @@ def init_anon_api_user():
         else:
             # Anonymous API User already exists
             pass
-    except Exception as exc:
+    except Exception:
         consoleLogger.exception('init_anon_api_user: could not initialize the anonymous API user')
 
 
@@ -43,6 +43,6 @@ class Command(BaseCommand):
         try:
             init_anon_api_user()
 
-        except Exception as e:
+        except Exception:
             consoleLogger.exception('init_anon_api_user: initialization failed')
             raise CommandError('Initialization failed.')
