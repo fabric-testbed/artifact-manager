@@ -23,7 +23,7 @@ from artifactmgr.apps.artifacts.api.artifact_viewsets import ArtifactViewSet
 from artifactmgr.apps.artifacts.api.author_viewsets import AuthorViewSet
 from artifactmgr.apps.artifacts.api.tag_viewsets import TagViewSet
 from artifactmgr.apps.artifacts.api.version_viewsets import ArtifactVersionViewSet
-from artifactmgr.server.views import landing_page, robots_txt
+from artifactmgr.server.views import help_page, landing_page, robots_txt
 
 router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'authors', AuthorViewSet, basename='authors')
@@ -37,6 +37,7 @@ urlpatterns = [
     path('', landing_page, name='home'),
     # path('', TemplateView.as_view(template_name='home.html'), name='home'),
     path('robots.txt', robots_txt, name='robots_txt'),
+    path('help/', help_page, name='help'),
     path('artifacts/', include('artifactmgr.apps.artifacts.urls')),
     path('admin/', admin.site.urls),
     path('api/', include((router.urls, 'artifactmgr.apps.artifacts'))),

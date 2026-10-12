@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+{% block title %}
+    Help - FABRIC Artifact Manager
+{% endblock %}
+
+{% block content %}
+    <div class="container w-85 help-page">
+        <div class="page-header">
+            <h2>Using the Artifact Manager</h2>
+            <span class="subtitle">Share, version and publish FABRIC research artifacts</span>
+        </div>
+
+        <nav aria-label="On this page" class="form-card mb-4">
+            <strong>On this page</strong>
+            <ul class="mb-0 mt-2">
+                <li><a href="#artifacts">Create an artifact</a></li>
+                <li><a href="#versions">Versions</a></li>
+                <li><a href="#github">Link a GitHub repository</a></li>
+                <li><a href="#import">Import releases and tags by hand</a></li>
+                <li><a href="#actions">Publish automatically with GitHub Actions</a></li>
+                <li><a href="#tokens">Which token goes where</a></li>
+                <li><a href="#api">Scripting with the REST API</a></li>
+                <li><a href="#troubleshooting">Troubleshooting GitHub publishing</a></li>
+                <li><a href="#limits">Limits</a></li>
+            </ul>
+        </nav>
+
+        <section id="artifacts" class="mb-4">
+            <h4>Create an artifact</h4>
+            <p>Sign in with your FABRIC account, then choose <strong>Create Artifact</strong> on the
+                Artifacts page. Creating artifacts requires a FABRIC account with JupyterHub access.
+                Give it a title, a short and a long description, tags, and a visibility:</p>
+            <ul>
+                <li><strong>Author</strong> - only the artifact's authors can see it.</li>
+                <li><strong>Project</strong> - authors and members of the chosen FABRIC project.</li>
+                <li><strong>Public</strong> - everyone, including people who are not signed in.</li>
+            </ul>
+            <p>Clearing <em>Show Authors</em> or <em>Show Project</em> hides them from non-authors, for
+                double-blind review. Authors can add co-authors by their FABRIC user UUID on the artifact's
+                <strong>Edit</strong> page; every author can manage the artifact.</p>
+        </section>
+
+        <section id="versions" class="mb-4">
+            <h4>Versions</h4>
+            <p>An artifact holds one or more versions. Each version is a single archive with a
+                permanent URN, downloadable by anyone allowed to see the artifact.</p>
+            <ul>
+                <li><strong>Upload</strong> - on the artifact page, use <em>Add a new Version</em> with a
+                    <code>.tgz</code> or <code>.tar.gz</code> file.</li>
+                <li><strong>Import from GitHub</strong> - copy the source of a release or tag from a linked
+                    repository (below), by hand or automatically.</li>
+                <li><strong>Disable / enable</strong> - a disabled version stays recorded but cannot be
+                    downloaded. Uploaded and GitHub versions can live side by side.</li>
+            </ul>
+        </section>
+
+        <section id="github" class="mb-4">
+            <h4>Link a GitHub repository</h4>
+            <p>On the artifact page, an author enters <code>owner/repo</code> or
+                <code>https://github.com/owner/repo</code> under <em>Link a GitHub repository</em> and
+                chooses <strong>Link repository</strong>. Only <strong>public</strong> repositories on
+                github.com can be linked, and each artifact links at most one.</p>
+            <div class="alert alert-warning" role="note">
+                Linking trusts the repository: <strong>anyone with write access to it can publish new
+                versions of this artifact</strong> through GitHub Actions. Link only repositories whose
+                collaborators you would also trust as authors.
+            </div>
+            <p>Versions published this way are credited to the author who linked (or last re-confirmed)
+                the repository. If that person stops being an author, the page shows <em>Publishing
+                paused</em> until a current author chooses <strong>Re-confirm</strong>; the same applies if
+                the repository is transferred or recreated. A plain rename is followed automatically.
+                <strong>Unlink</strong> stops publishing and keeps every version already imported.</p>
+        </section>
+
+        <section id="import" class="mb-4">
+            <h4>Import releases and tags by hand</h4>
+            <p>Under <em>GitHub releases and tags</em>, choose <strong>Show releases and tags</strong>. The
+                list shows published GitHub Releases first (with their name, date and any pre-release
+                badge), then every git tag that has no Release, marked <span class="badge text-bg-secondary">tag</span>.
+                Choose <strong>Import</strong> on a row to copy that version's source archive into FABRIC
+                storage.</p>
+            <ul>
+                <li>A <strong>release</strong> import keeps the release's name, publication date and
+                    pre-release flag.</li>
+                <li>A <strong>tag</strong> import records the tag, its commit and the commit date. Draft
+                    releases count as plain tags.</li>
+                <li>Importing a tag that is already imported returns the existing version; nothing is
+                    duplicated.</li>
+            </ul>
+        </section>
+
+        <section id="actions" class="mb-4">
+            <h4>Publish automatically with GitHub Actions</h4>
+            <div class="alert alert-success" role="note">
+                <strong>You do not need to create, copy or store any token.</strong> No repository secret,
+                no FABRIC token, no personal access token. Each workflow run asks GitHub for a short-lived
+                identity token (OpenID Connect) that proves which repository it is running in, and the
+                Artifact Manager checks that it is the repository linked to your artifact. The only
+                requirement is the <code>permissions: id-token: write</code> line already in the workflow.
+            </div>
+            {% if not actions_enabled %}
+                <div class="alert alert-secondary" role="note">
+                    GitHub Actions publishing is not enabled on this site. You can still import releases
+                    and tags by hand.
+                </div>
+            {% endif %}
+            <ol>
+                <li><a href="#github">Link the repository</a> to the artifact.</li>
+                <li>On the artifact page, expand <strong>Publish automatically with GitHub Actions</strong> and
+                    choose <strong>Copy workflow</strong>. That copy already contains this site's address and
+                    your artifact's UUID.</li>
+                <li>In the repository, save it as <code>.github/workflows/publish-artifact.yml</code> and
+                    commit it to the default branch.</li>
+                <li>Publish a GitHub Release, or push a tag (<code>git tag v1.2.0 &amp;&amp; git push origin v1.2.0</code>).
+                    The workflow runs and the new version appears on the artifact page within a minute or two.</li>
+            </ol>
+            <p>For reference, the workflow looks like this; the artifact page fills in the UUID for you:</p>
+            <pre class="p-3 border rounded"><code>{{ workflow }}</code></pre>
+            <p>Things worth knowing:</p>
+            <ul>
+                <li><strong>It runs from the tagged commit.</strong> GitHub runs the workflow file as it
+                    exists in the commit being released or tagged, so tags made before the workflow was
+                    committed will not publish themselves; import those <a href="#import">by hand</a>.</li>
+                <li><strong>Releases and tags together.</strong> Creating a Release usually pushes its tag
+                    too, so two runs start. Whichever finishes first creates the version; the other finds it
+                    and succeeds without a duplicate. If the tag run wins, the version carries the tag's
+                    details rather than the release name.</li>
+                <li><strong>Pull requests never publish.</strong> Runs triggered by
+                    <code>pull_request</code> or <code>pull_request_target</code> are refused, so forks cannot
+                    publish to your artifact.</li>
+                <li><strong>Organization policies.</strong> If your GitHub organization restricts Actions,
+                    it must allow this workflow to run; no other repository or organization setting is needed.</li>
+            </ul>
+        </section>
+
+        <section id="tokens" class="mb-4">
+            <h4>Which token goes where</h4>
+            <div class="table-responsive">
+                <table class="soft-table">
+                    <thead>
+                        <tr><th>You want to</th><th>Token</th><th>Where it goes</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Publish versions automatically from GitHub Actions</td>
+                            <td>None - GitHub issues one per run</td>
+                            <td>Nowhere. Do not add secrets to the repository for this.</td>
+                        </tr>
+                        <tr>
+                            <td>Use this website</td>
+                            <td>None</td>
+                            <td>Sign in with your FABRIC account.</td>
+                        </tr>
+                        <tr>
+                            <td>Call the REST API from a script or notebook</td>
+                            <td>Your FABRIC token</td>
+                            <td>The <code>Authorization: Bearer &lt;token&gt;</code> header of each request.</td>
+                        </tr>
+                        <tr>
+                            <td>Raise GitHub's API rate limit for the whole site</td>
+                            <td>A GitHub token</td>
+                            <td>Server configuration, set by the site operators. Authors never need one.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="api" class="mb-4">
+            <h4>Scripting with the REST API</h4>
+            <p>Everything on the artifact page can also be done through the API, documented interactively
+                at <a href="/api/swagger/">/api/swagger/</a>. Authenticate with your FABRIC token: in the
+                <a href="{{ fabric_portal }}">FABRIC Portal</a>, open <em>Experiments &rsaquo; Manage Tokens</em>,
+                create a token and use its <code>id_token</code> value. Treat it like a password and never
+                commit it to a repository.</p>
+            <pre class="p-3 border rounded"><code>export FABRIC_TOKEN='...'   # id_token from the FABRIC Portal
+
+# List an artifact's GitHub releases and tags
+curl -sS -H "Authorization: Bearer $FABRIC_TOKEN" \
+  {{ api_root }}/artifacts/&lt;artifact-uuid&gt;/repo/releases
+
+# Import one of them as a new version
+curl -sS -X POST -H "Authorization: Bearer $FABRIC_TOKEN" -H 'Content-Type: application/json' \
+  --data '{"tag": "v1.2.0"}' \
+  {{ api_root }}/artifacts/&lt;artifact-uuid&gt;/repo/import</code></pre>
+            <p>An import made this way is credited to you, and you must be an author of the artifact.</p>
+        </section>
+
+        <section id="troubleshooting" class="mb-4">
+            <h4>Troubleshooting GitHub publishing</h4>
+            <p>When a publish run fails, open it in the repository's <em>Actions</em> tab: the last lines
+                of the <em>Publish</em> step show the HTTP status and the Artifact Manager's message.</p>
+            <div class="table-responsive">
+                <table class="soft-table">
+                    <thead>
+                        <tr><th>Status</th><th>Message</th><th>What to do</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>-</td>
+                            <td>The step fails before contacting this site, at the token request.</td>
+                            <td>The workflow is missing <code>permissions: id-token: write</code>, or it ran
+                                for a pull request from a fork, which GitHub never gives an identity token.</td>
+                        </tr>
+                        <tr>
+                            <td>401</td>
+                            <td>Invalid GitHub Actions token.</td>
+                            <td><code>AMGR_URL</code> in the workflow must match this site's address exactly.
+                                Re-copy the workflow from the artifact page.</td>
+                        </tr>
+                        <tr>
+                            <td>403</td>
+                            <td>GitHub publishing is not permitted.</td>
+                            <td>The run is not from the repository linked to this artifact (a fork, a different
+                                artifact UUID, or a transferred or recreated repository), the repository is
+                                private, publishing is paused, or it was a pull-request run. Check the UUID and
+                                the repository card on the artifact page; <strong>Re-confirm</strong> if asked.</td>
+                        </tr>
+                        <tr>
+                            <td>404</td>
+                            <td>GitHub tag was not found.</td>
+                            <td>The tag does not exist on GitHub (yet). Push it, then re-run the workflow.</td>
+                        </tr>
+                        <tr>
+                            <td>409</td>
+                            <td>An operation on this artifact is in progress; please retry.</td>
+                            <td>Another import was running; the workflow retries on its own. If it still fails,
+                                re-run it.</td>
+                        </tr>
+                        <tr>
+                            <td>409</td>
+                            <td>The GitHub repository identity changed; an author must re-confirm the link.</td>
+                            <td>An author chooses <strong>Re-confirm</strong> on the artifact page.</td>
+                        </tr>
+                        <tr>
+                            <td>413</td>
+                            <td>GitHub archive exceeds the import size limit.</td>
+                            <td>The source archive is over {{ import_max_mib }} MiB. Move large data out of the
+                                repository, or upload a trimmed <code>.tgz</code> by hand.</td>
+                        </tr>
+                        <tr>
+                            <td>429</td>
+                            <td>This artifact has reached its daily GitHub import limit.</td>
+                            <td>Wait until after midnight UTC, then re-run the workflow.</td>
+                        </tr>
+                        <tr>
+                            <td>503</td>
+                            <td>GitHub is refusing requests / imports are busy / signing keys unavailable</td>
+                            <td>Temporary. The workflow retries; if it still fails, re-run it later.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="limits" class="mb-4">
+            <h4>Limits</h4>
+            <ul>
+                <li>Public repositories on github.com only; GitHub Enterprise is not supported.</li>
+                <li>Source archives up to {{ import_max_mib }} MiB. Release assets (files attached to a
+                    Release) are not imported - only the repository source at that commit.</li>
+                <li>{{ imports_per_day }} new GitHub versions per artifact per UTC day, shared by the web page,
+                    the API and Actions. Re-importing an existing tag does not count.</li>
+                <li>The list shows up to 500 releases and up to 500 other tags; older ones can still be
+                    imported by name through the API.</li>
+            </ul>
+        </section>
+    </div>
+{% endblock %}

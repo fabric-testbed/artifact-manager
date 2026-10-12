@@ -1,8 +1,12 @@
+import json
+import os
+
+from django.conf import settings
 from django.http import Http404, HttpResponse
 from django.shortcuts import render
 
 from artifactmgr.apps.artifacts.models import ArtifactAuthor
-from artifactmgr.apps.artifacts.views import list_object_paginator, ListObjectType
+from artifactmgr.apps.artifacts.views import GITHUB_PUBLISH_WORKFLOW, list_object_paginator, ListObjectType
 from artifactmgr.server.settings import API_DEBUG
 from artifactmgr.utils.api_logger import consoleLogger
 from artifactmgr.utils.fabric_auth import get_api_user
@@ -24,6 +28,25 @@ ROBOTS_TXT = '\n'.join([
 
 def robots_txt(request):
     return HttpResponse(ROBOTS_TXT, content_type='text/plain')
+
+
+def help_page(request):
+    """Usage guide. Public: nothing on it depends on who is asking beyond the navbar."""
+    api_user = get_api_user(request=request)
+    site_url = settings.GITHUB_OIDC_AUDIENCE or request.build_absolute_uri('/')
+    # The same template the artifact page fills in, so the guide cannot drift from what authors copy.
+    workflow = GITHUB_PUBLISH_WORKFLOW.replace('__AMGR_URL__', json.dumps(site_url)).replace(
+        '__ARTIFACT_UUID__', json.dumps('replace-with-your-artifact-uuid'))
+    return render(request, 'help.html', {
+        # None only when the anonymous ApiUser row is missing; the guide must render regardless.
+        'api_user': api_user.as_dict() if api_user else {},
+        'actions_enabled': bool(settings.GITHUB_OIDC_AUDIENCE),
+        'api_root': site_url.rstrip('/') + '/api',
+        'fabric_portal': os.getenv('FABRIC_PORTAL') or 'https://portal.fabric-testbed.net',
+        'import_max_mib': settings.GITHUB_IMPORT_MAX_BYTES // (1024 * 1024),
+        'imports_per_day': settings.GITHUB_IMPORTS_PER_DAY,
+        'workflow': workflow,
+    })
 
 
 def landing_page(request, *args, **kwargs):

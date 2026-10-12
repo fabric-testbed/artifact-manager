@@ -51,7 +51,7 @@ jobs:
           OIDC_TOKEN=$(curl -sSf --get --data-urlencode "audience=$AMGR_URL" \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
             "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r .value)
-          curl -sSf --retry 5 --retry-delay 15 --retry-all-errors -X POST \
+          curl -sS --fail-with-body --retry 5 --retry-delay 15 --retry-all-errors -X POST \
             "${AMGR_URL%/}/api/artifacts/$ARTIFACT_UUID/repo/publish" \
             -H "Authorization: Bearer $OIDC_TOKEN" -H 'Content-Type: application/json' \
             --data "$(jq -cn --arg tag "$TAG" '{tag: $tag}')"

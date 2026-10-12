@@ -250,11 +250,16 @@ flag; uploaded versions have `source: null`. When authors are hidden, non-author
 
 ## Publishing releases from GitHub
 
+The site's own usage guide at `/help/` covers this for artifact authors, including the GitHub
+Actions setup; this section is the operator-side summary.
+
 An artifact author can link a public GitHub repository from the artifact detail page. Enter
 `owner/repo` or `https://github.com/owner/repo`, then choose **Link repository**. Anyone with write
 access to that repository can then publish versions of this artifact through GitHub Actions.
-Choose **Show releases** and **Import** to copy a published release manually; the equivalent API
-call is `POST /api/artifacts/{uuid}/repo/import` with `{"tag": "v1.0"}` and the author's FABRIC token.
+Choose **Show releases and tags** and **Import** to copy a published release, or a git tag that has
+no release, manually; the equivalent API call is `POST /api/artifacts/{uuid}/repo/import` with
+`{"tag": "v1.0"}` and the author's FABRIC token. A tag without a published release is imported with
+its commit, a `tree/<tag>` link and the commit date, but no release name or pre-release flag.
 
 The source tarball is copied into FABRIC storage at the resolved commit. GitHub and uploaded
 versions can coexist, and downloads follow the artifact's visibility even after the repository
@@ -269,10 +274,14 @@ URL and artifact UUID; for the example below, replace both values. The site admi
 set `GITHUB_OIDC_AUDIENCE` to that exact public site URL to enable Actions publishing.
 
 ```yaml
-name: Publish release to FABRIC Artifact Manager
+name: Publish to FABRIC Artifact Manager
+# Runs for a published release and for a pushed tag. When one action does both, the
+# second run finds the version already imported and succeeds without a second copy.
 on:
   release:
     types: [published]
+  push:
+    tags: ['*']
 permissions:
   id-token: write
   contents: read
@@ -280,17 +289,17 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Publish ${{ github.event.release.tag_name }}
+      - name: Publish ${{ github.event.release.tag_name || github.ref_name }}
         env:
           AMGR_URL: "https://artifacts.example.org"
           ARTIFACT_UUID: "replace-with-artifact-uuid"
-          TAG: ${{ github.event.release.tag_name }}
+          TAG: ${{ github.event.release.tag_name || github.ref_name }}
         run: |
           set -euo pipefail
           OIDC_TOKEN=$(curl -sSf --get --data-urlencode "audience=$AMGR_URL" \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
             "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r .value)
-          curl -sSf --retry 3 --retry-all-errors -X POST \
+          curl -sS --fail-with-body --retry 5 --retry-delay 15 --retry-all-errors -X POST \
             "${AMGR_URL%/}/api/artifacts/$ARTIFACT_UUID/repo/publish" \
             -H "Authorization: Bearer $OIDC_TOKEN" -H 'Content-Type: application/json' \
             --data "$(jq -cn --arg tag "$TAG" '{tag: $tag}')"
@@ -315,15 +324,16 @@ current author chooses **Re-confirm**. A repository transfer also needs author r
 ### Limits
 
 - Only public repositories on GitHub.com are supported. GitHub Enterprise OIDC issuers are
-  unsupported. Only published releases, including pre-releases, can be imported; drafts, bare
-  tags and attached release assets are not imported.
+  unsupported. Published releases (including pre-releases) and git tags without a published
+  release can be imported; a draft release is treated as a bare tag. Attached release assets are
+  not imported.
 - Source archives are limited to 75 MiB (`78643200` bytes) by default, configurable through
   `GITHUB_IMPORT_MAX_BYTES`. Downloads have a 50-second budget shared with metadata requests;
   stalled reads time out after at most 15 seconds.
 - The default cap is 10 new imports per artifact per UTC day (`GITHUB_IMPORTS_PER_DAY`), shared
   by web, API and Actions publishing. Re-importing the same repository ID and tag returns the
   existing version (HTTP 200; a new version returns 201), even when the cap has been reached.
-- Release listing reads at most five pages of 100 GitHub releases. Older tags can still be
+- Listing reads at most five pages of 100 GitHub releases and five pages of 100 tags. Older tags can still be
   imported by name through the API. Two imports can run concurrently across the site; busy,
   rate-limited or timed-out requests can be retried. `GITHUB_API_TOKEN` is recommended for
   production to raise GitHub's API rate limit.
