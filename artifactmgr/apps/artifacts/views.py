@@ -26,10 +26,14 @@ from artifactmgr.utils.fabric_auth import get_api_user
 from artifactmgr.utils import github_api, repo_link
 
 
-GITHUB_PUBLISH_WORKFLOW = r'''name: Publish release to FABRIC Artifact Manager
+GITHUB_PUBLISH_WORKFLOW = r'''name: Publish to FABRIC Artifact Manager
+# Runs for a published release and for a pushed tag. When one action does both, the
+# second run finds the version already imported and succeeds without a second copy.
 on:
   release:
     types: [published]
+  push:
+    tags: ['*']
 permissions:
   id-token: write
   contents: read
@@ -37,17 +41,17 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Publish ${{ github.event.release.tag_name }}
+      - name: Publish ${{ github.event.release.tag_name || github.ref_name }}
         env:
           AMGR_URL: __AMGR_URL__
           ARTIFACT_UUID: __ARTIFACT_UUID__
-          TAG: ${{ github.event.release.tag_name }}
+          TAG: ${{ github.event.release.tag_name || github.ref_name }}
         run: |
           set -euo pipefail
           OIDC_TOKEN=$(curl -sSf --get --data-urlencode "audience=$AMGR_URL" \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
             "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r .value)
-          curl -sSf --retry 3 --retry-all-errors -X POST \
+          curl -sSf --retry 5 --retry-delay 15 --retry-all-errors -X POST \
             "${AMGR_URL%/}/api/artifacts/$ARTIFACT_UUID/repo/publish" \
             -H "Authorization: Bearer $OIDC_TOKEN" -H 'Content-Type: application/json' \
             --data "$(jq -cn --arg tag "$TAG" '{tag: $tag}')"

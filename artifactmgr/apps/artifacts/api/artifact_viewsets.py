@@ -459,7 +459,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get'], url_path='repo/releases', parser_classes=[JSONParser],
             pagination_class=None, filter_backends=[])
     def repo_releases(self, request, *args, **kwargs):
-        """List up to 5 GitHub pages (500 releases), marking already imported tags."""
+        """List published releases and other tags (up to 500 of each), marking already imported tags."""
         artifact = self.get_object()
         api_user = request_api_user(self.request, get_api_user)
         try:
@@ -472,7 +472,7 @@ class ArtifactViewSet(viewsets.ModelViewSet):
                    responses={200: ArtifactVersionSerializer, 201: ArtifactVersionSerializer})
     @action(detail=True, methods=['post'], url_path='repo/import', parser_classes=[JSONParser])
     def repo_import(self, request, *args, **kwargs):
-        """Import a published release using the caller's FABRIC identity."""
+        """Import a published release, or a tag without one, using the caller's FABRIC identity."""
         artifact = self.get_object()
         api_user = request_api_user(self.request, get_api_user)
         serializer = ReleaseImportSerializer(data=request.data)

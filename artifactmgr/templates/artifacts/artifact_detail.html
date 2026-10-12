@@ -148,11 +148,12 @@
                         </button>
                     </form>
                     <div class="page-header">
-                        <h5>GitHub releases</h5>
+                        <h5>GitHub releases and tags</h5>
                     </div>
-                    <p><a href="{% url 'artifact_detail' uuid=artifact.uuid %}?releases=1">Show releases</a></p>
+                    <p><a href="{% url 'artifact_detail' uuid=artifact.uuid %}?releases=1">Show releases and tags</a></p>
                     {% if releases is not None %}
-                        <p class="text-secondary">Showing published releases from up to 500 GitHub releases.</p>
+                        <p class="text-secondary">Published releases first (up to 500), then tags that have no release (up to 500).
+                            A tag imports its source at that commit, without release notes or a pre-release flag.</p>
                         <div class="table-responsive">
                             <table class="soft-table">
                                 <thead>
@@ -163,10 +164,11 @@
                                         <tr>
                                             <td>
                                                 <a href="{{ release.html_url }}">{{ release.tag_name }}</a>
+                                                {% if release.kind == 'tag' %}<span class="badge text-bg-secondary">tag</span>{% endif %}
                                                 {% if release.prerelease %}<span class="badge text-bg-warning">pre-release</span>{% endif %}
                                             </td>
                                             <td>{{ release.name|default_if_none:'' }}</td>
-                                            <td>{{ release.published_at|normalize_date_to_utc }}</td>
+                                            <td>{% if release.published_at %}{{ release.published_at|normalize_date_to_utc }}{% endif %}</td>
                                             <td>
                                                 {% if release.imported %}
                                                     <span class="text-secondary">imported</span>
@@ -176,13 +178,13 @@
                                                         <input type="hidden" name="tag" value="{{ release.tag_name }}">
                                                         <button class="btn btn-primary btn-sm" type="submit"
                                                                 name="artifact_detail_button" value="import_release"
-                                                                onclick="return confirm('Import release {{ release.tag_name|escapejs }}?')">Import</button>
+                                                                onclick="return confirm('Import {{ release.kind }} {{ release.tag_name|escapejs }}?')">Import</button>
                                                     </form>
                                                 {% endif %}
                                             </td>
                                         </tr>
                                     {% empty %}
-                                        <tr><td colspan="4">No published releases found.</td></tr>
+                                        <tr><td colspan="4">No published releases or tags found.</td></tr>
                                     {% endfor %}
                                 </tbody>
                             </table>

@@ -38,7 +38,12 @@ class GitHubSourceSerializer(serializers.Serializer):
 
 
 class GitHubReleaseSerializer(serializers.Serializer):
-    """Published releases from the first 5 GitHub pages (at most 500 releases)."""
+    """Published releases, then tags without one, each from the first 5 GitHub pages (500 apiece).
+
+    A `tag` entry has no name or publication date and is never a pre-release.
+    """
+
+    kind = serializers.ChoiceField(choices=['release', 'tag'])
 
     tag_name = serializers.CharField()
     name = serializers.CharField(allow_null=True)

@@ -8,6 +8,7 @@ from urllib.parse import quote, urlsplit
 
 import requests
 from django.conf import settings
+from django.utils.dateparse import parse_datetime
 from urllib3.exceptions import HTTPError
 from urllib3.util import Timeout
 
@@ -116,7 +117,7 @@ def _headers(accept='application/vnd.github+json'):
 
 def _check_status(response):
     if response.status_code == 404:
-        raise GitHubError('GitHub repository or release was not found.', 404)
+        raise GitHubError('GitHub repository, release or tag was not found.', 404)
     if response.status_code in (403, 429):
         raise GitHubError('GitHub is refusing requests; please retry later.', 503)
     if response.status_code != 200:
@@ -175,21 +176,63 @@ def list_releases(repository):
     return releases
 
 
+def list_tags(repository):
+    """Return valid tag names from at most 5 pages (500 tags), within the time budget."""
+    repository = validate_repository(repository)
+    names = []
+    with request_deadline():
+        for page in range(1, 6):
+            batch = _json('/repos/%s/tags?per_page=100&page=%s' % (repository, page), list)
+            for tag in batch:
+                name = tag.get('name') if isinstance(tag, dict) else None
+                try:
+                    names.append(validate_tag(name))
+                except GitHubError:
+                    continue
+            if len(batch) < 100:
+                break
+    return names
+
+
 def get_release_by_tag(repository, tag):
     return _json('/repos/%s/releases/tags/%s' % (
         validate_repository(repository), quote(validate_tag(tag), safe='')), dict)
 
 
 def resolve_tag_commit(repository, tag):
-    with _api_get('/repos/%s/commits/tags/%s' % (
+    """Return the commit a tag points at, peeling annotated tags.
+
+    The full refs/tags/ form matters: GitHub resolves the short tags/<name> form only for
+    lightweight tags and answers 422 for annotated ones. It also answers 422, not 404, for a
+    tag that does not exist.
+    """
+    with _api_get('/repos/%s/commits/refs/tags/%s' % (
             validate_repository(repository), quote(validate_tag(tag), safe='')),
             accept='application/vnd.github.sha') as response:
+        if response.status_code == 422:
+            raise GitHubError('GitHub tag was not found.', 404)
         _check_status(response)
         commit = response.text.strip()
         _check_deadline()
         if not COMMIT_RE.fullmatch(commit):
             raise GitHubError('GitHub returned an invalid commit SHA.')
         return commit
+
+
+def get_commit_date(repository, commit):
+    """Return a commit's committer date string, or None when GitHub omits or garbles it.
+
+    Uses the git data endpoint, which unlike /commits/{sha} carries no file diffs.
+    """
+    if not isinstance(commit, str) or not COMMIT_RE.fullmatch(commit):
+        raise GitHubError('Invalid commit SHA.', 400)
+    data = _json('/repos/%s/git/commits/%s' % (validate_repository(repository), commit), dict)
+    committer = data.get('committer')
+    date = committer.get('date') if isinstance(committer, dict) else None
+    try:
+        return date if isinstance(date, str) and parse_datetime(date) else None
+    except ValueError:
+        return None
 
 
 def download_tarball(repository, commit, destination):
