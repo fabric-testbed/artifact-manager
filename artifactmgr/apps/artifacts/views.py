@@ -8,6 +8,7 @@ from django.db.models import Count, Q
 from django.http import Http404, QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.http import require_safe
 from rest_framework import status
 
 from artifactmgr.apps.apiuser.models import ApiUser
@@ -88,6 +89,7 @@ def _visible_artifacts(api_user):
     ).distinct()
 
 
+@require_safe
 def artifact_list(request):
     api_user = request_api_user(request, get_api_user)
     try:
@@ -114,6 +116,7 @@ def artifact_list(request):
                   })
 
 
+@require_safe
 def author_list(request):
     api_user = request_api_user(request, get_api_user)
     try:
@@ -150,6 +153,7 @@ def author_list(request):
                   })
 
 
+@require_safe
 def author_detail(request, *args, **kwargs):
     api_user = request_api_user(request, get_api_user)
     message = None
@@ -395,6 +399,7 @@ def project_list(request):
                   })
 
 
+@require_safe
 def project_detail(request, *args, **kwargs):
     api_user = request_api_user(request, get_api_user)
     message = None

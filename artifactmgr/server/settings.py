@@ -342,6 +342,9 @@ LOGGING = {
             'formatter': 'django.server',
         },
         'metrics': _metrics_handler,
+        'null': {
+            'class': 'logging.NullHandler',
+        },
     },
     'root': {
         'handlers': ['console'],
@@ -362,6 +365,12 @@ LOGGING = {
         'django.server': {
             'handlers': ['django.server'],
             'level': DJANGO_LOG_LEVEL,
+            'propagate': False,
+        },
+        # Scanners that send a bare IP or junk Host header get a 400 from Django, logged by
+        # default as an ERROR with a full traceback. Nginx's access log already records the 400.
+        'django.security.DisallowedHost': {
+            'handlers': ['null'],
             'propagate': False,
         },
         'django.db.backends': {

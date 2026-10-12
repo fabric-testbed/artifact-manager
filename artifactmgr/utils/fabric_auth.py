@@ -58,6 +58,10 @@ def get_oidc_sub_from_token(token: str) -> str | None:
             options={"verify_aud": False}
         )
         oidc_sub = token_json.get('sub')
+    except jwt.PyJWTError as exc:
+        # Client input (malformed, expired or wrongly signed token), not a server fault.
+        consoleLogger.warning('fabric_auth: rejected a bearer token that is not a valid FABRIC JWT: %s', exc)
+        oidc_sub = None
     except Exception as exc:
         consoleLogger.exception('fabric_auth: could not decode the bearer token into an OIDC subject')
         oidc_sub = None
