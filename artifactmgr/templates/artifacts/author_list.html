@@ -64,15 +64,9 @@
                 <button type="button" class="btn btn-secondary btn-sm"
                         title="Go to page {{ prev_page }}"
                         data-bs-toggle="tooltip" data-bs-placement="left">
-                    {% if search %}
-                        <a href="{{ authors.previous }}&search={{ search }}" class="unlink">
-                            <em class="fa-solid fa-angles-left"></em> Page {{ prev_page }}
-                        </a>
-                    {% else %}
-                        <a href="{{ authors.previous }}" class="unlink">
-                            <em class="fa-solid fa-angles-left"></em> Page {{ prev_page }}
-                        </a>
-                    {% endif %}
+                    <a href="{{ authors.previous }}" class="unlink">
+                        <em class="fa-solid fa-angles-left"></em> Page {{ prev_page }}
+                    </a>
                 </button>
             {% else %}
                 <button class="btn btn-secondary btn-sm disabled"
@@ -86,15 +80,9 @@
                 <button type="button" class="btn btn-secondary btn-sm"
                         title="Go to page {{ next_page }}"
                         data-bs-toggle="tooltip" data-bs-placement="right">
-                    {% if search %}
-                        <a href="{{ authors.next }}&search={{ search }}" class="unlink">
-                            Page {{ next_page }} <em class="fa-solid fa-angles-right"></em>
-                        </a>
-                    {% else %}
-                        <a href="{{ authors.next }}" class="unlink">
-                            Page {{ next_page }} <em class="fa-solid fa-angles-right"></em>
-                        </a>
-                    {% endif %}
+                    <a href="{{ authors.next }}" class="unlink">
+                        Page {{ next_page }} <em class="fa-solid fa-angles-right"></em>
+                    </a>
                 </button>
             {% else %}
                 <button class="btn btn-secondary btn-sm disabled"

@@ -1,4 +1,7 @@
-FROM python:3.13
+# Overridable so the CI smoke test can build from a base image it already fetched
+# (tests/smoke/pull.sh); the default is what every deployment builds.
+ARG BASE_IMAGE=python:3.13
+FROM ${BASE_IMAGE}
 #MAINTAINER Michael J. Stealey <mjstealey@gmail.com>
 LABEL org.opencontainers.image.authors="Michael J. Stealey <mjstealey@gmail.com>"
 

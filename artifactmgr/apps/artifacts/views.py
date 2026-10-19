@@ -1,6 +1,6 @@
 import json
 import os
-from urllib.parse import parse_qs, urlparse, urlsplit
+from urllib.parse import parse_qs, urlencode, urlparse, urlsplit
 
 from django.conf import settings
 from django.db import models
@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_safe
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 
 from artifactmgr.apps.apiuser.models import ApiUser
 from artifactmgr.apps.artifacts.api.artifact_viewsets import ArtifactViewSet
@@ -72,6 +73,37 @@ def _github_repository_name(value):
     except ValueError as exc:
         raise github_api.GitHubError('Invalid repository URL.', 400) from exc
     return github_api.validate_repository(repository.rstrip('/').removesuffix('.git'))
+
+
+def _validation_message(exc: ValidationError) -> str:
+    """Readable text for a ValidationError raised by the in-process API, e.g. 'authors: unable to verify ...'.
+
+    The viewsets raise {'ValidationError': [{'<field>': '<reason>'}, ...]}; rendering exc.detail as is would
+    show the ErrorDetail reprs (issue #97).
+    """
+    def leaves(detail, field=None):
+        if isinstance(detail, dict):
+            for key, value in detail.items():
+                yield from leaves(value, None if key == 'ValidationError' else key)
+        elif isinstance(detail, list):
+            for value in detail:
+                yield from leaves(value, field)
+        else:
+            yield '{0}: {1}'.format(field, detail) if field else str(detail)
+    return '; '.join(leaves(exc.detail)) or 'Unable to save this artifact; please retry.'
+
+
+def _single_valued_link(url):
+    """A DRF previous/next link with one value per query parameter (issue #95).
+
+    DRF builds those links from the current URL, so one already padded with repeated ?search= values would
+    carry every copy forward; keep the last, which is the one request.GET.get() reads.
+    """
+    if not url:
+        return url
+    parts = urlsplit(url)
+    query = parse_qs(parts.query, keep_blank_values=True)
+    return parts._replace(query=urlencode([(key, values[-1]) for key, values in query.items()])).geturl()
 
 
 class ListObjectType(models.TextChoices):
@@ -466,6 +498,10 @@ def artifact_create(request):
                     message = artifact.data
             except Http404:
                 raise
+            except ValidationError as exc:
+                # Input-driven (bad field, Core API lookup failed): show the reason, no traceback (issue #97).
+                message = _validation_message(exc)
+                consoleLogger.warning('artifact_create: validation failed for user %s: %s', api_user.uuid, message)
             except Exception:
                 consoleLogger.exception('artifact_create: unable to create an artifact for user %s', api_user.uuid)
                 message = 'Unable to load this page; please retry.'
@@ -526,6 +562,10 @@ def artifact_update(request, *args, **kwargs):
                     message = artifact.data
             except Http404:
                 raise
+            except ValidationError as exc:
+                # Input-driven (bad field, Core API lookup failed): show the reason, no traceback (issue #97).
+                message = _validation_message(exc)
+                consoleLogger.warning('artifact_update: validation failed for artifact %s: %s', artifact_uuid, message)
             except Exception:
                 consoleLogger.exception('artifact_update: unable to update artifact %s', artifact_uuid)
                 message = 'Unable to load this page; please retry.'
@@ -598,17 +638,28 @@ def list_object_paginator(request, object_type: str, *args, **kwargs):
             list_objects = ArtifactViewSet.as_view({'get': 'by_project'})(request=request, *args, **kwargs)
         else:
             list_objects = {}
-        if getattr(list_objects, 'status_code', None) == status.HTTP_404_NOT_FOUND:
+        status_code = getattr(list_objects, 'status_code', None)
+        if status_code == status.HTTP_404_NOT_FOUND:
             # DRF's paginator answers 404 for a page past the end.
             raise Http404('Invalid page.')
+        if status_code != status.HTTP_200_OK:
+            # A refused or failed API call (401/403, a 400, a 5xx from the Core API) is handled, not a fault:
+            # render an empty listing with its detail instead of reading a 'count' it lacks (issue #96).
+            data = getattr(list_objects, 'data', None)
+            detail = data.get('detail') if isinstance(data, dict) else None
+            consoleLogger.warning('list_object_paginator: %s list returned %s', object_type, status_code)
+            message = str(detail) if detail else 'Unable to load this page; please retry.'
+            list_objects = None
         # get prev, next and item range
         next_page = None
         prev_page = None
         count = 0
         min_range = 0
         max_range = 0
-        if list_objects.data:
+        if list_objects is not None and list_objects.data:
             list_objects = json.loads(json.dumps(list_objects.data))
+            list_objects['previous'] = _single_valued_link(list_objects.get('previous'))
+            list_objects['next'] = _single_valued_link(list_objects.get('next'))
             prev_url = list_objects.get('previous', None)
             if prev_url:
                 prev_dict = parse_qs(urlparse(prev_url).query)
@@ -629,7 +680,7 @@ def list_object_paginator(request, object_type: str, *args, **kwargs):
                     consoleLogger.exception('list_object_paginator: could not parse a page number from'
                                             ' the next link %s; using page 1', next_url)
                     next_page = 1
-            count = int(list_objects.get('count'))
+            count = int(list_objects.get('count') or 0)
             min_range = int(current_page - 1) * int(REST_FRAMEWORK['PAGE_SIZE']) + 1
             max_range = int(current_page - 1) * int(REST_FRAMEWORK['PAGE_SIZE']) + int(REST_FRAMEWORK['PAGE_SIZE'])
             if max_range > count:
