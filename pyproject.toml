@@ -1,15 +1,16 @@
 [project]
 name = "artifact-manager"
-version = "1.16.2"
+version = "1.16.3"
 description = "FABRIC Artifact Manager — a Django platform for sharing and reproducing FABRIC research artifacts"
 requires-python = ">=3.13"
 dependencies = [
+    "certifi>=2026.10.18",  # transitive via requests; GHSA-6q48-6c7w-9gw2 (emSign root)
     "cryptography",
-    "django~=6.0",
+    "django~=6.0.9",  # 6.0.9: CVE-2026-84429, -87975, -77050
     "django-bootstrap5",
     "django-cors-headers",
     "django-filter",
-    "djangorestframework",
+    "djangorestframework>=3.18.2",  # CVE-2026-114136, -114137, -114138
     "drf-spectacular",
     "fontawesomefree",
     "markdown",

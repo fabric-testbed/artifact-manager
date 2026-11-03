@@ -98,6 +98,28 @@ UWSGI_UID=$(id -u) UWSGI_GID=$(id -g) ./run_server.sh --run-mode local-ssl --mak
 MAKE_MIGRATIONS=1 LOAD_FIXTURES=1 docker compose up -d
 ```
 
+### <a name="upgrade"></a>Upgrading a deployment
+
+Hosts track `main` of the public repository, which moves only when a release is published. Read
+the release's CHANGELOG entry first and patch `.env` before pulling if it adds a variable, then
+run the standard procedure from the deployment directory:
+
+```bash
+sudo bash scripts/deploy-release.sh v1.16.2 artifacts.example.org
+# a checkout that predates the script:
+ssh <host> 'sudo bash -s -- v1.16.2 artifacts.example.org' < scripts/deploy-release.sh
+```
+
+It backs up `.env`, the git revision, the nginx image ID and a `pg_dump` to
+`/home/nrig-service/amgr-deploy-backups/<UTC timestamp>-pre-<tag>/`, fast-forwards to the tag,
+gates on `docker compose config`, pulls the `nginx` image and **force-recreates both `django` and
+`nginx`**, then checks `/robots.txt`, `nginx -t`, the footer version and the django log through
+Nginx. If a check fails, it restores the previous revision and nginx image and recreates both again.
+
+Recreating nginx on every deploy is deliberate. `docker compose up -d` leaves a running nginx on
+its old image and its old rendered `default.conf.template`, and uWSGI does not reload code from
+the bind mount, so a release that changes either one would otherwise not take effect.
+
 ### <a name="downloads"></a>Artifact downloads
 
 Bundles reach several hundred megabytes, so a download is never buffered in memory. Two
