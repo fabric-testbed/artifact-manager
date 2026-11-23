@@ -15,9 +15,10 @@
 #   4. pull the nginx image, then force-recreate BOTH django and nginx. Every deploy does this:
 #      `up -d` alone leaves nginx running on its old image and its old rendered template, and
 #      uWSGI does not reload code from the bind mount on its own.
-#   5. health checks through nginx: robots.txt 200, footer shows the release, `nginx -t`, and no
-#      new [ERROR] lines from django. On failure the previous revision and nginx image are
-#      restored and both services recreated again.
+#   5. health checks through nginx: robots.txt 200, footer shows the release, `nginx -t`, the
+#      running nginx version matches the tag docker-compose.yml pins, and no new [ERROR] lines
+#      from django. On failure the previous revision and nginx image are restored and both
+#      services recreated again.
 set -uo pipefail
 
 TAG=${1:?usage: deploy-release.sh <tag> <fqdn> [deploy-dir]}
@@ -42,6 +43,11 @@ recreate() {
     docker compose up -d --force-recreate django nginx </dev/null
 }
 
+# The nginx image the checked-out docker-compose.yml names, e.g. nginx:1.31.9.
+compose_nginx_image() {
+    docker compose config --images </dev/null 2>/dev/null | grep -m1 -E '(^|/)nginx:' || echo nginx:1
+}
+
 healthy() {
     local version=$1 since=$2 deadline=$((SECONDS + WAIT_SECONDS)) code
     until [ "$(c -o /dev/null -w '%{http_code}' "https://${FQDN}:${HTTPS_PORT}/robots.txt" 2>/dev/null)" = 200 ]; do
@@ -51,6 +57,16 @@ healthy() {
     log "ok   robots.txt 200"
     docker compose exec -T nginx nginx -t </dev/null >/dev/null 2>&1 \
         && log "ok   nginx -t" || { log "FAIL nginx -t"; return 1; }
+    # An exact x.y.z pin must be what is running; a floating tag (nginx:1) is only reported.
+    local image running
+    image=$(compose_nginx_image)
+    running=$(docker compose exec -T nginx nginx -v </dev/null 2>&1 | sed -n 's|^nginx version: nginx/||p')
+    if [[ "${image##*:}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        [ "${running}" = "${image##*:}" ] && log "ok   nginx/${running} (${image})" \
+            || { log "FAIL nginx is ${running:-unknown}, ${image} pins ${image##*:}"; return 1; }
+    else
+        log "ok   nginx/${running:-unknown} (${image}, not pinned)"
+    fi
     code=$(c -o /tmp/deploy-footer.html -w '%{http_code}' "https://${FQDN}:${HTTPS_PORT}/artifacts/")
     if [ "${code}" = 200 ] && grep -qF "v${version}" /tmp/deploy-footer.html; then
         log "ok   /artifacts/ 200, footer v${version}"
@@ -94,7 +110,8 @@ log "ok   docker compose config"
 
 # --- 4. nginx image + recreate ---------------------------------------------------------------
 docker compose pull -q nginx </dev/null || log "WARN nginx pull failed, keeping the local image"
-log "nginx image ${NGINX_IMAGE} ${PREV_NGINX_IMAGE:7:12} -> $(docker image inspect -f '{{.Id}}' "${NGINX_IMAGE}" | cut -c8-19)"
+NEW_NGINX_IMAGE=$(compose_nginx_image)
+log "nginx image ${NGINX_IMAGE} ${PREV_NGINX_IMAGE:7:12} -> ${NEW_NGINX_IMAGE} $(docker image inspect -f '{{.Id}}' "${NEW_NGINX_IMAGE}" 2>/dev/null | cut -c8-19)"
 SINCE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 recreate || log "FAIL recreate"
 

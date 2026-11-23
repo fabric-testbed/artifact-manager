@@ -65,7 +65,9 @@ services:
 
   nginx:
     # container ports 80, 443 - published as NGINX_HTTP_PORT / NGINX_HTTPS_PORT
-    image: nginx:1
+    # Pinned to an exact release so a deploy runs a known build; Dependabot bumps it, and CI
+    # keeps the compose/ variants and the smoke test on the same tag.
+    image: nginx:1.31.9
     container_name: amgr-nginx
     networks:
       - amgr-network
